@@ -90,7 +90,7 @@ def bestMove2(board):
 while not board.is_game_over():
     print(bestMove2(board))
     board.push(bestMove2(board))
-    #display(chess.svg.board(board=board,size=400,flipped=True))
+    display(chess.svg.board(board=board,size=400,flipped=True))
     print(board.legal_moves)
     board.push_san(input())
 
