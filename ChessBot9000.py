@@ -57,7 +57,11 @@ def bestMoveValue(board):
     for move in board.legal_moves:
         board.push(move)
         moveRatings.append(points(board))
+        if board.is_checkmate():
+            moveRatings[-1]+=1000
         board.pop()
+        if board.gives_check(move):
+            moveRatings[-1]+=0.1
     if moveRatings == []:
         return 0
     return min(moveRatings)
@@ -69,8 +73,13 @@ def bestMove2(board):
         moves.append(move)
         board.push(move)
         print(bestMoveValue(board),points(board))
+        if board.is_checkmate():
+            board.pop()
+            return move
         moveRatings.append(2000-bestMoveValue(board))
         board.pop()
+        if board.gives_check(move):
+            moveRatings[-1]-=0.1
 
     newRatings = []
     for move in moveRatings:
