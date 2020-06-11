@@ -88,6 +88,7 @@ def bestMove2(board):
     return moves[newRatings.index(min(newRatings))]
 
 while not board.is_game_over():
+    print(bestMove2(board))
     board.push(bestMove2(board))
     display(chess.svg.board(board=board,size=400,flipped=True))
     print(board.legal_moves)
