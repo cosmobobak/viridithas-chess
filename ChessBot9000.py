@@ -5,7 +5,7 @@ import random
 board = chess.Board()
 
 def points(boardState):
-    rating = 0.00000
+    rating = 0.0
     if not chess.Color:
         for letter in board.fen()[:-12]:
             if letter == 'p':
@@ -44,15 +44,11 @@ def bestMove(board):
         board.push(move)
         moves.append(move)
         moveRatings.append(points(board))
-        if board.is_checkmate():
-            moveRatings[-1]+=1000
         board.pop()
-        if board.gives_check(move):
-            moveRatings[-1]+=0.1
 
     newRatings = []
     for move in moveRatings:
-        newRatings.append(move+(random.randint(1,99)/10000))
+        newRatings.append(move+(random.randint(1,100)/1000))
 
     return moves[newRatings.index(min(newRatings))]
 
@@ -63,7 +59,7 @@ def bestMoveValue(board):
         moveRatings.append(points(board))
         board.pop()
     if moveRatings == []:
-        return 0.00000
+        return 0
     return min(moveRatings)
 
 def bestMove2(board):
@@ -83,7 +79,7 @@ def bestMove2(board):
     return moves[newRatings.index(min(newRatings))]
 
 while not board.is_game_over():
-    board.push(bestMove(board))
+    board.push(bestMove2(board))
     display(chess.svg.board(board=board,size=400,flipped=True))
     print(board.legal_moves)
     board.push_san(input())
