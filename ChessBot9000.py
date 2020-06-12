@@ -4,103 +4,96 @@ import random
 
 board = chess.Board()
 
-def points(boardState):
-    rating = 0.00000
-    if not chess.Color:
-        for letter in board.fen()[:-12]:
-            if letter == 'p':
-                rating += 1
-            elif letter == 'k':
-                rating += 1000
-            elif letter == 'n':
-                rating += 3
-            elif letter == 'b':
-                rating += 3.5
-            elif letter == 'q':
-                rating += 9
-            elif letter == 'r':
-                rating += 5
+def points(board,player):
+    rating = 0.0
+    for letter in board.fen()[:-12]:
+        if letter == 'p':
+            rating += 1
+        elif letter == 'k':
+            rating += 1000
+        elif letter == 'n':
+            rating += 3
+        elif letter == 'b':
+            rating += 3.5
+        elif letter == 'q':
+            rating += 9
+        elif letter == 'r':
+            rating += 5
+        elif letter == 'P':
+            rating -= 1
+        elif letter == 'K':
+            rating -= 1000
+        elif letter == 'N':
+            rating -= 3
+        elif letter == 'B':
+            rating -= 3.5
+        elif letter == 'Q':
+            rating -= 9
+        elif letter == 'R':
+            rating -= 5
+    if board.is_checkmate():
+        rating += 10000
+    if player == 'white':
+        return rating
     else:
-        for letter in board.fen()[:-12]:
-            if letter == 'P':
-                rating += 1
-            elif letter == 'K':
-                rating += 1000
-            elif letter == 'N':
-                rating += 3
-            elif letter == 'B':
-                rating += 3.5
-            elif letter == 'Q':
-                rating += 9
-            elif letter == 'R':
-                rating += 5
-    return rating
+        return rating*-1
 
-def bestMove(board):
-    moveRatings = [] #the piece values for the opponent after each move
-    moves = [] #corresponding moves
-
-    for move in board.legal_moves:
-        board.push(move)
-        moves.append(move)
-        moveRatings.append(points(board))
-        if board.is_checkmate():
-            moveRatings[-1]+=1000
-        board.pop()
-        if board.gives_check(move):
-            moveRatings[-1]+=0.1
-
-    newRatings = []
-    for move in moveRatings:
-        newRatings.append(move+(random.randint(1,99)/10000))
-
-    return moves[newRatings.index(min(newRatings))]
-
-def bestMoveValue(board):
-    moveRatings = []
-    for move in board.legal_moves:
-        board.push(move)
-        moveRatings.append(points(board))
-        if board.is_checkmate():
-            moveRatings[-1]+=1000
-        board.pop()
-        if board.gives_check(move):
-            moveRatings[-1]+=0.1
-    if moveRatings == []:
-        return 0.00000
-    return min(moveRatings)
-
-def bestMove2(board):
-    moveRatings = [] #the piece values for the opponent after each move
-    moves = [] #corresponding moves
-    for move in board.legal_moves:
-        moves.append(move)
-        board.push(move)
-        print(bestMoveValue(board),points(board))
-        if board.is_checkmate():
+def minimax(board, node, depth, a, b, player):
+    if depth == 0 or node >= depth:
+        return points(board,player)
+    if player == 'white':
+        value = -100000
+        for move in board.legal_moves:
+            board.push(move)
+            value = max([value, minimax(board, node, depth-1, a, b, 'black')])
+            a = max([a,value])
             board.pop()
-            return move
-        moveRatings.append(2000-bestMoveValue(board))
+            if a>=b:
+                break
+        return value
+    else:
+        value = 100000
+        for move in board.legal_moves:
+            board.push(move)
+            value = min([value, minimax(board, node, depth-1, a, b, 'white')])
+            b = min(b,value)
+            board.pop()
+            if b<=a:
+                break
+        return value
+
+def userMove(board):
+    move = input("enter move: ")
+    while True:
+        try:
+            board.push_san(move)
+            break
+        except Exception:
+            move = input("enter move: ")
+
+def bestMove(board,player):
+    moveRatings = [] #the piece values for the opponent after each move
+    moves = [] #corresponding moves
+
+    for move in board.legal_moves:
+        board.push(move)
+        moves.append(move)
+        moveRatings.append(minimax(board,0,4,-1000000,1000000,player))
         board.pop()
-        if board.gives_check(move):
-            moveRatings[-1]-=0.1
 
-    newRatings = []
-    for move in moveRatings:
-        newRatings.append(move+(random.randint(1,100)/1000))
+    return moves[moveRatings.index(max(moveRatings))]
 
-    return moves[newRatings.index(min(newRatings))]
+display(chess.svg.board(board=board,size=400,flipped=True))
+
+player = input('enter side: ')
+while player not in ['white','black']:
+    player = input('enter side: ')
+
+if player != 'white':
+    userMove(board)
 
 while not board.is_game_over():
-<<<<<<< HEAD
-    print(bestMove2(board))
-    board.push(bestMove2(board))
-=======
-    board.push(bestMove(board))
->>>>>>> parent of af2f67d... Jamie version
+    board.push(bestMove(board,player))
     display(chess.svg.board(board=board,size=400,flipped=True))
     print(board.legal_moves)
-    board.push_san(input())
-
-#treesearch
-#prune high-risk strategies from the tree
+    userMove(board)
