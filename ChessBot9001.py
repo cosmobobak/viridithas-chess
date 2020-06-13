@@ -6,7 +6,7 @@ board = chess.Board()
 
 def points(board,player):
     rating = 0.0
-    for letter in board.fen()[:-12]:
+    for letter in board.board_fen():
         if letter == 'p':
             rating += 1
         elif letter == 'k':
@@ -37,6 +37,17 @@ def points(board,player):
         return rating
     else:
         return rating*-1
+
+def eval(board,player):
+    rating = 0.0
+    string = board.board_fen()
+    rating += 200*(string.count(k)-string.count(K))
+    rating += 1*(string.count(p)-string.count(P))
+    rating += 3*(string.count(n)-string.count(N))
+    rating += 3.5*(string.count(b)-string.count(B))
+    rating += 9*(string.count(q)-string.count(Q))
+    rating += 5*(string.count(r)-string.count(R))
+    rating -= 0.1*(board.legal_moves.count())
 
 def minimax(board, node, depth, a, b, player):
     if depth == 0 or node >= depth:

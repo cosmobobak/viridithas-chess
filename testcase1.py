@@ -39,6 +39,7 @@ def points(board,player):
         return rating*-1
 
 def minimax(board, node, depth, a, b, player):
+    print(board, node, depth, a, b, player)
     if depth == 0 or node >= depth:
         return points(board,player)
     if player == 'white':
@@ -50,6 +51,7 @@ def minimax(board, node, depth, a, b, player):
             board.pop()
             if a>=b:
                 break
+        print(value)
         return value
     else:
         value = 100000
@@ -60,40 +62,7 @@ def minimax(board, node, depth, a, b, player):
             board.pop()
             if b<=a:
                 break
+        print(value)
         return value
 
-def userMove(board):
-    move = input("enter move: ")
-    while True:
-        try:
-            board.push_san(move)
-            break
-        except Exception:
-            move = input("enter move: ")
-
-def bestMoveMinimax(board,player):
-    moveRatings = [] #the piece values for the opponent after each move
-    moves = [] #corresponding moves
-
-    for move in board.legal_moves:
-        board.push(move)
-        moves.append(move)
-        moveRatings.append(minimax(board,0,4,-1000000,1000000,player))
-        board.pop()
-
-    return moves[moveRatings.index(max(moveRatings))]
-
-display(chess.svg.board(board=board,size=400,flipped=True))
-
-player = input('enter side: ')
-while player not in ['white','black']:
-    player = input('enter side: ')
-
-if player != 'white':
-    userMove(board)
-
-while not board.is_game_over():
-    board.push(bestMoveMinimax(board,player))
-    display(chess.svg.board(board=board,size=400,flipped=True))
-    print(board.legal_moves)
-    userMove(board)
+minimax(board,0,3,-1000000,1000000,'white')
