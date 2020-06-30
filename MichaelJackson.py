@@ -2,6 +2,10 @@ import chess
 import chess.svg
 import random
 
+'''
+CAPITAL LETTERS ARE WHITE
+'''
+
 pawnSpaces =  reversed([0,0,0,0,0,0,0,0,50,50,50,50,50,50,50,50,10,10,20,30,30,20,10,10,5,5,10,25,25,10,5,5,0,0,0,20,20,0,0,0,5,-5,-10,0,0,-10,-5,5,5,10,10,-20,-20,10,10,5,0,0,0,0,0,0,0,0])
 knightSpaces = reversed([-50,-40,-30,-30,-30,-30,-40,-50,-40,-20,0,0,0,0,-20,-40,-30,0,10,15,15,10,0,-30,-30,5,15,20,20,15,5,-30,-30,0,15,20,20,15,0,-30,-30,5,10,15,15,10,5,-30,-40,-20,0,5,5,0,-20,-40,-50,-40,-30,-30,-30,-30,-40,-50,])
 bishopSpaces = reversed([-20,-10,-10,-10,-10,-10,-10,-20,-10,0,0,0,0,0,0,-10,-10,0,5,10,10,5,0,-10,-10,5,5,10,10,5,5,-10,-10,0,10,10,10,10,0,-10,-10,10,10,10,10,10,10,-10,-10,5,0,0,0,0,5,-10,-20,-10,-10,-10,-10,-10,-10,-20,])
@@ -14,14 +18,16 @@ def points(board):
     rating = 0.0
     string = board.board_fen()
     map = board.piece_map()
-    x = 0.5
-    if True:
+    x = 0
+    if board.turn:
+        x=x*-1
+    if False:
         for counter in range(64):
             try:
                 if map[counter] == 'p':
                     rating += pawnSpaces[counter]*x
                 elif map[counter] == 'P':
-                    rating += pawnSpaces[counter]*-x
+                    rating += -pawnSpaces[counter]*x
                 elif map[counter] == 'n':
                     rating += knightSpaces[counter]*x
                 elif map[counter] == 'b':
@@ -33,77 +39,97 @@ def points(board):
                 elif map[counter] == 'k':
                     rating += kingSpaces[counter]*x
                 elif map[counter] == 'N':
-                    rating += knightSpaces[counter]*-x
+                    rating += -knightSpaces[counter]*x
                 elif map[counter] == 'B':
-                    rating += bishopSpaces[counter]*-x
+                    rating += -bishopSpaces[counter]*x
                 elif map[counter] == 'R':
-                    rating += rookSpaces[counter]*-x
+                    rating += -rookSpaces[counter]*x
                 elif map[counter] == 'Q':
-                    rating += queenSpaces[counter]*-x
+                    rating += -queenSpaces[counter]*x
                 elif map[counter] == 'K':
-                    rating += kingSpaces[counter]*-x
+                    rating += -kingSpaces[counter]*x
                 else:
                     pass
                     #print('something has gone horribly wrong')
                     #return False
             except Exception:
                 continue
-    '''
+
     #incentivises king to stay back
     ranks = string.split('/')
     rankIndex = 1
+    y=1
+    if board.turn:
+        y=-1
     for rank in ranks:
         if 'k' in rank:
-            rating += 0.5*(9-rankIndex)
-            #print(0.5*(9-rankIndex))
+            rating += 0.5*(9-rankIndex)*y
         if 'K' in rank:
-            rating -= 0.5*(9-rankIndex)
-            #print(-0.5*(9-rankIndex))
+            rating -= 0.5*(9-rankIndex)*y
         rankIndex+=1
-    '''
-    #aggregates piece score
 
-    rating += 200*(string.count('k')-string.count('K'))
-    rating += 1*(string.count('p')-string.count('P'))
-    rating += 3*(string.count('n')-string.count('N'))
-    rating += 3.5*(string.count('b')-string.count('B'))
-    rating += 9*(string.count('q')-string.count('Q'))
-    rating += 5*(string.count('r')-string.count('R'))
-    rating += 0.01*(board.legal_moves.count())
+    #aggregates piece score
+    '''
+    IF WHITE:
+        ADD CAPITALS, SUBTRACT LOWERCASE
+    ELSE:
+        ADD LOWERCASE, SUBTRACT CAPITALS
+    '''
+    if board.turn: #rating for the turn before, so this is 'IF BLACK:'
+        rating += 200*(string.count('k')-string.count('K'))
+        rating += 1*(string.count('p')-string.count('P'))
+        rating += 3*(string.count('n')-string.count('N'))
+        rating += 3.5*(string.count('b')-string.count('B'))
+        rating += 9*(string.count('q')-string.count('Q'))
+        rating += 5*(string.count('r')-string.count('R'))
+    else:
+        rating += -200*(string.count('k')-string.count('K'))
+        rating += -1*(string.count('p')-string.count('P'))
+        rating += -3*(string.count('n')-string.count('N'))
+        rating += -3.5*(string.count('b')-string.count('B'))
+        rating += -9*(string.count('q')-string.count('Q'))
+        rating += -5*(string.count('r')-string.count('R'))
+
+    #rating -= 0.01*(board.legal_moves.count())
+    #for xmove in board.legal_moves:
+        #board.push(xmove)
+        #rating += 0.0005*(board.legal_moves.count())
+        #board.pop()
 
     #maintain castling rights incentive
-    if board.has_kingside_castling_rights(chess.WHITE) and board.has_queenside_castling_rights(chess.WHITE):
+    if board.has_kingside_castling_rights(board.turn) and board.has_queenside_castling_rights(board.turn):
         rating += -1.2
-    elif board.has_kingside_castling_rights(chess.WHITE) or board.has_queenside_castling_rights(chess.WHITE):
+    elif board.has_kingside_castling_rights(board.turn) or board.has_queenside_castling_rights(board.turn):
         rating += -0.6
     else:
-        rating -= -1.2
-    if board.has_kingside_castling_rights(chess.BLACK) and board.has_queenside_castling_rights(chess.BLACK):
         rating += 1.2
-    elif board.has_kingside_castling_rights(chess.BLACK) or board.has_queenside_castling_rights(chess.BLACK):
+    if board.has_kingside_castling_rights(not board.turn) and board.has_queenside_castling_rights(not board.turn):
+        rating += 1.2
+    elif board.has_kingside_castling_rights(not board.turn) or board.has_queenside_castling_rights(not board.turn):
         rating += 0.6
     else:
-        rating -= 1.2
+        rating += -1.2
     #try to give check
     if board.is_check():
-        rating += -0.9
+        rating += 0.9
     if board.is_checkmate():
-        rating += -10000
-    #incentivises threatening pieces by worth
-    #for piece in board.pieces('PAWN','WHITE'):
-        #pass
+        rating += 10000
+    if board.is_fivefold_repetition():
+        rating += -20000
     #incentivises castling
     if board.move_stack:
         move = board.peek()
         if chess.square_distance(move.from_square,move.to_square) == 2:
             if board.piece_at(move.to_square).symbol().upper() == 'K':
-                rating -= (7)
+                rating += (7)
         elif chess.square_distance(move.from_square,move.to_square) == 1:
             if board.piece_at(move.to_square).symbol().upper() == 'K':
-                rating += 0.05
-    #flip to reverse scores for minimax
-    if board.turn:
-        return rating*-1
+                rating -= 0.05
+    try:
+        #print(rating,board.peek())
+        pass
+    except Exception:
+        pass
     return rating
 
 def bestMoveValue(board):
@@ -116,23 +142,49 @@ def bestMoveValue(board):
         board.pop()
     if moveRatings == []:
         return 100
-    return min(moveRatings)
+    return max(moveRatings)
+
+def bestMoveValue2(board):
+    moveRatings = []
+    for move in board.legal_moves:
+        board.push(move)
+        moveRatings.append(points(board))
+        if board.is_checkmate():
+            moveRatings[-1] += 100000000
+        board.pop()
+    if moveRatings == []:
+        return 100
+    return max(moveRatings)
+
+def recurseMoveValue(depth,board):
+    if depth == 1:
+        #print('test: ',depth,points(board))
+        return points(board)
+    else:
+        moveRatings = []
+        for move in board.legal_moves:
+            board.push(move)
+            moveRatings.append(recurseMoveValue(depth-1,board))
+            if board.is_checkmate():
+                moveRatings[-1] += 100000000
+            board.pop()
+        if moveRatings == []:
+            return 100
+        #print('test: ',depth,max(moveRatings))
+        return max(moveRatings)
 
 def bestMove2(board):
-    moveRatings = [] #the piece values for the opponent after each move
-    moves = [] #corresponding moves
+    moveRatings = []
+    moves = []
     for move in board.legal_moves:
         moves.append(move)
         board.push(move)
-        #print(round(bestMoveValue(board),3),round(points(board),3),move,board.board_fen())
-        moveRatings.append((bestMoveValue(board)+points(board))/2)
+        moveRatings.append(-bestMoveValue2(board))
+        #moveRatings.append(recurseMoveValue(3,board))
         board.pop()
-
-    newRatings = []
-    for move in moveRatings:
-        newRatings.append(move+(random.randint(1,99)/1000))
-    #print(moves[newRatings.index(max(newRatings))])
-    return moves[newRatings.index(max(newRatings))]
+    for move,moveRating in zip(moves,moveRatings):
+        print(move,moveRating)
+    return moves[moveRatings.index(max(moveRatings))]
 
 def userMove(board):
     move = input("enter move: ")
@@ -170,10 +222,10 @@ def londonMove(board,trackerArray):
         board.push(bestMove2(board))
 
 def main():
-    board = chess.Board()
+    board = chess.Board('kbK5/pp6/1P6/8/8/8/8/R7 w - -')
     n = 40
     blackwin = True
-    while not board.is_game_over():
+    while not board.is_checkmate():
         trackerArray = [False,False,False,False,False,False,False]
         board.push(bestMove2(board))
         standardValue = points(board)
@@ -190,33 +242,43 @@ def main():
             if standardValue > (points(board)+0.5) or expectedValue > (bestMoveValue(board)+0.5):
                 board.pop()
                 board.push(bestMove2(board))
+            print(board.peek())
 
         else:
             board.push(bestMove2(board))
+            print(board.peek())
 
         display(chess.svg.board(board=board,size=400,flipped=True))
         #print(board)
         #print('WIN PREDICTION:',str(min([round(n+random.randint(1,30)/3,3),100.0]))+'% CHANCE OF WHITE WIN.')
         n += 5
         if not board.is_game_over():
-            print(board.legal_moves)
-            userMove(board)
-            #board.push(bestMove2(board))
-            #display(chess.svg.board(board=board,size=400,flipped=True))
-            #print(board)
-        else:
-            print('WHITE WINS ON TURN',board.fullmove_number)
+            #print(board.legal_moves)
+            #userMove(board)
+            board.push(bestMove2(board))
             display(chess.svg.board(board=board,size=400,flipped=True))
+            #print(board)
+        elif board.is_checkmate() and not board.turn:
+            print('WHITE WINS ON TURN',board.fullmove_number)
             blackwin = False
             #print(board)
             break
         #display(chess.svg.board(board=board,size=400,flipped=True))
+        if board.is_game_over() and not board.is_checkmate():
+            print('ABNORMAL END ON TURN',board.fullmove_number)
+            blackwin = False
+            if board.is_stalemate():
+                print('END BY STALEMATE')
+            elif board.is_insufficient_material():
+                print('END BY INSUFFICIENT MATERIAL')
+            elif board.is_fivefold_repetition():
+                print('END BY FIVEFOLD REPETITION')
+            else:
+                print('END BY UNKNOWN REASON')
+            break
+    #print()
+    #display(chess.svg.board(board=board,size=400,flipped=True))
     if blackwin == True:
         print('BLACK WINS ON TURN',board.fullmove_number)
-        display(chess.svg.board(board=board,size=400,flipped=True))
 
-    #treesearch
-    #prune high-risk strategies from the tree
-
-for counter in range(10):
-    main()
+main()
