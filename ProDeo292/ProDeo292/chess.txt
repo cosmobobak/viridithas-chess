@@ -1,0 +1,1164 @@
+[BEGIN]
+﻿When you see a good move, look for a better one.
+
+-- Emanuel Lasker
+[END]
+
+[BEGIN]
+We cannot resist the fascination of sacrifice, since a passion for sacrifices is part of a chessplayer’s nature.
+
+-- Rudolf Spielman
+[END]
+
+[BEGIN]
+All I want to do, ever, is just play Chess.
+
+-- Bobby Fischer
+[END]
+
+[BEGIN]
+A win by an unsound combination, however showy, fills me with artistic horror.
+
+-- Wilhelm Steinitz
+[END]
+
+[BEGIN]
+The chessboard is the world, the pieces are the phenomena of the Universe, the rules of the game are what we call the laws of Nature and the player on the other side is hidden from us.
+
+-- Thomas Huxley
+[END]
+
+[BEGIN]
+Strategy requires thought, tactics require observation.
+
+-- Max Euwe
+[END]
+
+[BEGIN]
+I don’t believe in psychology. I believe in good moves.
+
+-- Bobby Fischer
+[END]
+
+[BEGIN]
+Modern Chess is too much concerned with things like Pawn structure. Forget it, checkmate ends the game.
+
+--Nigel Short
+[END]
+
+[BEGIN]
+Even the laziest King flees wildly in the face of a double check!
+
+-- Aaron Nimzowitsch
+[END]
+
+[BEGIN]
+Combinations have always been the most intriguing aspect of Chess. The masters look for them, the public applauds them, the critics praise  them. It is because combinations are possible that Chess is more than a lifeless mathematical exercise. They are the poetry of the game; they are to Chess what melody is to music. They represent the triumph of mind over matter.
+
+-- Reuben Fine
+[END]
+
+[BEGIN]
+Chess is a fairy tale of 1001 blunders.
+
+-- Savielly Tartakower
+[END]
+
+[BEGIN]
+Chess is no whit inferior to the violin, and we have a large number of professional violinists.
+
+-- Mikhail Botvinnik
+[END]
+
+[BEGIN]
+Only the player with the initiative has the right to attack.
+
+-- Wilhelm Steinitz
+[END]
+
+[BEGIN]
+The winner of the game is the player who makes the next-to-last mistake.
+
+-- Savielly Tartakover
+[END]
+
+[BEGIN]
+Your body has to be in top condition. Your Chess deteriorates as your body does. You can’t separate body from mind.
+
+-- Bobby Fischer
+[END]
+
+[BEGIN]
+I have added these principles to the law: get the Knights into action before both Bishops are developed.
+
+-- Emanuel Lasker
+[END]
+
+[BEGIN]
+It is the aim of the modern school, not to treat every position according to one general law, but according to the principle inherent in the position.
+
+-- Richard Reti
+[END]
+
+[BEGIN]
+The Pawns are the soul of the game.
+
+-- Philidor
+[END]
+
+[BEGIN]
+In order to improve your game, you must study the endgame before everything else, for whereas the endings can be studied and mastered by themselves, the middle game and the opening must be studied in relation to the endgame.
+
+-- Jose Raul Capablanca
+[END]
+
+[BEGIN]
+Without error there can be no brilliancy.
+
+-- Emanuel Lasker
+[END]
+
+[BEGIN]
+Chess is mental torture.
+
+-- Garry Kasparov
+[END]
+
+[BEGIN]
+Many have become Chess Masters, no one has become the Master of Chess.
+
+-- Siegbert Tarrasch
+[END]
+
+[BEGIN]
+My style is somewhere between that of Tal and Petrosian.
+
+-- Reshevsky
+[END]
+
+[BEGIN]
+Play the opening like a book, the middle game like a magician, and the endgame like a machine.
+
+-- Spielmann
+[END]
+
+[BEGIN]
+That’s what Chess is all about. One day you give your opponent a lesson, the next day he gives you one.
+
+-- Bobby Fischer
+[END]
+
+[BEGIN]
+Some part of a mistake is always correct.
+
+-- Savielly Tartakover
+[END]
+
+[BEGIN]
+Who is your opponent tonight, tonight I am playing against the Black pieces.
+
+-- Akiba Rubinstein
+[END]
+
+[BEGIN]
+Chess is the art of analysis.
+
+-- Mikhail Botvinnik
+[END]
+
+[BEGIN]
+The mistakes are there, waiting to be made.
+
+-- Savielly Tartakower
+[END]
+
+[BEGIN]
+A passed Pawn increases in strength as the number of pieces on the board diminishes.
+
+-- Capablanca
+[END]
+
+[BEGIN]
+The essence of Chess is thinking about what Chess is.
+
+-- David Bronstein
+[END]
+
+[BEGIN]
+Half the variations which are calculated in a tournament game turn out to be completely superfluous. Unfortunately, no one knows in advance which half.
+
+-- Jan Tinman
+[END]
+
+[BEGIN]
+What would Chess be without silly mistakes?
+
+-- Kurt Richter
+[END]
+
+[BEGIN]
+Chess was Capablanca’s mother tongue.
+
+-- Reti
+[END]
+
+[BEGIN]
+Alekhine is a poet who creates a work of art out of something that would hardly inspire another man to send home a picture post card.
+
+-- Max Euwe
+[END]
+
+[BEGIN]
+During a Chess competition a Chessmaster should be a combination of a beast of prey and a monk.
+
+-- Alexander Alekhine
+[END]
+
+[BEGIN]
+No one ever won a game by resigning.
+
+-- Saviely Tartakower
+[END]
+
+[BEGIN]
+The defensive power of a pinned piece is only imaginary.
+
+-- Aaron Nimzovich
+[END]
+
+[BEGIN]
+One doesn’t have to play well, it’s enough to play better than your opponent.
+
+-- Siegbert Tarrasch
+[END]
+
+[BEGIN]
+Chess is above all, a fight!
+
+-- Emanuel Lasker
+[END]
+
+[BEGIN]
+Discovered check is the dive bomber of the Chessboard.
+
+-- Reuben Fine
+[END]
+
+[BEGIN]
+The hardest game to win is a won game.
+
+-- Emanuel Lasker
+[END]
+
+[BEGIN]
+The most powerful weapon in Chess is to have the next move.
+
+-- David Bronstein
+[END]
+
+[BEGIN]
+He who fears an isolated Queen’s Pawn should give up Chess.
+
+-- Siegbert Tarrasch
+[END]
+
+[BEGIN]
+Help your pieces so they can help you.
+
+-- Paul Morphy
+[END]
+
+[BEGIN]
+In a gambit you give up a Pawn for the sake of getting a lost game.
+
+-- Samuel Standige Boden
+[END]
+
+[BEGIN]
+It is not enough to be a good player... you must also play well.
+
+-- Siegbert Tarrasch
+[END]
+
+[BEGIN]
+A sacrifice is best refuted by accepting it.
+
+-- Wilhelm Steinitz
+[END]
+
+[BEGIN]
+Tactics flow from a superior position.
+
+-- Bobby Fischer
+[END]
+
+[BEGIN]
+Later, I began to succeed in decisive games. Perhaps because I realized a very simple truth: not only was I worried, but also my opponent.
+
+-- Mikhail Tal
+[END]
+ 
+[BEGIN]
+Some sacrifices are sound; the rest are mine.
+
+-- Mikhail Tal
+[END]
+
+[BEGIN]
+A bad plan is better than none at all.
+
+-- Frank Marshall
+[END]
+
+[BEGIN]
+Chess books should be used as we use glasses: to assist the sight, although some players make use of them as if they thought they conferred sight.
+
+-- Jose Raul Capablanca
+[END]
+
+[BEGIN]
+There are two types of sacrifices: correct ones and mine.
+
+-- Mikhail Tal
+[END]
+
+[BEGIN]
+Morphy was probably the greatest genius of them all.
+
+-- Bobby Fischer
+[END]
+
+[BEGIN]
+My opponents make good moves too. Sometimes I don’t take these things into consideration.
+
+-- Bobby Fischer
+[END]
+
+[BEGIN]
+The combination player thinks forward; he starts from the given position, and tries the forceful moves in his mind.
+
+-- Emanuel Lasker
+[END]
+
+[BEGIN]
+A Chess game is divided into three stages: the first, when you hope you have the advantage, the second when you believe you have an   advantage, and the third... when you know you’re going to lose!
+
+-- Savielly Tartakower
+[END]
+
+[BEGIN]
+Chess, like love, like music, has the power to make people happy.
+
+-- Siegbert Tarrasch
+[END]
+
+[BEGIN]
+Chess is everything: art, science and sport.
+
+-- Anatoly Karpov
+[END]
+
+[BEGIN]
+Chess is the art which expresses the science of logic.
+
+-- Mikhail Botvinnik
+[END]
+
+[BEGIN]
+Chess is imagination.
+
+-- David Bronstein
+[END]
+
+[BEGIN]
+Chess is thirty to forty percent psychology. You don’t have this  when you play a computer. I can’t confuse it.
+
+-- Judith Polgar
+[END]
+
+[BEGIN]
+On the chessboard, lies and hypocrisy do not survive long.
+
+-- Emanuel Lasker   
+[END]
+
+[BEGIN]
+The passed Pawn is a criminal, who should be kept under lock and key.  Mild measures, such as police surveillance, are not sufficient.
+
+-- Aaron Nimzovich
+[END]
+
+[BEGIN]
+Chess holds its master in its own bonds, shackling the mind and brain so that the inner freedom of the very strongest must suffer.
+
+-- Albert Einstein
+[END]
+
+[BEGIN]
+The blunders are all there on the board, waiting to be made.
+
+-- Savielly Tartakover
+[END]
+
+[BEGIN]
+For surely of all the drugs in the world, Chess must be the most permanently pleasurable.
+
+-- Assiac
+[END]
+
+[BEGIN]
+A thorough understanding of the typical mating continuations makes the most complicated sacrificial combinations leading up to them not only not difficult, but almost a matter of course.
+
+-- Siegbert Tarrasch
+[END]
+
+[BEGIN]
+The boy (then a 12 year old boy named Anatoly Karpov) doesn’t have a clue about Chess, and there’s no future at all for him in this profession.
+
+-- Mikhail Botvinnik
+[END]
+
+[BEGIN]
+Though most people love to look at the games of the great attacking masters, some of the most successful players in history have been the quiet positional players. They slowly grind you down by taking away your space, tying up your pieces, and leaving you with virtually nothing to do!
+
+-- Yasser Seirawan
+[END]
+
+[BEGIN]
+Chess is really ninety nine percent calculation.
+
+-- Soltis
+[END]
+
+[BEGIN]
+Chess is the gymnasium of the mind.
+
+-- Pascal
+[END]
+
+[BEGIN]
+The game of Chess is not merely an idle amusement; several very valuable qualities of the mind are to be acquired and strengthened by it, so as to become habits ready on all occasions; for life is a kind of Chess.
+
+-- Benjamin Franklin
+[END]
+
+[BEGIN]
+Winning isn’t everything... but losing is nothing.
+
+-- Mednis
+[END]
+
+[BEGIN]
+Chess is a terrible game. If you have no center, your opponent has a freer position. If you do have a center, then you really have something to worry about!
+
+-- Siegbert Tarrasch
+[END]
+
+[BEGIN]
+The battle for the ultimate truth will never be won. And that’s why Chess is so fascinating.
+
+-- Hans Kmoch
+[END]
+
+[BEGIN]
+In the perfect Chess combination as in a first-rate short story, the whole plot and counter-plot should lead up to a striking finale, the interest not being allayed until the very last moment.
+
+-- Yates and Winter
+[END]
+
+[BEGIN]
+Castle early and often.
+
+-- Rob Sillars
+[END]
+
+[BEGIN]
+I believe that Chess possesses a magic that is also a help in advanced age. A rheumatic knee is forgotten during a game of Chess and other events can seem quite unimportant in comparison with a catastrophe on the chessboard.
+
+-- Vlastimil Hort
+[END]
+
+[BEGIN]
+No Chess Grandmaster is normal; they only differ in the extent of their madness.
+
+-- Viktor Korchnoi
+[END]
+
+[BEGIN]
+Chess is 99 percent tactics.
+
+-- Teichmann
+[END]
+
+[BEGIN]
+Chess mastery essentially consists of analyzing Chess positions accurately.
+
+-- Mikhail Botvinnik
+[END]
+
+[BEGIN]
+The Chess pieces are the block alphabet which shapes thoughts; and these thoughts, although making a visual design on the chessboard, express their beauty abstractly, like a po[END]
+em.
+[BEGIN]
+
+-- Marcel Duchamp
+[END]
+
+[BEGIN]
+Chess is like life.
+
+-- Boris Spassky
+[END]
+
+[BEGIN]
+If your opponent offers you a draw, try to work out why he thinks he’s worse off.
+
+-- Nigel Short
+[END]
+
+[BEGIN]
+Chess is a foolish expedient for making idle people believe they are doing something very clever when they are only wasting their time.
+
+-- George Bernard Shaw
+[END]
+
+[BEGIN]
+You must take your opponent into a deep dark forest where 2+2=5,  and the path leading out is only wide enough for one.
+
+-- Mikhail Tal
+[END]
+
+[BEGIN]
+I feel as if I were a piece in a game of Chess, when my opponent says of it: That piece cannot be moved.
+
+-- Soren Kierkegaard
+[END]
+
+[BEGIN]
+When your house is on fire, you cant be bothered with the neighbors.  Or, as we say in Chess, if your King is under attack you don’t worry   about losing a Pawn on the Queen’s side.
+
+-- Gary Kasparov
+[END]
+
+[BEGIN]
+When asked, How is that you pick better moves than your opponents?, I responded: I’m very glad you asked me that, because, as it happens,  there is a very simple answer. I think up my own moves, and I make my opponent think up his.
+
+-- Alexander Alekhine
+[END]
+
+[BEGIN]
+Mistrust is the most necessary characteristic of the Chess player.
+
+-- Siegbert Tarrasch
+[END]
+
+[BEGIN]
+What is the object of playing a gambit opening?... To acquire a reputation of being a dashing player at the cost of losing a game.
+
+-- Siegbert Tarrasch
+[END]
+
+[BEGIN]
+Pawns: they are the soul of this game, they alone form the attack and defense.
+
+-- Philidor
+[END]
+
+[BEGIN]
+The tactician must know what to do whenever something needs doing; the strategist must know what to do when nothing needs doing.
+
+-- Savielly Tartakover
+[END]
+
+[BEGIN]
+All Chess players should have a hobby.
+
+-- Savielly Tartakower
+[END]
+
+[BEGIN]
+You may learn much more from a game you lose than from a game you win. You will have to lose hundreds of games before becoming a good player.
+
+-- Jose Raul Capablanca
+[END]
+
+[BEGIN]
+The way he plays Chess demonstrates a man’s whole nature.
+
+-- Stanley Ellin
+[END]
+
+[BEGIN]
+Whoever sees no other aim in the game than that of giving checkmate to one’s opponent will never become a good Chess player.
+
+-- Max Euwe
+[END]
+
+[BEGIN]
+In blitz, the Knight is stronger than the Bishop.
+
+-- Vlastimil Hort
+[END]
+
+[BEGIN]
+Chess is a fighting game which is purely intellectual and includes chance.
+
+-- Richard Reti
+[END]
+
+[BEGIN]
+The isolated Pawn casts gloom over the entire chessboard.
+
+-- Aaron Nimzovich
+[END]
+
+[BEGIN]
+Chess is so inspiring that I do not believe a good player is capable of having an evil thought during the game.
+
+-- Wilhelm Steinitz
+[END]
+
+[BEGIN]
+Capture of the adverse King is the ultimate but not the first object of the game.
+
+-- William Steinitz
+[END]
+
+[BEGIN]
+When I have White, I win because I am white; When I have Black, I win because I am Bogolyubov.
+
+-- Bogolyubov
+[END]
+
+[BEGIN]
+Chess is a part of culture and if a culture is declining then Chess too will decline.
+
+-- Mikhail Botvinnik
+[END]
+
+[BEGIN]
+A good sacrifice is one that is not necessarily sound but leaves your opponent dazed and confused.
+
+-- Rudolph Spielmann
+[END]
+
+[BEGIN]
+Chess, like any creative activity, can exist only through the combined efforts of those who have creative talent, and those who have the ability to organize their creative work[END]
+.
+[BEGIN]
+
+-- Mikhail Botvinnik
+[END]
+
+[BEGIN]
+One bad move nullifies forty good ones.
+
+-- Horowitz
+[END]
+
+[BEGIN]
+Place the contents of the Chess box in a hat, shake them up vigorously, pour them on the board from a height of two feet, and you get the style of Steinitz.
+
+-- Bird
+[END]
+
+[BEGIN]
+I have never in my life played the French Defence, which is the dullest of all openings.
+
+-- Wilhelm Steinitz
+[END]
+
+[BEGIN]
+Those who say they understand Chess, understand nothing.
+
+-- Robert Hubner
+[END]
+
+[BEGIN]
+Botvinnik tried to take the mystery out of Chess, always relating it to situations in ordinary life. He used to call Chess a typical inexact problem similar to those which people are always having to solve in everyday life.
+
+-- Garry Kasparov
+[END]
+
+[BEGIN]
+A good player is always lucky.
+
+-- Jose Raul Capablanca
+[END]
+
+[BEGIN]
+The sign of a great Master is his ability to win a won game quickly and painlessly.
+
+-- Irving Chernev
+[END]
+
+[BEGIN]
+One of these modest little moves may be more embarrassing to your opponent than the biggest threat.
+
+-- Siegbert Tarrasch
+[END]
+
+[BEGIN]
+The older I grow, the more I value Pawns.
+
+-- Paul Keres
+[END]
+
+[BEGIN]
+The beauty of a move lies not in its’ appearance but in the thought behind it.
+
+-- Aaron Nimzovich
+[END]
+
+[BEGIN]
+
+It is difficult to play against Einstein’s theory --on his first loss to Fischer.
+
+-- Mikhail Tal
+[END]
+
+[BEGIN]
+The only thing Chess players have in common is Chess.
+
+-- Lodewijk Prins
+[END]
+
+[BEGIN]
+Bobby just drops the pieces and they fall on the right squares.
+
+-- Miguel Najdorf
+[END]
+
+[BEGIN]
+The enormous mental resilience, without which no Chess player can exist, was so much taken up by Chess that he could never free his mind of this game.
+
+-- Albert Einstein
+[END]
+
+[BEGIN]
+Nowadays, when you’re not a grandmaster at 14, you can forget about it.
+
+-- Viswanathan Anand
+[END]
+
+[BEGIN]
+In Chess, as it is played by masters, chance is practically eliminated.
+
+-- Emanuel Lasker
+[END]
+
+[BEGIN]
+When you play Bobby, it is not a question if you win or lose.  It is a question if you survive.
+
+-- Boris Spassky
+[END]
+
+[BEGIN]
+When you absolutely don’t know what to do anymore, it is time to panic.
+
+-- John van der Wiel
+[END]
+
+[BEGIN]
+In complicated positions, Bobby Fischer hardly had to be afraid of anybody.
+
+-- Paul Keres
+[END]
+
+[BEGIN]
+It was clear to me that the vulnerable point of the American Grandmaster (Bobby Fischer) was in double-edged, hanging, irrational positions, where he often failed to find a win even in a won position.
+
+-- Efim Geller
+[END]
+
+[BEGIN]
+I love all positions. Give me a difficult positional game, I will play it. But totally won positions, I cannot stand them.
+
+-- Jan Hein Donner
+[END]
+
+[BEGIN]
+Is Bobby Fischer quite sane?
+
+-- Salo Flohr
+[END]
+
+[BEGIN]
+Robert Fischer is a law unto himself.
+
+-- Larry Evans
+[END]
+
+[BEGIN]
+Fischer is an American Chess tragedy on par with Morphy and Pillsbury.
+
+-- Mig Greengard
+[END]
+
+[BEGIN]
+Fischer is the strongest player in the world. In fact, the strongest player who ever lived.
+
+-- Larry Evans
+[END]
+
+[BEGIN]
+When I asked Fischer why he had not played a certain move in our game, he replied: ‘Well, you laughed when I wrote it down!
+
+-- Mikhail Tal
+[END]
+
+[BEGIN]
+“When you don’t know what to play, wait for an idea to come into your opponent’s mind. You may be sure that idea will be wrong.
+
+-- Siegbert Tarrasch
+[END]
+
+[BEGIN]
+By this measure (on the gap between Fischer & his contemporaries), I consider him the greatest world champion.
+
+-- Garry Kasparov
+[END]
+
+[BEGIN]
+Chess is a terrible game. If you have no center, your opponent has a freer position. If you do have a center, then you really have something to worry about!
+
+-- Siegbert Tarrasch
+[END]
+
+[BEGIN]
+Suddenly it was obvious to me in my analysis I had missed what Fischer had found with the greatest of ease at the board.
+
+-- Mikhail Botvinnik
+[END]
+
+[BEGIN]
+The King is a fighting piece. Use it!
+
+-- Wilhelm Steinitz
+[END]
+
+[BEGIN]
+A thorough understanding of the typical mating continuations makes the most complicated sacrificial combinations leading up to them not only not difficult, but almost a matter of course.
+
+-- Siegbert Tarrasch
+[END]
+
+[BEGIN]
+The laws of Chess do not permit a free choice: you have to move whether you like it or not.
+
+-- Emanuel Lasker
+[END]
+
+[BEGIN]
+First-class players lose to second-class players because second-class players sometimes play a first-class game.
+
+-- Siegbert Tarrasch
+[END]
+
+[BEGIN]
+After a bad opening, there is hope for the middle game. After a bad middle game, there is hope for the endgame. But once you are in the endgame, the moment of truth has arrived.
+
+-- Edmar Mednis
+[END]
+
+[BEGIN]
+Weak points or holes in the opponent’s position must be occupied by pieces not Pawns.
+
+-- Siegbert Tarrasch
+[END]
+
+[BEGIN]
+Up to this point White has been following well-known analysis. But now he makes a fatal error: he begins to use his own head.
+
+-- Siegbert Tarrasch
+[END]
+
+[BEGIN]
+I have always a slight feeling of pity for the man who has no knowledge of Chess.
+
+-- Siegbert Tarrasch
+[END]
+
+[BEGIN]
+I had a toothache during the first game. In the second game I had a headache. In the third game it was an attack of rheumatism. In the  fourth game, I wasn’t feeling well. And in the fifth game? Well, must one have to win every game?
+
+-- Siegbert Tarrasch
+[END]
+
+[BEGIN]
+﻿By the time a player becomes a Grandmaster, almost all of his training time is dedicated to work on this first phase. The opening is the only phase that holds out the potential for true creativity and doing something entirely new.
+
+-- Garry Kasparov
+[END]
+
+[BEGIN]
+By strictly observing Botvinnik’s rule regarding the thorough analysis of one’s own games, with the years I have come to realize that this provides the foundation for the continuos development of chess mastery. 
+
+-– Garry Kasparov
+[END]
+
+[BEGIN]
+Chess continues to advance over time, so the players of the future will inevitably surpass me in the quality of their play, assuming the rules and regulations allow them to play serious chess. But it will likely be a long time before anyone spends 20 consecutive years as number, one as I did.
+
+-– Garry Kasparov
+[END]
+
+[BEGIN]
+You can’t overestimate the importance of psychology in chess, and as much as some players try to downplay it, I believe that winning requires a constant and strong psychology not just at the board but in every aspect of your life.
+
+-- Garry Kasparov
+[END]
+
+[BEGIN]
+I have two vocations: chess and engineering. If I played chess only, I believe that my success would not have been significantly greater. I can play chess well only when I have fully convalesced from chess and when the hunger for chess once more awakens within me.
+
+-– Mikhail Botvinnik
+[END]
+
+[BEGIN]
+If you are going to make your mark among masters, you have to work far harder and more intensively, or, to put it more exactly, the work is far more complex than that needed to gain the title of Master. 
+
+-– Mikhail Botvinnik
+[END]
+
+[BEGIN]
+Above all else, before playing in competitions a player must have regard to his health, for if he is suffering from ill-health he cannot hope for success. In this connection the best of all tonics is 15 to 20 days in the fresh air, in the country.
+
+-– Mikhail Botvinnik
+[END]
+
+[BEGIN]
+If you are weak in the endgame, you must spend more time analysing studies; in your training games you must aim at transposing to endgames, which will help you to acquire the requisite experience.
+
+-– Mikhail Botvinnik
+[END]
+
+[BEGIN]
+My forte was the middlegame. I had a good feeling for the critical moments of the play. This undoubtedly compensated for my lack of opening preparation and, possibly, not altogether perfect play in the endgame. In my games things often did not reach the endgame!
+
+-– Boris Spassky
+[END]
+
+[BEGIN]
+The shortcoming of hanging pawns is that they present a convenient target for attack. As the exchange of men proceeds, their potential strength lessens and during the endgame they turn out, as a rule, to be weak.
+
+-– Boris Spassky
+[END]
+
+[BEGIN]
+Of course, analysis can sometimes give more accurate results than intuition but usually it’s just a lot of work. I normally do what my intuition tells me to do. Most of the time spent thinking is just to double-check.
+
+-– Magnus Carlsen
+[END]
+
+[BEGIN]
+I started by just sitting by the chessboard exploring things. I didn’t even have books at first, and I just played by myself. I learnt a lot from that, and I feel that it is a big reason why I now have a good intuitive understanding of chess.
+
+-– Magnus Carlsen
+[END]
+
+[BEGIN]
+Self-confidence is very important. If you don’t think you can win, you will take cowardly decisions in the crucial moments, out of sheer respect for your opponent. You see the opportunity but also greater limitations than you should. I have always believed in what I do on the chessboard, even when I had no objective reason to. It is better to overestimate your prospects than underestimate them.
+
+-– Magnus Carlsen
+[END]
+
+[BEGIN]
+I didn’t picture myself as even a grandmaster, to say nothing of aspiring to the chess crown. This was not because I was timid – I wasn’t – but because I simply lived in one world, and the grandmasters existed in a completely different one. People like that were not really even people, but like gods or mythical heroes.
+
+-– Anatoly Karpov
+[END]
+
+[BEGIN]
+By all means examine the games of the great chess players, but don’t swallow them whole. Their games are valuable not for their separate moves, but for their vision of chess, their way of thinking. 
+
+-– Anatoly Karpov
+[END]
+
+[BEGIN]
+The great mobility of the King forms one of the chief characteristics of all endgame strategy. In the middlegame the King is a mere “super”, in the endgame on the other hand – on of the “principals”. We must therefore develop him, bring him nearer to the fighting line.
+
+-– Aron Nimzowitsch
+[END]
+
+[BEGIN]
+If in a battle, I seize a bit of debatable land with a handful of soldiers, without having done anything to prevent an enemy bombardment of the position, would it ever occur to me to speak of a conquest of the terrain in question? Obviously not. Then why should I do so in chess?
+
+-– Aron Nimzowitsch
+[END]
+
+[BEGIN]
+When I today ask myself whence I got the moral courage, for it takes moral courage to make a move (or form a plan) running counter to all tradition, I think I may say in answer, that it was only my intense preoccupation with the problem of the blockade which helped me to do so.
+
+-– Aron Nimzowitsch
+[END]
+
+[BEGIN]
+It is a well known phenomenon that the same amateur who can conduct the middle game quite creditably, is usually perfectly helpless in the end game. One of the principal requisites of good chess is the ability to treat both the middle and end game equally well.
+
+-– Aron Nimzowitsch
+[END]
+
+[BEGIN]
+In mathematics, if I find a new approach to a problem, another mathematician might claim that he has a better, more elegant solution. In chess, if anybody claims he is better than I, I can checkmate him. 
+
+-– Emanuel Lasker
+[END]
+
+[BEGIN]
+By positional play a master tries to prove and exploit true values, whereas by combinations he seeks to refute false values. A combination produces an unexpected re-assessment of values. 
+
+-– Emanuel Lasker
+[END]
+
+[BEGIN]
+He who has a slight disadvantage plays more attentively, inventively and more boldly than his antagonist who either takes it easy or aspires after too much. Thus a slight disadvantage is very frequently seen to convert into a good, solid advantage.
+
+-– Emanuel Lasker
+[END]
+
+[BEGIN]
+A player, as the world believed he was, he was not, his studious temperament made that impossible; and thus he was conquered by a player and in the end little valued by the world, he died.
+
+-– Emanuel Lasker
+[END]
+
+[BEGIN]
+It is no secret that any talented player must in his soul be an artist, and what could be dearer to his heart and soul than the victory of the subtle forces of reason over crude material strength! Probably everyone has his own reason for liking the King`s Gambit, but my love for it can be seen in precisely those terms.
+
+-– David Bronstein
+[END]
+
+[BEGIN]
+It is annoying that the rules of chess do not allow a pawn to take either horizontally or backwards, but only forwards … This psychological tuning is ideal for attacking purposes, but what about for defence?
+
+-– David Bronstein
+[END]
+
+[BEGIN]
+If you have made a mistake or committed an inaccuracy there is no need to become annoyed and to think that everything is lost. You have to reorientate yourself quickly and find a new plan in the new situation. 
+
+-– David Bronstein
+[END]
+
+[BEGIN]
+When you play against an experienced opponent who exploits all the defensive resources at his command you sometimes have to walk time and again, along the narrow path of ‘the only move’. 
+
+-– David Bronstein
+[END]
+
+[BEGIN]
+Chess is not for the faint-hearted; it absorbs a person entirely. To get to the bottom of this game, he has to give himself up into slavery. Chess is difficult, it demands work, serious reflection and zealous research.
+
+-– Wilhelm Steinitz
+[END]
+
+[BEGIN]
+The task of the positional player is systematically to accumulate slight advantages and try to convert temporary advantages into permanent ones, otherwise the player with the better position runs the risk of losing it.
+
+
+-- Wilhelm Steinitz
+[END]
+
+[BEGIN]
+Whenever Black succeeds in assuming the initiative and maintaining it to a successful conclusion, the sporting spirit of the chess lover feels gratified, because it shows that the resources of the game are far from being exhausted.
+
+–- Savielly Tartakower
+[END]
+
+[BEGIN]
+It is always better to sacrifice your opponents’ men.
+
+-– Savielly Tartakower
+[END]
+
+[BEGIN]
+A thorough understanding of the typical mating continuations makes the most complicated sacrificial combinations leading up to them not only difficult, but almost a matter of course.
+
+-– Savielly Tartakower
+[END]
+
+[BEGIN]
+All that matters on the chessboard is good moves.
+
+-– Bobby Fischer
+[END]
+
+[BEGIN]
+A strong memory, concentration, imagination, and a strong will is required to become a great chess player.
+
+-– Bobby Fischer
+[END]
+
+[BEGIN]
+To play for a draw, at any rate with white, is to some degree a crime against chess.
+
+-– Mikhail Tal
+[END]
+
+[BEGIN]
+I have always thought it a matter of honour for every chess player to deserve the smile of fortune.
+
+-– Mikhail Tal
+[END]
+
+[BEGIN]
+Naturally, the psychological susceptibility of a match participant is significantly higher than a participant in a tournament, since each game substantially changes the over-all position.
+
+-– Mikhail Tal
+[END]
+
+[BEGIN]
+I go over many games collections and pick up something from the style of each player.
+
+-– Mikhail Tal
+[END]
+
+[BEGIN]
+Strategy requires thought, tactics require observation.
+
+-– Max Euwe
+[END]
+
+[BEGIN]
+If it is true that a player’s style is his person, then everyone plays as he is intended to by nature. I am naturally cautious, and I altogether dislike situations which involve risk.
+
+-– Tigran Petrosian
+[END]
+
+[BEGIN]
+In almost any position the boundless possibilities of chess enable a new or at least a little-studied continuation to be found.
+
+-– Tigran Petrosian
+[END]
+
+[BEGIN]
+They knock me for my draws, for my style, they knock me for everything I do. 
+
+-– Tigran Petrosian
+[END]
+
+[BEGIN]
+Even the most distinguished players have in their careers experienced severe disappointments due to ignorance of the best lines or suspension of their own common sense.
+
+-– Tigran Petrosian
+[END]
+
+[BEGIN]
+In some places words have been replaced by symbols which, like amulets from a witch’s bag, have the power to consume the living spirit of chess.
+
+-– Tigran Petrosian
+[END]
+
+[BEGIN]
+It is easy to play against the young players, for me they are like an open book. 
+
+-– Tigran Petrosian
+[END]
+
+[BEGIN]
+They knock me for my draws, for my style, they knock me for everything I do.
+
+-– Tigran Petrosian
+[END]
+

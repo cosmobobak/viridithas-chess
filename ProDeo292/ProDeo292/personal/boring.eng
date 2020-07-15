@@ -1,0 +1,243 @@
+[Personality = ProDeo.eng]      * ProDeo 2.5
+[Author = Ed Schröder]          
+
+[Quote File = gospel.txt]       * gospel.txt | chess.txt
+ 
+[Interface = ChessPartner]      * any | chesspartner
+[Interface ? any]               / any | chesspartner
+
+[PATTERN ? 1]                   / [1] KBppp vs Knppp to EPD
+[PATTERN FILE = root]           / [7] caught rooks
+
+[Testing environment paramters]
+[NPS ? 1]                       / 100.000
+[PLY ? 8]                       / 8
+[PLY NO_QUEENS = 0]             
+[PLY QUEEN_ENDING = 0]          
+[PLY NORMAL_ENDING = 2]         
+[PLY ROOK_ENDING = 3]           
+[PLY LIGHT_ENDING = 4]          
+[PLY PAWN_ENDING = 5]    
+
+[BISHOP MOBILITY = 100]         /
+[Rook MOBILITY = 100]           /
+[Knight MOBILITY = 100]         /
+
+[ASYMMETRY = 100]               /
+
+[PST Pawn = 100]                / 
+[PST Knight = 100]              /
+[PST Bishop = 100]              /
+[PST Rook = 100]                /
+[PST Queen = 100]               /
+[PST King = 100]                /
+
+[Pruning ? MISC_03]             / Fix crash bug
+[PST Divide = 200]              / 
+[PST Replace = on]              /
+[PST Max = 80]                  / [55] [80] [239]
+
+[Own Queen ? 64]                / Keep Queen when behind [0.25|0.75|1.50]
+[QUEEN ENDGAME BONUS ? 64]      /
+
+[Pruning ? MISC_12]             / UPDATE - skip BRd8 by BPd6/WPd5
+[Pruning ? MISC_13]             / UPDATE - Skip WPd4/BPd5 (WPc2/WNd2) stimulation
+
+[Pruning ? MISC_17]             / trapped knight a1|a8|h1|h8 
+[Pruning ? MISC_18]             / trapped knight a2|a7|h2|h7 
+[Pruning ? MISC_19]             / avoid shuffle pieces
+[Pruning ? MISC_20]             / rook pins 8th row 
+[Pruning ? MISC_21]             / rook pins knight on a7|h7
+
+[Pruning = MISC_33]             / LMR=18 - reduce less ab<>mp                
+[Pruning = MISC_34]             / LMR=18 - reduce less ontrekkende zetten    
+[Pruning = MISC_35]             / LMR=18 - reduce less on good vp move   
+[Pruning = MISC_36]             / LMR=18 - reduce less on good KS move       
+[Pruning = MISC_37]             / LMR=18 - reduce less nieuwe aanvals zetten 
+[Pruning = MISC_38]             / LMR=18 - reduce less if killer move        
+
+[Pruning ? MISC_39]             / LMR=18 - reduce more if pos dropped 0.25 in score
+
+[Pruning ? MISC_40]             / LMR=18 - if (history >    0) reduce less 
+[Pruning ? MISC_41]             / LMR=18 - if (history >= 500) reduce less 
+[Pruning ? MISC_42]             / LMR=18 - if (history >=1000) reduce less 
+[Pruning ? MISC_43]             / LMR=18 - if (history >=1500) reduce less 
+
+[Pruning ? MISC_44]             / LMR=18 - root moves
+[Pruning ? MISC_45]             / LMR=18 - reduce less if full vp eval increased 
+[Pruning ? MISC_46]             / LMR=18 - reduce bad move with bad history         
+[Pruning ? MISC_47]             / LMR=18 - reduce less if pos gained 0.25 in score 
+[Pruning ? MISC_48]             / LMR=18 - if (MP>128) reduce less
+
+[Pruning ? MISC_49]             / LMR=18 - or M34 (ontrekkende zetten)
+[Pruning ? MISC_50]             / LMR=18 - or M37 (nieuwe aanvals zetten)
+
+[Pruning ? MISC_51]             / LMR=18 - if (history <     0) reduce more 
+[Pruning = MISC_52]             / LMR=18 - if (history <  -500) reduce more 
+[Pruning = MISC_53]             / LMR=18 - if (history < -1000) reduce more 
+[Pruning = MISC_54]             / LMR=18 - if (history < -1500) reduce more 
+
+[Pruning ? MISC_55]             / LMR=18 - reduce bad checks with one ply only         
+[Pruning ? MISC_56]             / LMR=18 - reduce bad captures with one ply only       
+[Pruning ? MISC_57]             / LMR=18 - reduce less if good PST move  
+[Pruning ? MISC_58]             / LMR=18 - REDU via log ipv lmr_tab 
+[Pruning ? MISC_59]             / LMR=18 - bad pawn push (6th/7th) reduce one ply only
+[Pruning ? MISC_60]             / LMR=18 - reduce bad move without history check [M46]
+[Pruning ? MISC_61]             / LMR=18 - good vp-move reduce less [note M35] 
+[Pruning ? MISC_62]             / LMR=18 - or M37|M50 (nieuwe aanvals zetten) 
+
+[LMR VP ? 32]                   / M35-M45 - [64]
+[LMR KS ? 32]                   / M36 - [64]   
+[LMR AB = 0]                    / M33 - [0] 
+[LMR PST = 125]                 / M57 - [125] 
+[LMR EVAL = 128]                / M48 - reduce less if positional advantage >= 0.50
+[LMR EVAL increase = 64]        / M47 - reduce less if position gained 0.25 in score
+[LMR EVAL decrease = 64]        / M39 - reduce more if position dropped 0.25 in score
+[LMR = 50]                      / 
+[LMR ENDG = 50]                 / either [45] or [60] 
+[LMR LESS = 5]                  / LMR=19 - lmr_tab correctie
+[LMR MORE = 5]                  / LMR=19 - lmr_tab correctie
+[LMR DISTRIBUTION = 100]        / 
+
+/                                         default option1 option2
+[LMR value 1 ? 0]               / [M51]   [  off] [  off] [  off]
+[LMR value 2 ? 75]              / [M52]   [ -500] [    0] [ -750] 
+[LMR value 3 ? 125]             / [M53]   [-1000] [ -500] [-1250] 
+[LMR value 4 ? 175]             / [M54]   [-1500] [-1000] [-1750] 
+
+[Pruning ? MISC_01]             / TREE - HISTORY / 8
+[Pruning ? MISC_02]             / Fix nullmove bug 
+[Pruning ? MISC_04]             / skip former M12 checks in LE
+[Pruning ? MISC_05]             / RAZOR in last 4 plies  
+
+[Pruning ? MISC_09]             / Bishop vs Knight endings
+[Pruning ? MISC_10]             / Advantage rule 
+[Advantage = 100]               / 0, 0, 0, 32, 64, 128, 192, 256, 256
+
+[Pawn Value = 100]              /
+[Knight Value = 100]            / 
+[Bishop Value = 100]            /
+[Rook Value = 100]              / 
+[Queen Value = 100]             / 
+
+[My Lady = 22]                  / [22] 
+[My Rook = 0]                   / 10
+[My Bishop = 0]                 / 5
+[My Knight = 0]                 / 5
+[My Pawn = 0]                   / 2
+
+[King Safety = 105]             / [105] 
+[King Safety Modus ? normal]    /
+[King Safety Modus ? moderate]  /
+[King Safety Modus ? aggressive]/
+
+[Mobility = 55]                 / [55]  
+[Minimum Knight Mobility = 100] /
+[Minimum Bishop Mobility = 100] /
+[MOBILITY FACTOR = 0]           /
+
+[Pawn Structure = 100]          /
+[Weak Pawns = 100]              /
+[Pawn Formation = 100]          /
+[Pawn Pressure = 100]           
+[Double Pawns = 100]            
+[Double Isolated Pawns = 75]    
+[Passed Pawns = 100]            
+[Passed Pawns MIDG = 125]       
+[Passed Pawn Tropism (1) = 100] 
+[Passed Pawn Tropism (2) = 200] 
+
+[Core Personality = q3.eng]     
+[Score Margin = 25]             
+[Depth Margin = 0]              
+[Debug File = differences.epd]  
+[Output Margin = 200]           
+
+[Bad Bishop = 100]              
+[Bishop_Pair = 100]             
+[Unequal Bishops = 100]         
+[Pins = 100]                    
+[Xray = 100]                    
+[Center Control = 0]            
+[Right to Move = 50]            
+[Strong Squares = 150]          / [try=125]
+[Rook 7th Rank (1) = 50]           
+[Rook 7th Rank (2) = 75]        
+[Bishop Pair Extra = 100]       
+[Chess Knowledge = 125]         /
+
+[Attractiveness = 101]          /
+[Attractiveness MIDG = 101]     /
+[Attractiveness END1 = 101]     /
+[Attractiveness END2 = 101]     /
+
+[Playing Style = boring]        / wood | boring | dull | defensive | normal | optimistic | risky | gambit | mad
+
+[EVAL ? 100]                    /
+
+[Attacking = 100]               
+[Strength of Play = 100]          
+[Draw Contempt Factor = 0.00]   
+[Selective Search = 100]        
+[Search Technique = NULLMOVE] 
+[Search Technique ? NORMAL]     
+[Search Safety = 200]           
+
+[Book Learner = off]     
+[Position Learner = off]          
+[Engine Master = off]             
+[Engine Learner = off]            
+[Extended Book Learner = off]     
+
+[Permanent Brain = off]         / on | off
+
+[Consult File = ]             
+
+[EOC File = ]       
+[EOC Use = none]                 
+[EOC Learner = off]                 
+
+[EBF File = books\dc.ebf]       / database location
+[EBF Depth = 80]                / consult EBF database till 40 moves
+
+[EBF Priority = EBF]            / EBF | CHT
+
+[CHT File = books\ccrlcegt.cht] / database location
+[CHT Use = all]                 / human | comp | all | none
+[CHT Priority = comp]           / human | comp
+[CHT Depth = 60]                / consult CHT database till 30 moves
+[CHT Minimum = 7]               / engine classification (0-9) 9>=2800
+         
+[PLW3 redu = on]                
+[PLZ3 redu = on]               
+[HISTORY redu = on]             
+[HISTORY DEPTH = 8]             
+
+[Time Control = 100]            
+[TC slim ? 125]                 / [125=likely not good] 
+[TC tlim ? 90]                  / likely not good also
+[Blitz Time Control = 120]         
+
+[Recaptures = normal]             
+[Extensions (remaining)= 2]     
+[Extensions (checks)= low]      / [low]
+[Singular Checks = 1]           / [1]   
+[SINGULAR CHECKS ENDG ? 0]      / [0]
+[M37_MAX ? 0]                   / pvs extension
+[Extensions (max) = 100]        / [50] [40/15=49.0%]
+[Checks Depth = 2]              
+
+[Futility = 100]                
+[Futility Depth = 6]            
+[Futility_RD1 ? 1.00]           
+[Futility_RD2 ? 1.50]           
+[Futility_RD3 ? 2.00]           
+[Futility_RD4 ? 2.50]           
+[Futility_RD5 ? 3.00]           
+[Futility_RD6 ? 3.50]           
+[Futility_RD7 ? 4.00]           
+[Futility_RD8 ? 4.50]           
+[Futility_RD9 ? 5.00]           
+[Futility_RD10 ? 5.50]          
+[Futility_RD11 ? 6.00]          
+[Futility_RD12 ? 6.50]          

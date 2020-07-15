@@ -1,0 +1,13 @@
+1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 a6 6. Be3 e5 7. Nb3 Be6 8. f3 Be7 9. Qd2 O-O 10. O-O-O Nbd7 11. g4 b5 12. g5 b4 13. Ne2 Ne8 14. f4 a5 15. f5 a4 16. Nbd4 exd4 17. Nxd4 b3 18. Kb1 bxc2+ 19. Nxc2 Bb3 20. axb3 axb3 21. Na3 Ne5 22. h4 Ra4 23. Rh3 Qa8 24. Qd5 Rxa3 25. bxa3 Qxa3 26. Rd2 Nc7 27. Qb7 Qa5 28. Qb6 Qc3 29. Qd4 Qc6 30. f6 Rc8 31. fxe7 Ne6 32. Qb2 Qxe4+ 33. Bd3 Nxd3 34. Qxb3 Ndc5+ 35. Qc2 Rb8+ 36. Kc1 Nb3+ 37. Qxb3 Qc6+ 38. Rc2 Qe8 39. Qd5 Qxe7 40. g6 hxg6 41. Rf2 Nc7 42. Qc6 Rb3 43. Rff3 d5 44. Qa4 Rb4 45. Qa5 Rc4+ 46. Kd2 Qe4 47. Qa2 d4 48. Qxc4 dxe3+ 49. Kc3 Qxc4+ 50. Kxc4 Nd5 51. Kxd5 e2 52. Re3 g5 53. Re8+ Kh7 54. hxg5+ Kg6 55. Rxe2 Kxg5 56. Kc4 Kf6 57. Kd3 g5 58. Rf3+ Kg6 59. Re7 f5 60. Ke2 g4 61. Rg3 Kg5 62. Rg2 Kg6 63. Kf1 Kg5 64. Rd7 Kh6 65. Kf2 Kh5 66. Re7 Kg5 67. Rd7 Kh5 68. Re7 Kg5 69. Rd7 Kh5 70. Re7 Kg5 71. Rd7 Kh5 72. Re7 Kg5 73. Rd7 Kh6 74. Re7 Kh5 75. Rd7 Kg5 76. Rc7 Kh5 77. Rd7 Kg5 78. Rc7 Kh5 79. Rd7 Kg5 80. Rc7 Kh5 81. Rd7 Kg5 82. Rc7 Kh5 83. Rb7 Kg5 84. Rb6 Kh5 85. Rb7 Kg5 86. Rb6 Kh5 87. Rb7 Kg5 88. Rb6 Kh5 89. Rb7 Kg5 90. Rb6 Kh5 91. Kg3 Kg5 92. Rf2 f4+ 93. Rxf4 Kh5 94. Rf5#
+
+game ends with white mate
+
+white:
+0innac
+3mistakes
+17blunders
+
+black:
+2innac
+2mistakes
+9blunders

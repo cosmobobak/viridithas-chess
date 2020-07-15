@@ -1,0 +1,11 @@
+*.o
+*.P
+*.swp
+*.txt
+*.rtbw
+*.rtbz
+rtbgen
+rtbgenp
+rtbver
+rtbverp
+tbcheck

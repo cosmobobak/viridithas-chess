@@ -1,10 +1,15 @@
 import chess
 import chess.svg
+import chess.pgn
+import chess.polyglot
+import chess.syzygy
 import random
 import chess.variant
 import time
 import operator
 import line_profiler
+
+killer = 'a1a2'
 
 whiteTime = 0.0
 blackTime = 0.0
@@ -25,79 +30,168 @@ queenSpacesW = list(reversed(queenSpacesB))
 kingSpacesW = list(reversed(kingSpacesB))
 kingSpacesEndgameW = list(reversed(kingSpacesEndgameB))
 
-@profile
-def evaluate(board,depth):
+#@profile
+def evaluate(board,depth,endgame):
     if board.turn:
         mod = 1
     else:
         mod = -1
 
     if board.is_checkmate():
-        return 10000.0*depth*mod
-    if board.is_repetition(2):
+        return 10000.0*(depth+1)*mod
+    if board.is_repetition(2) or board.can_claim_fifty_moves():
         return -20000.0*mod
 
-    endgame = False
     rating = 0.0
 
-    rating += -sum([pawnSpacesW[i]+1000 for i in board.pieces(chess.PAWN, chess.WHITE)])*0.001
-    rating -= -sum([pawnSpacesB[i]+1000 for i in board.pieces(chess.PAWN, chess.BLACK)])*0.001
-    rating += -sum([knightSpacesW[i]+3200 for i in board.pieces(chess.KNIGHT, chess.WHITE)])*0.001
-    rating -= -sum([knightSpacesB[i]+3200 for i in board.pieces(chess.KNIGHT, chess.BLACK)])*0.001
-    rating += -sum([bishopSpacesW[i]+3330 for i in board.pieces(chess.BISHOP, chess.WHITE)])*0.001
-    rating -= -sum([bishopSpacesB[i]+3330 for i in board.pieces(chess.BISHOP, chess.BLACK)])*0.001
-    rating += -sum([rookSpacesW[i]+5100 for i in board.pieces(chess.ROOK, chess.WHITE)])*0.001
-    rating -= -sum([rookSpacesB[i]+5100 for i in board.pieces(chess.ROOK, chess.BLACK)])*0.001
-    rating += -sum([queenSpacesW[i]+8800 for i in board.pieces(chess.QUEEN, chess.WHITE)])*0.001
-    rating -= -sum([queenSpacesB[i]+8800 for i in board.pieces(chess.QUEEN, chess.BLACK)])*0.001
-    rating += -sum([kingSpacesW[i] for i in board.pieces(chess.KING, chess.WHITE)])*0.001
-    rating -= -sum([kingSpacesB[i] for i in board.pieces(chess.KING, chess.BLACK)])*0.001
+    rating += sum([pawnSpacesB[i]+1000 for i in board.pieces(chess.PAWN, chess.BLACK)])-sum([pawnSpacesW[i]+1000 for i in board.pieces(chess.PAWN, chess.WHITE)])
+    rating += sum([knightSpacesB[i]+3200 for i in board.pieces(chess.KNIGHT, chess.BLACK)])-sum([knightSpacesW[i]+3200 for i in board.pieces(chess.KNIGHT, chess.WHITE)])
+    rating += sum([bishopSpacesB[i]+3330 for i in board.pieces(chess.BISHOP, chess.BLACK)])-sum([bishopSpacesW[i]+3330 for i in board.pieces(chess.BISHOP, chess.WHITE)])
+    rating += sum([rookSpacesB[i]+5100 for i in board.pieces(chess.ROOK, chess.BLACK)])-sum([rookSpacesW[i]+5100 for i in board.pieces(chess.ROOK, chess.WHITE)])
+    rating += sum([queenSpacesB[i]+8800 for i in board.pieces(chess.QUEEN, chess.BLACK)])-sum([queenSpacesW[i]+8800 for i in board.pieces(chess.QUEEN, chess.WHITE)])
+    if endgame:
+        rating += sum([kingSpacesEndgameB[i] for i in board.pieces(chess.KING, chess.BLACK)])-sum([kingSpacesEndgameW[i] for i in board.pieces(chess.KING, chess.WHITE)])
+    else:
+        rating += sum([kingSpacesB[i] for i in board.pieces(chess.KING, chess.BLACK)])-sum([kingSpacesW[i] for i in board.pieces(chess.KING, chess.WHITE)])
 
-    return rating
+    return rating*0.001
 
-def orderedMoves(board,killer):
+#@profile
+def orderedMoves(board):
+    first = []
+    last = []
 
+    for move in board.legal_moves:
+        if board.is_capture(move):
+            first.append(move)
+        else:
+            last.append(move)
 
-@profile
-def negamax(node, depth, a, b, colour, killer):
+    return first + last
+
+#@profile
+def negamax_killer(node, depth, a, b, colour, endgame):
     if depth == 0 or node.is_game_over():
-        return colour * evaluate(node,depth)
+        return colour * evaluate(node, depth, endgame)
     value = -1337000.0
-    for move in node.legal_moves:
+    moves = orderedMoves(node)
+    for move in moves:
         node.push(move)
-        value = max(value, -negamax(node, depth-1, -b, -a, -colour, killer))
+        value = max(value, -negamax_killer(node, depth-1, -b, -a, -colour, endgame))
         a = max(a, value)
         node.pop()
         if a >= b:
-            killer = move
             break
     return value
 
-@profile
+def deepNegamax(node, limit, a, b, colour):
+    start = time.time()
+    depth = 0
+    while True:
+        value = negamax_killer(node, depth, a, b, colour)
+        depth += 1
+        if time.time()-start > limit:
+            break
+    return value
+
+def minimax(node, depth, colour, tablebase):
+    DTZ = tablebase.probe_dtz(node)
+    if DTZ == 0 or depth == 0:
+        return 0
+    if colour:
+        value = -123456789
+        for move in node.legal_moves:
+            value = max(value, minimax(node, depth - 1, False, tablebase))
+        return value
+    else:
+        value = 123456789
+        for move in node.legal_moves:
+            value = min(value, minimax(node, depth - 1, True, tablebase))
+        return value
+
+def pieceCount(board):
+    count = 0
+    for piece in board.pieces(chess.PAWN, chess.BLACK):
+        count += 1
+    for piece in board.pieces(chess.PAWN, chess.WHITE):
+        count += 1
+    for piece in board.pieces(chess.KNIGHT, chess.BLACK):
+        count += 1
+    for piece in board.pieces(chess.KNIGHT, chess.WHITE):
+        count += 1
+    for piece in board.pieces(chess.BISHOP, chess.BLACK):
+        count += 1
+    for piece in board.pieces(chess.BISHOP, chess.WHITE):
+        count += 1
+    for piece in board.pieces(chess.ROOK, chess.BLACK):
+        count += 1
+    for piece in board.pieces(chess.ROOK, chess.WHITE):
+        count += 1
+    for piece in board.pieces(chess.QUEEN, chess.BLACK):
+        count += 1
+    for piece in board.pieces(chess.QUEEN, chess.WHITE):
+        count += 1
+    return count
+
+#@profile
 def pushMove(board,depth,debug):
     start = time.time()
+
+    moves = []
+    for move in board.legal_moves:
+        moves.append(move)
+
+    endgame = False
+    if pieceCount(board) <= 3:
+        endgame = True
+
     if board.turn:
         turn = 1
     else:
         turn = -1
-    moves = []
-    for move in board.legal_moves:
-        moves.append(move)
+
     boards = []
     moveRatings = []
-    heuristicRatings = []
-    for move in board.legal_moves:
-        board.push(move)
+    RESET = board.copy()
 
-        moveRatings.append(negamax(board, depth, -1337000, 1337000, turn, move))
+    try:
+        #OPENING BOOK PROBING
+        book = chess.polyglot.open_reader(r"C:\Users\Cosmo\Documents\GitHub\Chess\ProDeo292\ProDeo292\books\elo2500.bin")
+        main_entry = book.find(board)
+        best = main_entry.move
 
-        boards.append(board.copy())
+        board.push(best)
+        print(best)
+        print(chess.pgn.Game.from_board(board)[-1])
+    except Exception:
+        #NOT OPENING BOOK PROBING
+        for move in moves:
+            if not endgame:
+                board.push(move)
+                moveRatings.append(negamax_killer(board, depth, -1337000, 1337000, turn, endgame))
+                board.pop()
+            else:
+                try:
+                    with chess.syzygy.open_tablebase(r'C:\Users\Cosmo\Documents\GitHub\Chess\3-4-5piecesSyzygy\3-4-5') as tablebase:
+                        board.push(move)
+                        moveRatings.append(minimax(board,depth,turn,tablebase))
+                        board.pop()
+                        tablebase.close()
+                except Exception:
+                    board.push(move)
+                    moveRatings.append(negamax_killer(board, depth, -1337000, 1337000, turn, endgame))
+                    board.pop()
 
-        board.pop()
-    if debug:
-        for move,moveRating in zip(moves,moveRatings):
-            print(move,moveRating)
-    board.push(moves[moveRatings.index(min(moveRatings))])
+        if debug:
+            for move,moveRating in zip(moves,moveRatings):
+                print(move,moveRating)
+
+        best = moves[moveRatings.index(min(moveRatings))]
+
+        board.push(best)
+        print(best)
+        print(chess.pgn.Game.from_board(board)[-1])
+
     end = time.time()
     global whiteTime
     print(end-start)
@@ -119,7 +213,19 @@ def usermoveKermit(board,a,b):
         except Exception:
             move = input("enter move: ")
 
-@profile
+def endingPrinter(board):
+    show(board)
+    if board.is_stalemate():
+        print('END BY STALEMATE')
+    elif board.is_insufficient_material():
+        print('END BY INSUFFICIENT MATERIAL')
+    elif board.is_fivefold_repetition():
+        print('END BY FIVEFOLD REPETITION')
+    elif board.is_checkmate:
+        print(board.turn,'WINS ON TURN',board.fullmove_number)
+    else:
+        print('END BY UNKNOWN REASON')
+
 def main(string,rounds,debug,human,side,depth):
     for game in range(rounds):
         board = chess.Board(str(string))
@@ -132,29 +238,24 @@ def main(string,rounds,debug,human,side,depth):
             show(board)
 
             boards,ratings = pushMove(board,depth,debug)
-            boardArrays.append(boards)
-            ratingArrays.append(ratings)
+            #usermoveKermit(board,1,1)
+
+            #boardArrays.append(boards)
+            #ratingArrays.append(ratings)
 
             if board.is_game_over():
                 break
 
             show(board)
 
-            boards,ratings = pushMove(board,depth,debug)
-            boardArrays.append(boards)
-            ratingArrays.append(ratings)
+            #boards,ratings = pushMove(board,depth,debug)
+            usermoveKermit(board,1,1)
 
-        show(board)
-        if board.is_stalemate():
-            print('END BY STALEMATE')
-        elif board.is_insufficient_material():
-            print('END BY INSUFFICIENT MATERIAL')
-        elif board.is_fivefold_repetition():
-            print('END BY FIVEFOLD REPETITION')
-        elif board.is_checkmate:
-            print(board.turn,'WINS ON TURN',board.fullmove_number)
-        else:
-            print('END BY UNKNOWN REASON')
+            #boardArrays.append(boards)
+            #ratingArrays.append(ratings)
+
+        endingPrinter(board)
+
     return boardArrays,ratingArrays,board.move_stack
 
 standard = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
@@ -162,56 +263,38 @@ standard = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
 whiteMate1 = '8/8/8/8/8/4R1K1/8/6k1 w - - 0 1'
 blackMate1 = '8/8/8/8/8/4r1k1/8/6K1 b - - 0 1'
 
-test = 'r3k2r/pp1n1pp1/2p1p2p/q1Pp1b2/1b1PnB2/PQN1PN1P/1P3PP1/R3KB1R w - - 0 1'
+openings = ['rnbqkbnr/pppppppp/8/8/8/6P1/PPPPPP1P/RNBQKBNR b KQkq - 0 1',
+            'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+            'rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1',
+            'rnbqkbnr/pppppppp/8/8/8/5N2/PPPPPPPP/RNBQKB1R b KQkq - 1 1',
+            'rnbqkbnr/pppppppp/8/8/2P5/8/PP1PPPPP/RNBQKBNR b KQkq c3 0 1',
+            'rnbqkbnr/pppppppp/8/8/8/N7/PPPPPPPP/R1BQKBNR b KQkq - 1 1',
+            'rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2']
 
-boardArrays,ratingArrays,stack = main(test,1,False,False,True,4)
-print('time elapsed while white was thinking:',whiteTime)
-print('time elapsed while black was thinking:',blackTime)
-print(stack)
+#g3
+#e4
+#d4
+#Nf3
+#c4
+#Na3
+#sicilian (1. e4 c5)
 
-'''
-pawn = 1000
-knight = 3000
-bishop = 3500
-rook = 5000
-queen = 9000
+if True:
+    test = '8/8/1R6/6k1/5Rp1/6K1/8/8 b - - 0 93'
 
-pieces = [pawn,knight,bishop,rook,queen]
-diffs = []
-for boards,ratings in zip(boardArrays,ratingArrays):
-    for board,rating in zip(boards,ratings):
-        if abs(float(rating)) < 900:
-            diffs.append((float(rating)-float(evaluateTuned(board,pawn,knight,bishop,rook,queen)))**2)
-        else:
-            diffs.append(0.0)
-print(diffs)
+    boardArrays,ratingArrays,stack = main(standard,1,True,True,True,3)
+    print('time elapsed while thinking:',whiteTime)
+    print(stack)
 
-for counter in range(5):
-    newdiffs = []
-    modifier = 100
-    index = 0
-    for piece in pieces:
-        piece += modifier
-        for boards,ratings in zip(boardArrays,ratingArrays):
-            for board,rating in zip(boards,ratings):
-                if abs(float(rating)) < 900:
-                    newdiffs.append((float(rating)-float(evaluateTuned(board,pawn,knight,bishop,rook,queen)))**2)
-                else:
-                    newdiffs.append(0.0)
-        if sum(newdiffs) > sum(diffs):
-            piece -= modifier*2
-            for boards,ratings in zip(boardArrays,ratingArrays):
-                for board,rating in zip(boards,ratings):
-                    if abs(float(rating)) < 900:
-                        newdiffs.append((float(rating)-float(evaluateTuned(board,pawn,knight,bishop,rook,queen)))**2)
-                    else:
-                        newdiffs.append(0.0)
-            if sum(newdiffs) > sum(diffs):
-                piece += modifier
-            else:
-                pieces[index] = piece
-        else:
-            pieces[index] = piece
-        index+=1
-print(pieces)
-'''
+if False:
+    stacks = []
+    for opening in openings:
+        a,b,stack = main(opening,1,False,True,True,3)
+        stacks.append(stack)
+    print(stacks)
+
+if False:
+    for counter in range(5):
+        print(str(counter)+':',negamax_killer(chess.Board(standard), counter, -1337000, 1337000, True))
+    print('-----------------')
+    print(deepNegamax(chess.Board(standard), 20, -1337000, 1337000, True))

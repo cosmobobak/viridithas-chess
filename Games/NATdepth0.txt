@@ -1,0 +1,13 @@
+1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 a6 6. Be3 e5 7. Nb3 Be6 8. f3 Be7 9. Qd2 O-O 10. O-O-O Nbd7 11. g4 b5 12. g5 b4 13. Ne2 Ne8 14. f4 a5 15. f5 a4 16. Nbd4 exd4 17. Nxd4 b3 18. Kb1 bxc2+ 19. Nxc2 Bb3 20. axb3 axb3 21. Na3 Ne5 22. h4 Ra4 23. Rh3 Qa8 24. Qd5 Rxa3 25. bxa3 Qxa3 26. Rd2 Nc7 27. Qb7 Qa5 28. Qb6 Qc3 29. Qd4 Qc6 30. f6 Rc8 31. fxe7 Qxe4+ 32. Qxe4 b2 33. e8=Q+ Rxe8 34. Qxe5 dxe5 35. Rxb2 Nd5 36. Bc4 Nxe3 37. Rxe3 e4 38. Rxe4 Rxe4 39. Bxf7+ Kxf7 40. Rb7+ Kg8 41. Rxg7+ Kxg7 42. g6 hxg6 43. Kc2 Kh8 44. Kd3 Re8 45. Kd4 Kg8 46. Kd5 Kh8 47. Kd6 Kg8 48. Kd7 Kf8 49. Kc7 Kg8 50. Kd7 Kf8 51. Kc7 Kg8 52. Kd7 Kf8 53. Kc7 Kg8 54. Kd7 Kf8 55. Kc7 Kg8 56. Kd7
+
+game ends with 5fold
+
+white:
+2innac
+0mistakes
+2blunders
+
+black:
+3innac
+0mistakes
+6blunders

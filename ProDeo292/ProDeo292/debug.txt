@@ -1,0 +1,42 @@
+[0] - xboard
+[0] - new
+[0] - setlevel 5 300 0
+[0] - post
+[0] - hard
+[0] - force
+[0] - new
+[0] - post
+[0] - hard
+[0] - setboard r1b2rk1/1p1nbppp/pq1p4/3B4/P2NP3/2N1p3/1PP3PP/R2Q1R1K w - - 0 1
+[0] - analyze
+[0] - exit
+[0] - force
+[0] - new
+[0] - post
+[0] - hard
+[0] - force
+[0] - setboard r1b2rk1/1p1nbppp/pq1p4/3B4/P2NP3/2N1p3/1PP3PP/R2Q1R1K w - - 0 1
+[0] - f1f7
+[0] - analyze
+[0] - exit
+[0] - force
+[0] - f8f7
+[0] - analyze
+[0] - exit
+[0] - force
+[0] - d5f7
+[0] - analyze
+[0] - exit
+[0] - force
+[0] - g8f7
+[0] - analyze
+[0] - exit
+[0] - force
+[0] - d1h5
+[0] - analyze
+[0] - exit
+[0] - force
+[0] - f7g8
+[0] - analyze
+[0] - exit
+[0] - quit

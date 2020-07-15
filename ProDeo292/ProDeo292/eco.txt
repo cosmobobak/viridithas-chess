@@ -1,0 +1,2017 @@
+A00 Polish
+A00 Polish
+A00 Polish
+A00 Benko
+A00 Lasker
+A00 Benko
+A00 Grob
+A00 Grob
+A00 Grob
+A00 Grob
+A00 Clemenz
+A00 Global
+A00 Amar
+A00 Amar
+A00 Dunst
+A00 Dunst
+A00 Battambang
+A00 Novosibirsk
+A00 Anderssen
+A00 Ware
+A00 Crab
+A00 Saragossa
+A00 Mieses
+A00 Mieses
+A00 Valencia
+A00 Venezolana
+A00 Kruijs
+A00 Amsterdam
+A00 Gedult
+A00 Hammerschlag
+A00 Anti-Borg
+A00 Durkink
+A01 Nimzovich
+A01 Nimzovich
+A01 Nimzovich
+A01 Nimzovich
+A01 Nimzovich
+A01 Nimzovich
+A01 Nimzovich
+A01 Nimzovich
+A02 Bird
+A02 Bird
+A02 Bird
+A02 Bird
+A02 Bird
+A02 Bird
+A03 Bird
+A03 Mujannah
+A03 Bird
+A03 Bird
+A04 Reti
+A04 Reti
+A04 Reti
+A04 Reti
+A04 Reti
+A04 Reti
+A04 Reti
+A05 Reti
+A05 Reti
+A05 Reti
+A05 Reti
+A06 Reti
+A06 Reti
+A06 Santasiere
+A06 Tennison
+A06 Reti
+A07 Reti
+A07 Reti
+A07 Reti
+A07 Reti
+A07 Reti
+A07 Reti
+A08 Reti
+A08 Reti
+A09 Reti
+A09 Reti
+A09 Reti
+A09 Reti
+A10 English
+A10 English
+A10 English
+A10 English
+A10 English
+A11 English
+A12 English
+A12 English
+A12 English
+A12 English
+A12 English
+A12 English
+A12 English
+A12 English
+A13 English
+A13 English
+A13 English
+A13 English
+A13 English
+A13 English
+A13 English
+A13 English
+A14 English
+A14 English
+A15 English
+A15 English
+A15 English
+A16 English
+A16 English
+A16 English
+A16 English
+A16 English
+A16 English
+A17 English
+A17 English
+A17 English
+A17 English
+A18 English
+A18 English
+A18 English
+A19 English
+A20 English
+A20 English
+A20 English
+A21 English
+A21 English
+A21 English
+A21 English
+A21 English
+A21 English
+A22 English
+A22 English
+A22 English
+A22 English
+A22 English
+A23 English
+A24 English
+A25 English
+A25 English
+A25 English
+A25 English
+A25 English
+A25 English
+A25 English
+A26 English
+A26 English
+A27 English
+A28 English
+A28 English
+A28 English
+A28 English
+A28 English
+A28 English
+A28 English
+A28 English
+A28 English
+A29 English
+A30 English
+A30 English
+A30 English
+A31 English
+A32 English
+A33 English
+A33 English
+A34 English
+A34 English
+A34 English
+A34 English
+A35 English
+A35 English
+A36 English
+A36 English
+A36 English
+A36 English
+A37 English
+A37 English
+A38 English
+A38 English
+A38 English
+A39 English
+A40 Queen's pawn
+A40 Queen's pawn
+A40 Queen's pawn
+A40 Queen's pawn
+A40 Queen's pawn
+A40 Polish
+A40 Queen's pawn
+A40 Queen's pawn
+A40 Queen's pawn
+A40 Modern defence
+A40 Beefeater
+A41 Queen's Pawn
+A41 Old Indian
+A41 Old Indian
+A41 Modern defence
+A41 Robatsch
+A42 Modern defence
+A42 Pterodactyl
+A42 Modern defence
+A42 Averbakh
+A43 Old Benoni
+A43 Old Benoni
+A43 Old Benoni
+A43 Old Benoni
+A43 Woozle
+A43 Old Benoni
+A43 Hawk
+A43 Old Benoni
+A43 Old Benoni
+A44 Old Benoni
+A44 Semi-Benoni
+A45 Queen's pawn
+A45 Queen's pawn
+A45 Canard opening
+A45 Paleface
+A45 Blackmar-Diemer
+A45 Gedult attack
+A45 Trompovsky
+A46 Queens pawn
+A46 Queens pawn
+A46 Queens pawn
+A46 Queens pawn
+A46 Doery
+A47 Queens Indian
+A47 Queens Indian
+A47 Queens Indian
+A48 Kings Indian
+A48 Kings Indian
+A48 Kings Indian
+A49 Kings Indian
+A50 Queens pawn
+A50 Kevitz
+A50 Queens Indian
+A51 Budapest
+A51 Budapest
+A51 Budapest
+A52 Budapest
+A52 Budapest
+A52 Budapest
+A52 Budapest
+A52 Budapest
+A52 Budapest
+A53 Old Indian
+A53 Old Indian
+A54 Old Indian
+A54 Old Indian
+A54 Old Indian
+A55 Old Indian
+A56 Benoni
+A56 Benoni
+A56 Vulture
+A56 Czech Benoni
+A56 Czech Benoni
+A57 Benko gambit
+A57 Benko gambit
+A57 Benko gambit
+A57 Benko gambit
+A58 Benko gambit
+A58 Benko gambit
+A58 Benko gambit
+A59 Benko gambit
+A59 Benko gambit
+A59 Benko gambit
+A59 Benko gambit
+A60 Benoni
+A61 Benoni
+A61 Benoni
+A61 Benoni
+A61 Benoni
+A62 Benoni
+A63 Benoni
+A64 Benoni
+A65 Benoni
+A66 Benoni
+A66 Benoni
+A67 Benoni
+A68 Benoni
+A69 Benoni
+A70 Benoni
+A70 Benoni
+A71 Benoni
+A72 Benoni
+A73 Benoni
+A74 Benoni
+A75 Benoni
+A76 Benoni
+A77 Benoni
+A78 Benoni
+A79 Benoni
+A80 Dutch
+A80 Dutch
+A80 Dutch
+A80 Dutch
+A80 Dutch
+A80 Dutch
+A80 Dutch
+A81 Dutch
+A81 Dutch
+A81 Dutch
+A81 Dutch
+A81 Dutch
+A82 Dutch
+A82 Dutch
+A82 Dutch
+A82 Dutch
+A83 Dutch
+A83 Dutch
+A83 Dutch
+A83 Dutch
+A83 Dutch
+A84 Dutch
+A84 Dutch
+A84 Dutch
+A84 Dutch
+A84 Dutch
+A84 Dutch
+A85 Dutch
+A86 Dutch
+A86 Dutch
+A86 Dutch
+A87 Dutch
+A88 Dutch
+A89 Dutch
+A90 Dutch
+A90 Dutch
+A90 Dutch
+A91 Dutch
+A92 Dutch
+A92 Dutch
+A92 Dutch
+A92 Dutch
+A93 Dutch
+A94 Dutch
+A95 Dutch
+A95 Dutch
+A96 Dutch
+A97 Dutch
+A97 Dutch
+A98 Dutch
+A99 Dutch
+B00 Kings pawn
+B00 Hippopotamus
+B00 Corn stalk
+B00 Lemming
+B00 Fred
+B00 Barnes
+B00 Fried
+B00 Carr
+B00 Grob)
+B00 St. George
+B00 Owen
+B00 Guatemala
+B00 KP: Nimzovich
+B00 KP: Nimzovich
+B00 KP: Nimzovich
+B00 KP: Colorado
+B00 KP: Nimzovich
+B00 KP: Nimzovich
+B00 KP: Nimzovich
+B00 KP: Mongoloid
+B01 Scandinavian
+B01 Scandinavian
+B01 Scandinavian
+B01 Scandinavian
+B01 Scandinavian
+B01 Scandinavian
+B01 Scandinavian
+B01 Scandinavian
+B01 Scandinavian
+B01 Scandinavian
+B01 Scandinavian
+B01 Scandinavian
+B01 Scandinavian
+B01 Scandinavian
+B01 Scandinavian
+B01 Scandinavian
+B01 Scandinavian
+B02 Alekhine
+B02 Alekhine
+B02 Alekhine
+B02 Alekhine
+B02 Alekhine
+B02 Alekhine
+B02 Alekhine
+B02 Alekhine
+B02 Alekhine
+B02 Alekhine
+B02 Alekhine
+B02 Alekhine
+B02 Alekhine
+B02 Alekhine
+B02 Alekhine
+B03 Alekhine
+B03 Alekhine
+B03 Alekhine
+B03 Alekhine
+B03 Alekhine
+B03 Alekhine
+B03 Alekhine
+B03 Alekhine
+B03 Alekhine
+B03 Alekhine
+B03 Alekhine
+B03 Alekhine
+B03 Alekhine
+B03 Alekhine
+B03 Alekhine
+B03 Alekhine
+B04 Alekhine
+B04 Alekhine
+B04 Alekhine
+B04 Alekhine
+B04 Alekhine
+B05 Alekhine
+B05 Alekhine
+B05 Alekhine
+B05 Alekhine
+B05 Alekhine
+B06 Robatsch
+B06 Norwegian
+B06 Robatsch
+B06 Robatsch
+B06 Robatsch
+B06 Robatsch
+B06 Robatsch
+B06 Robatsch
+B06 Robatsch
+B06 Robatsch
+B07 Pirc
+B07 Pirc
+B07 Pirc
+B07 Pirc
+B07 Pirc
+B07 Pirc
+B07 Pirc
+B07 Pirc
+B07 Pirc
+B07 Pirc
+B07 Robatsch
+B08 Pirc
+B08 Pirc
+B08 Pirc
+B08 Pirc
+B09 Pirc
+B09 Pirc
+B09 Pirc
+B09 Pirc
+B09 Pirc
+B09 Pirc
+B09 Pirc
+B10 Caro-Kann
+B10 Caro-Kann
+B10 Caro-Kann
+B10 Caro-Kann
+B10 Caro-Kann
+B10 Caro-Kann
+B10 Caro-Kann
+B10 Caro-Kann
+B11 Caro-Kann
+B12 Caro-Kann
+B12 de Bruycker
+B12 Caro-Masi
+B12 Caro-Kann
+B12 Caro-Kann
+B12 Caro-Kann
+B12 Caro-Kann
+B12 Caro-Kann
+B12 Caro-Kann
+B13 Caro-Kann
+B13 Caro-Kann
+B13 Caro-Kann
+B13 Caro-Kann
+B13 Caro-Kann
+B13 Caro-Kann
+B13 Caro-Kann
+B13 Caro-Kann
+B13 Caro-Kann
+B14 Caro-Kann
+B14 Caro-Kann
+B15 Caro-Kann
+B15 Caro-Kann
+B15 Caro-Kann
+B15 Caro-Kann
+B15 Caro-Kann
+B15 Caro-Kann
+B15 Caro-Kann
+B15 Caro-Kann
+B16 Caro-Kann
+B17 Caro-Kann
+B18 Caro-Kann
+B18 Caro-Kann
+B18 Caro-Kann
+B18 Caro-Kann
+B19 Caro-Kann
+B19 Caro-Kann
+B20 Sicilian
+B20 Sicilian
+B20 Sicilian
+B20 Sicilian
+B20 Sicilian
+B20 Sicilian
+B20 Sicilian
+B20 Sicilian
+B20 Sicilian
+B21 Sicilian
+B21 Sicilian
+B21 Sicilian
+B21 Sicilian
+B21 Sicilian
+B22 Sicilian
+B22 Sicilian
+B23 Sicilian
+B23 Sicilian
+B23 Sicilian
+B23 Sicilian
+B23 Sicilian
+B23 Sicilian
+B24 Sicilian
+B24 Sicilian
+B25 Sicilian
+B25 Sicilian
+B25 Sicilian
+B25 Sicilian
+B26 Sicilian
+B27 Sicilian
+B27 Sicilian
+B27 Sicilian
+B27 Sicilian
+B27 Sicilian
+B27 Sicilian
+B28 Sicilian
+B29 Sicilian
+B29 Sicilian
+B30 Sicilian
+B30 Sicilian
+B31 Sicilian
+B31 Sicilian
+B32 Sicilian
+B32 Sicilian
+B32 Sicilian
+B32 Sicilian
+B32 Sicilian
+B33 Sicilian
+B33 Sicilian
+B33 Sicilian
+B33 Sicilian
+B33 Sicilian
+B34 Sicilian
+B34 Sicilian
+B35 Sicilian
+B36 Sicilian
+B36 Sicilian
+B37 Sicilian
+B37 Sicilian
+B38 Sicilian
+B39 Sicilian
+B40 Sicilian
+B40 Sicilian
+B40 Sicilian
+B40 Sicilian
+B40 Sicilian
+B40 Sicilian
+B40 Sicilian
+B41 Sicilian
+B41 Sicilian
+B41 Sicilian
+B42 Sicilian
+B42 Sicilian
+B42 Sicilian
+B42 Sicilian
+B43 Sicilian
+B44 Sicilian
+B44 Sicilian
+B44 Sicilian
+B44 Sicilian
+B45 Sicilian
+B45 Sicilian
+B46 Sicilian
+B47 Sicilian
+B48 Sicilian
+B49 Sicilian
+B50 Sicilian
+B50 Sicilian
+B51 Sicilian
+B52 Sicilian
+B52 Sicilian
+B52 Sicilian
+B53 Sicilian
+B53 Sicilian
+B54 Sicilian
+B54 Sicilian
+B55 Sicilian
+B56 Sicilian
+B56 Sicilian
+B56 Sicilian
+B57 Sicilian
+B57 Sicilian
+B57 Sicilian
+B58 Sicilian
+B58 Sicilian
+B58 Sicilian
+B59 Sicilian
+B60 Sicilian
+B60 Sicilian
+B60 Sicilian
+B61 Sicilian
+B62 Sicilian
+B62 Sicilian
+B62 Sicilian
+B62 Sicilian
+B62 Sicilian
+B63 Sicilian
+B63 Sicilian
+B64 Sicilian
+B64 Sicilian
+B65 Sicilian
+B65 Sicilian
+B66 Sicilian
+B67 Sicilian
+B68 Sicilian
+B69 Sicilian
+B70 Sicilian
+B71 Sicilian
+B71 Sicilian
+B72 Sicilian
+B72 Sicilian
+B72 Sicilian
+B72 Sicilian
+B72 Sicilian
+B73 Sicilian
+B73 Sicilian
+B73 Sicilian
+B74 Sicilian
+B74 Sicilian
+B74 Sicilian
+B74 Sicilian
+B74 Sicilian
+B74 Sicilian
+B75 Sicilian
+B76 Sicilian
+B76 Sicilian
+B77 Sicilian
+B77 Sicilian
+B77 Sicilian
+B78 Sicilian
+B79 Sicilian
+B80 Sicilian
+B80 Sicilian
+B80 Sicilian
+B80 Sicilian
+B81 Sicilian
+B82 Sicilian
+B82 Sicilian
+B83 Sicilian
+B83 Sicilian
+B83 Sicilian
+B83 Sicilian
+B84 Sicilian
+B84 Sicilian
+B84 Sicilian
+B85 Sicilian
+B85 Sicilian
+B85 Sicilian
+B85 Sicilian
+B86 Sicilian
+B87 Sicilian
+B88 Sicilian
+B88 Sicilian
+B89 Sicilian
+B89 Sicilian
+B90 Sicilian
+B90 Sicilian
+B90 Sicilian
+B90 Sicilian
+B91 Sicilian
+B92 Sicilian
+B93 Sicilian
+B94 Sicilian
+B94 Sicilian
+B95 Sicilian
+B96 Sicilian
+B96 Sicilian
+B96 Sicilian
+B97 Sicilian
+B97 Sicilian
+B98 Sicilian
+B98 Sicilian
+B98 Sicilian
+B98 Sicilian
+B99 Sicilian
+C00 French
+C00 French
+C00 French
+C00 French
+C00 French
+C00 French
+C00 French
+C00 French
+C00 French
+C00 French
+C00 French
+C00 French
+C00 French
+C00 French
+C00 Lengfellner
+C00 St. George
+C00 French
+C00 French
+C00 French
+C01 French
+C01 French
+C01 French
+C02 French
+C02 French
+C02 French
+C02 French
+C02 French
+C02 French
+C02 French
+C02 French
+C02 French
+C02 French
+C03 French
+C03 French
+C03 French
+C04 French
+C05 French
+C05 French
+C05 French
+C06 French
+C06 French
+C07 French
+C07 French
+C08 French
+C09 French
+C10 French
+C10 French
+C10 French
+C10 French
+C10 French
+C10 French
+C10 French
+C11 French
+C11 French
+C11 French
+C11 French
+C11 French
+C11 French
+C11 French
+C11 French
+C11 French
+C11 French
+C11 French
+C12 French
+C12 French
+C12 French
+C12 French
+C12 French
+C12 French
+C12 French
+C12 French
+C12 French
+C12 French
+C12 French
+C12 French
+C13 French
+C13 French
+C13 French
+C13 French
+C13 French
+C13 French
+C13 French
+C13 French
+C13 French
+C13 French
+C13 French
+C14 French
+C14 French
+C14 French
+C14 French
+C14 French
+C14 French
+C14 French
+C15 French
+C15 French
+C15 French
+C15 French
+C15 French
+C15 French
+C15 French
+C16 French
+C16 French
+C17 French
+C17 French
+C17 French
+C17 French
+C17 French
+C18 French
+C18 French
+C19 French
+C19 French
+C19 French
+C19 French
+C19 French
+C19 French
+C20 Kings pawn
+C20 KP: Indian
+C20 KP: Mengarini
+C20 KP: Kings head
+C20 KP: Patzer
+C20 KP: Napoleon
+C20 KP: Lopez
+C20 Alapin
+C21 Centre game
+C21 Centre game
+C21 Halasz gambit
+C21 Danish gambit
+C21 Danish gambit
+C21 Danish gambit
+C21 Danish gambit
+C21 Centre game
+C22 Centre game
+C22 Centre game
+C22 Centre game
+C22 Centre game
+C22 Centre game
+C22 Centre game
+C22 Centre game
+C23 Bishop's game
+C23 Bishop's game
+C23 Bishop's game
+C23 Bishop's game
+C23 Bishop's game
+C23 Bishop's game
+C23 Bishop's game
+C23 Bishop's game
+C23 Bishop's game
+C23 Bishop's game
+C23 Bishop's game
+C23 Bishop's game
+C23 Bishop's game
+C23 Bishop's game
+C23 Bishop's game
+C24 Bishop's game
+C24 Bishop's game
+C24 Bishop's game
+C24 Bishop's game
+C24 Bishop's game
+C25 Vienna
+C25 Vienna
+C25 Vienna
+C25 Vienna
+C25 Vienna
+C25 Vienna
+C25 Vienna
+C25 Vienna
+C25 Vienna
+C25 Vienna
+C25 Vienna
+C25 Vienna
+C25 Vienna
+C25 Vienna
+C25 Vienna
+C25 Vienna
+C26 Vienna
+C26 Vienna
+C26 Vienna
+C26 Vienna
+C27 Vienna
+C27 Vienna
+C27 Vienna
+C27 Vienna
+C27 Vienna
+C27 Vienna
+C27 Vienna
+C28 Vienna
+C29 Vienna
+C29 Vienna
+C29 Vienna
+C29 Vienna
+C29 Vienna
+C29 Vienna
+C29 Vienna
+C29 Vienna
+C29 Vienna
+C30 Kings gambit
+C30 Kings gambit
+C30 Kings gambit
+C30 Kings gambit
+C30 Kings gambit
+C30 Kings gambit
+C30 Kings gambit
+C30 Kings gambit
+C30 Kings gambit
+C30 Kings gambit
+C30 Kings gambit
+C30 Kings gambit
+C30 Kings gambit
+C30 Kings gambit
+C30 Kings gambit
+C31 Kings gambit
+C31 Kings gambit
+C31 Kings gambit
+C31 Kings gambit
+C31 Kings gambit
+C31 Kings gambit
+C31 Kings gambit
+C31 Kings gambit
+C31 Kings gambit
+C31 Kings gambit
+C32 Kings gambit
+C32 Kings gambit
+C32 Kings gambit
+C32 Kings gambit
+C32 Kings gambit
+C32 Kings gambit
+C32 Kings gambit
+C32 Kings gambit
+C33 Kings gambit
+C33 Kings gambit
+C33 Kings gambit
+C33 Kings gambit
+C33 Kings gambit
+C33 Kings gambit
+C33 Kings gambit
+C33 Kings gambit
+C33 Kings gambit
+C33 Kings gambit
+C33 Kings gambit
+C33 Kings gambit
+C33 Kings gambit
+C33 Kings gambit
+C33 Kings gambit
+C33 Kings gambit
+C33 Kings gambit
+C33 Kings gambit
+C33 Kings gambit
+C33 Kings gambit
+C33 Kings gambit
+C33 Kings gambit
+C33 Kings gambit
+C33 Kings gambit
+C33 Kings gambit
+C33 Kings gambit
+C33 Kings gambit
+C33 Kings gambit
+C33 Kings gambit
+C33 Kings gambit
+C33 Kings gambit
+C33 Kings gambit
+C33 Kings gambit
+C33 Kings gambit
+C33 Kings gambit
+C33 Kings gambit
+C33 Kings gambit
+C34 Kings gambit
+C34 Kings gambit
+C34 Kings gambit
+C34 Kings gambit
+C34 Kings gambit
+C34 Kings gambit
+C35 Kings gambit
+C35 Kings gambit
+C35 Kings gambit
+C35 Kings gambit
+C36 Kings gambit
+C36 Kings gambit
+C36 Kings gambit
+C37 Kings gambit
+C37 Kings gambit
+C37 Kings gambit
+C37 Kings gambit
+C37 Kings gambit
+C37 Kings gambit
+C37 Kings gambit
+C37 Kings gambit
+C37 Kings gambit
+C37 Kings gambit
+C37 Kings gambit
+C37 Kings gambit
+C37 Kings gambit
+C37 Kings gambit
+C37 Kings gambit
+C37 Kings gambit
+C37 Kings gambit
+C37 Kings gambit
+C37 Kings gambit
+C37 Kings gambit
+C37 Kings gambit
+C38 Kings gambit
+C38 Kings gambit
+C38 Kings gambit
+C38 Kings gambit
+C38 Kings gambit
+C39 Kings gambit
+C39 Kings gambit
+C39 Kings gambit
+C39 Kings gambit
+C39 Kings gambit
+C39 Kings gambit
+C39 Kings gambit
+C39 Kings gambit
+C39 Kings gambit
+C39 Kings gambit
+C39 Kings gambit
+C39 Kings gambit
+C39 Kings gambit
+C39 Kings gambit
+C39 Kings gambit
+C39 Kings gambit
+C39 Kings gambit
+C39 Kings gambit
+C39 Kings gambit
+C39 Kings gambit
+C39 Kings gambit
+C39 Kings gambit
+C39 Kings gambit
+C39 Kings gambit
+C39 Kings gambit
+C40 Kings knight
+C40 Gunderam
+C40 Greco
+C40 Damiano
+C40 Elephant gambit
+C40 Maroczy gambit
+C40 Latvian
+C40 Latvian
+C40 Latvian
+C40 Latvian
+C40 Latvian
+C40 Latvian
+C40 Latvian
+C41 Philidor
+C41 Philidor
+C41 Philidor
+C41 Philidor
+C41 Philidor
+C41 Philidor
+C41 Philidor
+C41 Philidor
+C41 Philidor
+C41 Philidor
+C41 Philidor
+C41 Philidor
+C41 Philidor
+C41 Philidor
+C41 Philidor
+C41 Philidor
+C41 Philidor
+C41 Philidor
+C41 Philidor
+C41 Philidor
+C41 Philidor
+C41 Philidor
+C41 Philidor
+C41 Philidor
+C41 Philidor
+C41 Philidor
+C41 Philidor
+C41 Philidor
+C41 Philidor
+C41 Philidor
+C41 Philidor
+C41 Philidor
+C42 Petrov
+C42 Petrov
+C42 Petrov
+C42 Petrov
+C42 Petrov
+C42 Petrov
+C42 Petrov
+C42 Petrov
+C42 Petrov
+C42 Petrov
+C42 Petrov
+C42 Petrov
+C42 Petrov
+C42 Petrov
+C42 Petrov
+C42 Petrov
+C42 Petrov
+C42 Petrov
+C42 Petrov
+C42 Petrov
+C42 Petrov
+C43 Petrov
+C43 Petrov
+C43 Petrov
+C43 Petrov
+C43 Petrov
+C43 Petrov
+C43 Petrov
+C44 Kings pawn
+C44 Irish gambit
+C44 Konstantino
+C44 Dresden
+C44 Inv Hungarian
+C44 Inv Hanham
+C44 Tayler
+C44 Ponziani
+C44 Ponziani
+C44 Ponziani
+C44 Ponziani
+C44 Ponziani
+C44 Ponziani
+C44 Ponziani
+C44 Ponziani
+C44 Ponziani
+C44 Ponziani
+C44 Ponziani
+C44 Scotch
+C44 Scotch
+C44 Scotch
+C44 Scotch
+C44 Scotch
+C44 Scotch
+C44 Scotch
+C44 Scotch
+C44 Scotch
+C44 Scotch
+C44 Scotch
+C44 Scotch
+C44 Scotch
+C44 Scotch
+C44 Scotch
+C44 Scotch
+C44 Scotch
+C44 Scotch
+C44 Scotch
+C45 Scotch
+C45 Scotch
+C45 Scotch
+C45 Scotch
+C45 Scotch
+C45 Scotch
+C45 Scotch
+C45 Scotch
+C45 Scotch
+C45 Scotch
+C45 Scotch
+C45 Scotch
+C45 Scotch
+C45 Scotch
+C45 Scotch
+C45 Scotch
+C45 Scotch
+C45 Scotch
+C45 Scotch
+C45 Scotch
+C45 Scotch
+C46 Three knights
+C46 Three knights
+C46 Three knights
+C46 Three knights
+C46 Three knights
+C46 Four knights
+C46 Four knights
+C46 Four knights
+C46 Four knights
+C47 Four knights
+C47 Four knights
+C47 Four knights
+C47 Four knights
+C48 Four knights
+C48 Four knights
+C48 Four knights
+C48 Four knights
+C48 Four knights
+C48 Four knights
+C48 Four knights
+C48 Four knights
+C48 Four knights
+C48 Four knights
+C48 Four knights
+C48 Four knights
+C49 Four knights
+C49 Four knights
+C49 Four knights
+C49 Four knights
+C49 Four knights
+C49 Four knights
+C49 Four knights
+C49 Four knights
+C49 Four knights
+C49 Four knights
+C49 Four knights
+C49 Four knights
+C49 Four knights
+C49 Four knights
+C49 Four knights
+C50 Kings pawn
+C50 Blackburne
+C50 Rousseau
+C50 Hungarian
+C50 Hungarian
+C50 Giuoco Piano
+C50 Giuoco Piano
+C50 Giuoco Piano
+C50 Giuoco Piani
+C50 Giuoco Piani
+C50 Giuoco Piani
+C50 Giuoco Piani
+C50 Giuoco Piani
+C51 Evans gambit
+C51 Evans gambit
+C51 Evans gambit
+C51 Evans gambit
+C51 Evans gambit
+C51 Evans gambit
+C51 Evans gambit
+C51 Evans gambit
+C51 Evans gambit
+C51 Evans gambit
+C51 Evans gambit
+C51 Evans gambit
+C51 Evans gambit
+C51 Evans gambit
+C51 Evans gambit
+C51 Evans gambit
+C51 Evans gambit
+C51 Evans gambit
+C51 Evans gambit
+C51 Evans gambit
+C51 Evans gambit
+C51 Evans gambit
+C51 Evans gambit
+C51 Evans gambit
+C52 Evans gambit
+C52 Evans gambit
+C52 Evans gambit
+C52 Evans gambit
+C52 Evans gambit
+C52 Evans gambit
+C52 Evans gambit
+C52 Evans gambit
+C52 Evans gambit
+C52 Evans gambit
+C52 Evans gambit
+C52 Evans gambit
+C52 Evans gambit
+C52 Evans gambit
+C52 Evans gambit
+C52 Evans gambit
+C53 Giuoco Piano
+C53 Giuoco Piano
+C53 Giuoco Piano
+C53 Giuoco Piano
+C53 Giuoco Piano
+C53 Giuoco Piano
+C53 Giuoco Piano
+C53 Giuoco Piano
+C53 Giuoco Piano
+C53 Giuoco Piano
+C53 Giuoco Piano
+C53 Giuoco Piano
+C53 Giuoco Piano
+C54 Giuoco Piano
+C54 Giuoco Piano
+C54 Giuoco Piano
+C54 Giuoco Piano
+C54 Giuoco Piano
+C54 Giuoco Piano
+C54 Giuoco Piano
+C54 Giuoco Piano
+C54 Giuoco Piano
+C54 Giuoco Piano
+C54 Giuoco Piano
+C54 Giuoco Piano
+C55 Two knights
+C55 Giuoco piano
+C55 Giuoco piano
+C55 Giuoco piano
+C55 Two knights
+C55 Two knights
+C55 Two knights
+C55 Two knights
+C55 Two knights
+C55 two knights
+C55 two knights
+C55 two knights
+C55 two knights
+C55 two knights
+C55 two knights
+C55 two knights
+C55 two knights
+C56 Two knights
+C56 two knights
+C56 two knights
+C57 Two knights
+C57 two knights
+C57 two knights
+C57 two knights
+C57 two knights
+C57 two knights
+C57 two knights
+C57 two knights
+C57 two knights
+C57 two knights
+C58 two knights
+C58 two knights
+C58 two knights
+C58 two knights
+C58 Two knights
+C58 two knights
+C58 two knights
+C58 two knights
+C58 two knights
+C58 Two knights
+C59 Two knights
+C59 two knights
+C59 two knights
+C59 two knights
+C60 Ruy Lopez
+C60 Ruy Lopez
+C60 Ruy Lopez
+C60 Ruy Lopez
+C60 Ruy Lopez
+C60 Ruy Lopez
+C60 Ruy Lopez
+C60 Ruy Lopez
+C60 Ruy Lopez
+C61 Ruy Lopez
+C61 Ruy Lopez
+C62 Ruy Lopez
+C62 Ruy Lopez
+C62 Ruy Lopez
+C63 Ruy Lopez
+C63 Ruy Lopez
+C64 Ruy Lopez
+C64 Ruy Lopez
+C64 Ruy Lopez
+C64 Ruy Lopez
+C64 Ruy Lopez
+C64 Ruy Lopez
+C64 Ruy Lopez
+C65 Ruy Lopez
+C65 Ruy Lopez
+C65 Ruy Lopez
+C65 Ruy Lopez
+C65 Ruy Lopez
+C65 Ruy Lopez
+C65 Ruy Lopez
+C65 Ruy Lopez
+C65 Ruy Lopez
+C66 Ruy Lopez
+C66 Ruy Lopez
+C66 Ruy Lopez
+C66 Ruy Lopez
+C66 Ruy Lopez
+C66 Ruy Lopez
+C66 Ruy Lopez
+C67 Ruy Lopez
+C67 Ruy Lopez
+C67 Ruy Lopez
+C67 Ruy Lopez
+C67 Ruy Lopez
+C67 Ruy Lopez
+C67 Ruy Lopez
+C67 Ruy Lopez
+C67 Ruy Lopez
+C67 Ruy Lopez
+C67 Ruy Lopez
+C67 Ruy Lopez
+C68 Ruy Lopez
+C68 Ruy Lopez
+C68 Ruy Lopez
+C68 Ruy Lopez
+C69 Ruy Lopez
+C69 Ruy Lopez
+C69 Ruy Lopez
+C69 Ruy Lopez
+C70 Ruy Lopez
+C70 Ruy Lopez
+C70 Ruy Lopez
+C70 Ruy Lopez
+C70 Ruy Lopez
+C70 Ruy Lopez
+C70 Ruy Lopez
+C70 Ruy Lopez
+C70 Ruy Lopez
+C70 Ruy Lopez
+C71 Ruy Lopez
+C71 Ruy Lopez
+C71 Ruy Lopez
+C71 Ruy Lopez
+C72 Ruy Lopez
+C73 Ruy Lopez
+C73 Ruy Lopez
+C74 Ruy Lopez
+C74 Ruy Lopez
+C74 Ruy Lopez
+C75 Ruy Lopez
+C75 Ruy Lopez
+C76 Ruy Lopez
+C77 Ruy Lopez
+C77 Ruy Lopez
+C77 Ruy Lopez
+C77 Ruy Lopez
+C77 Ruy Lopez
+C77 Ruy Lopez
+C77 Ruy Lopez
+C78 Ruy Lopez
+C78 Ruy Lopez
+C78 Ruy Lopez
+C78 Ruy Lopez
+C78 Ruy Lopez
+C78 Ruy Lopez
+C79 Ruy Lopez
+C79 Ruy Lopez
+C79 Ruy Lopez
+C79 Ruy Lopez
+C80 Ruy Lopez
+C80 Ruy Lopez
+C80 Ruy Lopez
+C80 Ruy Lopez
+C80 Ruy Lopez
+C80 Ruy Lopez
+C80 Ruy Lopez
+C80 Ruy Lopez
+C80 Ruy Lopez
+C80 Ruy Lopez
+C80 Ruy Lopez
+C80 Ruy Lopez
+C80 Ruy Lopez
+C80 Ruy Lopez
+C80 Ruy Lopez
+C80 Ruy Lopez
+C80 Ruy Lopez
+C81 Ruy Lopez
+C81 Ruy Lopez
+C81 Ruy Lopez
+C82 Ruy Lopez
+C82 Ruy Lopez
+C82 Ruy Lopez
+C82 Ruy Lopez
+C82 Ruy Lopez
+C82 Ruy Lopez
+C82 Ruy Lopez
+C83 Ruy Lopez
+C83 Ruy Lopez
+C83 Ruy Lopez
+C83 Ruy Lopez
+C83 Ruy Lopez
+C84 Ruy Lopez
+C84 Ruy Lopez
+C84 Ruy Lopez
+C85 Ruy Lopez
+C86 Ruy Lopez
+C86 Ruy Lopez
+C86 Ruy Lopez
+C87 Ruy Lopez
+C88 Ruy Lopez
+C88 Ruy Lopez
+C88 Ruy Lopez
+C88 Ruy Lopez
+C88 Ruy Lopez
+C88 Ruy Lopez
+C88 Ruy Lopez
+C88 Ruy Lopez
+C88 Ruy Lopez
+C89 Ruy Lopez
+C89 Ruy Lopez
+C89 Ruy Lopez
+C89 Ruy Lopez
+C89 Ruy Lopez
+C89 Ruy Lopez
+C89 Ruy Lopez
+C90 Ruy Lopez
+C90 Ruy Lopez
+C90 Ruy Lopez
+C90 Ruy Lopez
+C91 Ruy Lopez
+C91 Ruy Lopez
+C92 Ruy Lopez
+C92 Ruy Lopez
+C92 Ruy Lopez
+C92 Ruy Lopez
+C92 Ruy Lopez
+C93 Ruy Lopez
+C94 Ruy Lopez
+C95 Ruy Lopez
+C95 Ruy Lopez
+C95 Ruy Lopez
+C95 Ruy Lopez
+C96 Ruy Lopez
+C96 Ruy Lopez
+C96 Ruy Lopez
+C96 Ruy Lopez
+C96 Ruy Lopez
+C97 Ruy Lopez
+C97 Ruy Lopez
+C98 Ruy Lopez
+C98 Ruy Lopez
+C99 Ruy Lopez
+D00 Queens pawn
+D00 Queens pawn
+D00 Queens pawn
+D00 Levitsky
+D00 Blackmar gambit
+D00 Queens pawn
+D00 Queens pawn
+D00 Queens pawn
+D00 Blackmar-Diemer
+D00 Blackmar-Diemer
+D00 Blackmar-Diemer
+D01 Richter-Veresov
+D01 Richter-Veresov
+D01 Richter-Veresov
+D02 Queens pawn
+D02 Queens pawn
+D02 Queens pawn
+D02 Queens pawn
+D02 Queens bishop
+D03 Torre attack
+D04 Queens pawn
+D05 Queens pawn
+D05 Queens pawn
+D05 Queens pawn
+D05 Queens pawn
+D05 Colle system
+D06 Queens Gambit
+D06 Queens Gambit
+D06 Queens Gambit
+D06 Queens Gambit
+D07 Queens Gambit
+D07 Queens Gambit
+D08 Queens Gambit
+D08 Queens Gambit
+D08 Queens Gambit
+D08 Queens Gambit
+D08 Queens Gambit
+D08 Queens Gambit
+D08 Queens Gambit
+D09 Queens Gambit
+D10 Queens Gambit
+D10 Queens Gambit
+D10 Queens Gambit
+D10 Queens Gambit
+D11 Queens Gambit
+D11 Queens Gambit
+D11 Queens Gambit
+D12 Queens Gambit
+D12 Queens Gambit
+D12 Queens Gambit
+D12 Queens Gambit
+D13 Queens Gambit
+D14 Queens Gambit
+D14 Queens Gambit
+D15 Queens Gambit
+D15 Queens Gambit
+D15 Queens Gambit
+D15 Queens Gambit
+D15 Queens Gambit
+D15 Queens Gambit
+D15 Queens Gambit
+D16 Queens Gambit
+D16 Queens Gambit
+D16 Queens Gambit
+D16 Queens Gambit
+D17 Queens Gambit
+D17 Queens Gambit
+D17 Queens Gambit
+D17 Queens Gambit
+D18 Queens Gambit
+D18 Queens Gambit
+D19 Queens Gambit
+D19 Queens Gambit
+D19 Queens Gambit
+D20 Queens gambit
+D20 Queens Gambit
+D20 Queens Gambit
+D20 Queens Gambit
+D21 Queens Gambit
+D21 Queens Gambit
+D21 Queens Gambit
+D22 Queens Gambit
+D22 Queens Gambit
+D22 Queens Gambit
+D23 Queens gambit
+D23 Queens Gambit
+D24 Queens Gambit
+D24 Queens Gambit
+D25 Queens Gambit
+D25 Queens Gambit
+D25 Queens Gambit
+D25 Queens Gambit
+D26 Queens Gambit
+D26 Queens Gambit
+D26 Queens Gambit
+D26 Queens Gambit
+D26 Queens Gambit
+D27 Queens Gambit
+D27 Queens Gambit
+D27 Queens Gambit
+D28 Queens Gambit
+D28 Queens Gambit
+D28 Queens Gambit
+D29 Queens Gambit
+D29 Queens Gambit
+D30 Queens gambit
+D30 Queens Gambit
+D30 Queens Gambit
+D30 Queens Gambit
+D30 Queens Gambit
+D30 Queens Gambit
+D30 Queens Gambit
+D30 Queens Gambit
+D30 Queens Gambit
+D30 Queens Gambit
+D30 Queens Gambit
+D31 Queens Gambit
+D31 Queens Gambit
+D31 Queens Gambit
+D31 Queens Gambit
+D31 Queens Gambit
+D31 Queens Gambit
+D31 Queens Gambit
+D31 Queens Gambit
+D31 Queens Gambit
+D31 Queens Gambit
+D32 Queens Gambit
+D32 Queens Gambit
+D32 Queens Gambit
+D32 Queens Gambit
+D32 Queens Gambit
+D32 Queens Gambit
+D33 Queens Gambit
+D33 Queens Gambit
+D33 Queens Gambit
+D33 Queens Gambit
+D33 Queens Gambit
+D34 Queens Gambit
+D34 Queens Gambit
+D34 Queens Gambit
+D34 Queens Gambit
+D34 Queens Gambit
+D34 Queens Gambit
+D35 Queens Gambit
+D35 Queens Gambit
+D35 Queens Gambit
+D35 Queens Gambit
+D35 Queens Gambit
+D35 Queens Gambit
+D35 Queens Gambit
+D36 Queens Gambit
+D37 Queens Gambit
+D37 Queens Gambit
+D38 Queens Gambit
+D39 Queens Gambit
+D40 Queens Gambit
+D40 Queens Gambit
+D40 Queens Gambit
+D40 Queens Gambit
+D41 Queens Gambit
+D41 Queens Gambit
+D41 Queens Gambit
+D41 Queens Gambit
+D42 Queens Gambit
+D43 Queens Gambit
+D43 Queens Gambit
+D44 Queens Gambit
+D44 Queens Gambit
+D44 Queens Gambit
+D44 Queens Gambit
+D44 Queens Gambit
+D44 Queens Gambit
+D44 Queens Gambit
+D45 Queens Gambit
+D45 Queens Gambit
+D45 Queens Gambit
+D45 Queens Gambit
+D45 Queens Gambit
+D45 Queens Gambit
+D46 Queens Gambit
+D46 Queens Gambit
+D46 Queens Gambit
+D46 Queens Gambit
+D47 Queens Gambit
+D47 Queens Gambit
+D47 Queens Gambit
+D47 Queens Gambit
+D48 Queens Gambit
+D48 Queens Gambit
+D48 Queens Gambit
+D48 Queens Gambit
+D48 Queens Gambit
+D49 Queens Gambit
+D49 Queens Gambit
+D49 Queens Gambit
+D49 Queens Gambit
+D49 Queens Gambit
+D49 Queens Gambit
+D50 Queens Gambit
+D50 Queens Gambit
+D50 Queens Gambit
+D50 Queens Gambit
+D50 Queens Gambit
+D50 Queens Gambit
+D51 Queens Gambit
+D51 Queens Gambit
+D51 Queens Gambit
+D51 Queens Gambit
+D51 Queens Gambit
+D51 Queens Gambit
+D51 Queens Gambit
+D52 Queens Gambit
+D52 Queens Gambit
+D52 Queens Gambit
+D52 Queens Gambit
+D52 Queens Gambit
+D52 Queens Gambit
+D52 Queens Gambit
+D52 Queens Gambit
+D53 Queens Gambit
+D53 Queens Gambit
+D53 Queens Gambit
+D54 Queens Gambit
+D55 Queens Gambit
+D55 Queens Gambit
+D55 Queens Gambit
+D55 Queens Gambit
+D55 Queens Gambit
+D55 Queens Gambit
+D56 Queens Gambit
+D56 Queens Gambit
+D56 Queens Gambit
+D57 Queens Gambit
+D57 Queens Gambit
+D58 Queens Gambit
+D59 Queens Gambit
+D59 Queens Gambit
+D60 Queens Gambit
+D60 Queens Gambit
+D60 Queens Gambit
+D61 Queens Gambit
+D62 Queens Gambit
+D63 Queens Gambit
+D63 Queens Gambit
+D63 Queens Gambit
+D63 Queens Gambit
+D63 Queens Gambit
+D63 Queens Gambit
+D64 Queens Gambit
+D64 Queens Gambit
+D64 Queens Gambit
+D64 Queens Gambit
+D65 Queens Gambit
+D66 Queens Gambit
+D66 Queens Gambit
+D67 Queens Gambit
+D67 Queens Gambit
+D67 Queens Gambit
+D67 Queens Gambit
+D67 Queens Gambit
+D68 Queens Gambit
+D68 Queens Gambit
+D68 Queens Gambit
+D69 Queens Gambit
+D70 Neo-Gruenfeld
+D70 Neo-Gruenfeld
+D71 Neo-Gruenfeld
+D72 Neo-Gruenfeld
+D73 Neo-Gruenfeld
+D74 Neo-Gruenfeld
+D75 Neo-Gruenfeld
+D75 Neo-Gruenfeld
+D76 Neo-Gruenfeld
+D77 Neo-Gruenfeld
+D78 Neo-Gruenfeld
+D79 Neo-Gruenfeld
+D80 Gruenfeld
+D80 Gruenfeld
+D80 Gruenfeld
+D80 Gruenfeld
+D81 Gruenfeld
+D82 Gruenfeld
+D83 Gruenfeld
+D83 Gruenfeld
+D83 Gruenfeld
+D84 Gruenfeld
+D85 Gruenfeld
+D85 Gruenfeld
+D86 Gruenfeld
+D86 Gruenfeld
+D86 Gruenfeld
+D86 Gruenfeld
+D87 Gruenfeld
+D87 Gruenfeld
+D88 Gruenfeld
+D89 Gruenfeld
+D89 Gruenfeld
+D90 Gruenfeld
+D90 Gruenfeld
+D90 Gruenfeld
+D90 Gruenfeld
+D91 Gruenfeld
+D92 Gruenfeld
+D93 Gruenfeld
+D94 Gruenfeld
+D94 Gruenfeld
+D94 Gruenfeld
+D94 Gruenfeld
+D94 Gruenfeld
+D94 Gruenfeld
+D95 Gruenfeld
+D95 Gruenfeld
+D95 Gruenfeld
+D96 Gruenfeld
+D97 Gruenfeld
+D97 Gruenfeld
+D97 Gruenfeld
+D97 Gruenfeld
+D97 Gruenfeld
+D97 Gruenfeld
+D98 Gruenfeld
+D98 Gruenfeld
+D99 Gruenfeld
+D99 Gruenfeld
+E00 Queens pawn
+E00 Neo-Indian
+E00 Catalan
+E01 Catalan
+E02 Catalan
+E03 Catalan
+E03 Catalan
+E04 Catalan
+E05 Catalan
+E06 Catalan
+E07 Catalan
+E07 Catalan
+E08 Catalan
+E08 Catalan
+E08 Catalan
+E08 Catalan
+E09 Catalan
+E09 Catalan
+E10 Queens pawn
+E10 Blumenfeld
+E10 Blumenfeld
+E10 Blumenfeld
+E10 Blumenfeld
+E10 Dzindzikhashvili
+E10 Doery defence
+E11 Bogo-Indian
+E11 Bogo-Indian
+E11 Bogo-Indian
+E11 Bogo-Indian
+E12 Queens Indian
+E12 Queens Indian
+E12 Queens Indian
+E12 Queens Indian
+E12 Queens Indian
+E13 Queens Indian
+E14 Queens Indian
+E14 Queens Indian
+E15 Queens Indian
+E15 Queens Indian
+E15 Queens Indian
+E15 Queens Indian
+E15 Queens Indian
+E16 Queens Indian
+E16 Queens Indian
+E16 Queens Indian
+E17 Queens Indian
+E17 Queens Indian
+E17 Queens Indian
+E17 Queens Indian
+E17 Queens Indian
+E18 Queens Indian
+E19 Queens Indian
+E20 Nimzo-Indian
+E20 Nimzo-Indian
+E20 Nimzo-Indian
+E20 Nimzo-Indian
+E21 Nimzo-Indian
+E21 Nimzo-Indian
+E21 Nimzo-Indian
+E22 Nimzo-Indian
+E23 Nimzo-Indian
+E23 Nimzo-Indian
+E23 Nimzo-Indian
+E23 Nimzo-Indian
+E24 Nimzo-Indian
+E24 Nimzo-Indian
+E25 Nimzo-Indian
+E25 Nimzo-Indian
+E25 Nimzo-Indian
+E26 Nimzo-Indian
+E26 Nimzo-Indian
+E27 Nimzo-Indian
+E28 Nimzo-Indian
+E29 Nimzo-Indian
+E29 Nimzo-Indian
+E30 Nimzo-Indian
+E30 Nimzo-Indian
+E31 Nimzo-Indian
+E32 Nimzo-Indian
+E32 Nimzo-Indian
+E33 Nimzo-Indian
+E33 Nimzo-Indian
+E34 Nimzo-Indian
+E35 Nimzo-Indian
+E36 Nimzo-Indian
+E36 Nimzo-Indian
+E36 Nimzo-Indian
+E37 Nimzo-Indian
+E37 Nimzo-Indian
+E38 Nimzo-Indian
+E39 Nimzo-Indian
+E40 Nimzo-Indian
+E40 Nimzo-Indian
+E41 Nimzo-Indian
+E41 Nimzo-Indian
+E42 Nimzo-Indian
+E43 Nimzo-Indian
+E44 Nimzo-Indian
+E45 Nimzo-Indian
+E46 Nimzo-Indian
+E46 Nimzo-Indian
+E46 Nimzo-Indian
+E47 Nimzo-Indian
+E48 Nimzo-Indian
+E49 Nimzo-Indian
+E50 Nimzo-Indian
+E51 Nimzo-Indian
+E51 Nimzo-Indian
+E52 Nimzo-Indian
+E53 Nimzo-Indian
+E53 Nimzo-Indian
+E53 Nimzo-Indian
+E54 Nimzo-Indian
+E54 Nimzo-Indian
+E55 Nimzo-Indian
+E56 Nimzo-Indian
+E57 Nimzo-Indian
+E58 Nimzo-Indian
+E59 Nimzo-Indian
+E60 Kings Indian
+E60 Kings Indian
+E60 Queens pawn
+E60 Kings Indian
+E60 Kings Indian
+E60 Kings Indian
+E60 Kings Indian
+E61 Kings Indian
+E61 Kings Indian
+E62 Kings Indian
+E62 Kings Indian
+E62 Kings Indian
+E62 Kings Indian
+E62 Kings Indian
+E62 Kings Indian
+E62 Kings Indian
+E63 Kings Indian
+E64 Kings Indian
+E65 Kings Indian
+E66 Kings Indian
+E67 Kings Indian
+E67 Kings Indian
+E68 Kings Indian
+E69 Kings Indian
+E70 Kings Indian
+E70 Kings Indian
+E70 Kings Indian
+E71 Kings Indian
+E72 Kings Indian
+E72 Kings Indian
+E73 Kings Indian
+E73 Kings Indian
+E73 Kings Indian
+E74 Kings Indian
+E75 Kings Indian
+E76 Kings Indian
+E76 Kings Indian
+E77 Kings Indian
+E77 Kings Indian
+E77 Kings Indian
+E77 Kings Indian
+E78 Kings Indian
+E79 Kings Indian
+E80 Kings Indian
+E81 Kings Indian
+E81 Kings Indian
+E82 Kings Indian
+E83 Kings Indian
+E83 Kings Indian
+E83 Kings Indian
+E84 Kings Indian
+E85 Kings Indian
+E86 Kings Indian
+E87 Kings Indian
+E87 Kings Indian
+E88 Kings Indian
+E89 Kings Indian
+E90 Kings Indian
+E90 Kings Indian
+E90 Kings Indian
+E91 Kings Indian
+E91 Kings Indian
+E92 Kings Indian
+E92 Kings Indian
+E92 Kings Indian
+E92 Kings Indian
+E92 Kings Indian
+E93 Kings Indian
+E93 Kings Indian
+E94 Kings Indian
+E94 Kings Indian
+E94 Kings Indian
+E95 Kings Indian
+E96 Kings Indian
+E97 Kings Indian
+E97 Kings Indian
+E98 Kings Indian
+E99 Kings Indian
+E99 Kings Indian
+F00 xxxxxxxxxxxx
+F00 xxxxxxxxxxxx
+

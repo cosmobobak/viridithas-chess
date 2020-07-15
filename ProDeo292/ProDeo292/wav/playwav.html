@@ -1,0 +1,313 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<meta name="GENERATOR" content="Microsoft FrontPage 5.0">
+<meta name="ProgId" content="FrontPage.Editor.Document">
+<title>RasDial Pro User's Manual</title>
+
+
+<!--mstheme--><link rel="stylesheet" type="text/css" href="../../_themes/mu-consulting-2/mu-c1000.css"><meta name="Microsoft Theme" content="mu-consulting-2 1000, default">
+<meta name="Microsoft Border" content="none">
+</head>
+
+<body>
+
+<div align="center">
+  <center>
+  <table bgcolor="#C0C0C0" width="80%" border="1">
+    <tr>
+      <td valign="middle" align="center" bordercolor="#000000" bordercolorlight="#000000" bordercolordark="#000000" colspan="2">
+        <h1 align="center" style="margin-top: 0; margin-bottom: 0">PlayWav
+        User's Manual</h1>
+        <p align="center" style="margin-top: 0; margin-bottom: 0">Version 1.0</p>
+        <p align="center" style="margin-top: 0; margin-bottom: 0">November 4,
+        2001</p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="middle" align="center" bordercolor="#000000" bordercolorlight="#000000" bordercolordark="#000000" width="50%">
+        <font size="4"><b>µ-Consulting</b></font> </td>
+      <td valign="middle" align="center" bordercolor="#000000" bordercolorlight="#000000" bordercolordark="#000000" width="50%"><a href="http://www.muconsulting.com">www.muconsulting.com</a> </td>
+    </tr>
+  </table>
+  </center>
+</div>
+<h2>Contents</h2>
+<ol>
+  <li>
+    <p style="line-height: 100%; word-spacing: 0; text-indent: 0; margin: 0" align="left"><a href="#Introduction">Introduction</a></li>
+  <li>
+    <p style="line-height: 100%; word-spacing: 0; text-indent: 0; margin: 0" align="left"><a href="#Installation">Installation</a></li>
+  <li>
+    <p style="line-height: 100%; word-spacing: 0; text-indent: 0; margin: 0" align="left"><a href="#Usage">Usage</a></li>
+  <li>
+    <p style="text-indent: 0; line-height: 100%; word-spacing: 0; margin: 0" align="left"><span style="mso-fareast-font-family: MS Mincho"><a href="#Usage Examples">Usage
+Examples</a></span></li>
+  <li>
+    <p style="line-height: 100%; word-spacing: 0; text-indent: 0; margin: 0" align="left">
+    <a href="#Batch File Integration">Batch File Integration</a></li>
+  <li>
+    <p style="line-height: 100%; word-spacing: 0; text-indent: 0; margin: 0" align="left">
+    <span lang="fr-lu"><a href="#Web Site Integration">Web Site Integration</a></span></li>
+  <li>
+    <p style="line-height: 100%; word-spacing: 0; text-indent: 0; margin: 0" align="left"><a href="#Revision History">Revision History</a></li>
+  <li>
+    <p style="mso-list: l0 level1 lfo1; tab-stops: list .5in; line-height: 100%; word-spacing: 0; text-indent: 0; margin: 0" align="left"><span style="mso-fareast-font-family: MS Mincho"><a href="#Distribution">Distribution</a></span></li>
+  <li>
+    <p style="line-height: 100%; word-spacing: 0; text-indent: 0; margin: 0" align="left"><a href="#How To Contact µ-Consulting">How
+    To Contact µ-Consulting</a></li>
+</ol>
+<hr>
+<h2><a name="Introduction">Introduction</a></h2>
+
+
+
+      
+<p><font face="Arial">PlayWav is a very simple <i>freeware</i> command-line 
+application that simply plays a Windows .WAV audio file.</font></p>
+
+
+
+      
+<p><font face="Arial">Because it is a command-line application, it can be easily 
+integrated into any type of application.&nbsp; It can be run from batch files, 
+various types of scripts, and even NT services such as a web server.&nbsp;
+</font></p>
+
+
+
+      
+<hr>
+<h2><a name="Installation">Installation</a></h2>
+<p><span style="font-family: Arial">PlayWav</span><span style="font-family:Arial;
+mso-fareast-font-family:&quot;MS Mincho&quot;"> is typically used
+from a custom batch file (.BAT or .CMD) or another application.<span style="mso-spacerun: yes">&nbsp;
+</span>Because of this, there is no install program for PlayWav.<span style="mso-spacerun: yes">&nbsp;
+</span>Installation will usually just consist of copying playwav.exe to a
+directory referenced by the batch file or other application.<span style="mso-spacerun: yes">&nbsp;
+</span>For convenience, playwav.exe may be copied to the Windows directory
+(usually C:\WINDOWS or C:\WINNT) or any other directory in the PATH so that it
+can be executed without the full directory path specified.</span></p>
+<hr>
+<h2><a name="Usage">Usage</a></h2>
+<p><font face="Arial"><span style="mso-fareast-font-family: MS Mincho">The usage is very simple for 
+PlayWav.&nbsp; Just specify the .WAV file name (and directory if necessary) and 
+PlayWav will play the audio file.&nbsp; When the audio file has finished 
+playing, PlayWav will exit.&nbsp; Multiple instances of PlayWav may be executing 
+simulatneously, provided that your audio device supports playing multiple 
+waveform sources.</span></font></p>
+<h4 style="text-indent: 0; margin-left: 0; margin-right: 0"><font face="Arial"><span style="mso-fareast-font-family: MS Mincho">Command-line
+Syntax:</span><span style="mso-fareast-font-family:&quot;MS Mincho&quot;"><o:p>
+</o:p>
+</span></font></h4>
+<p style="text-indent: -25; margin-left: 25; margin-right: 0">
+<font face="Courier New">playwav <i>filename.wav</i></font></p>
+<h4 style="text-indent: 0; margin-left: 0; margin-right: 0"><span style="font-family: Arial; mso-fareast-font-family: MS Mincho">Parameter
+Definitions:</span><span style="font-family:Arial;
+mso-fareast-font-family:&quot;MS Mincho&quot;"><o:p>
+</o:p>
+</span></h4>
+<table border="1" width="100%">
+  <tr>
+    <td width="25%"><i>filename.wav</i></td>
+    <td width="75%"><span style="font-family:Arial;
+mso-fareast-font-family:&quot;MS Mincho&quot;">The name of the .WAV file that 
+    you wish to play.&nbsp; If the file is not in the current directory, then 
+    the path must also be specified.&nbsp; Enclose the file name in double 
+    quotes if it contains spaces.&nbsp; Make sure to include the &quot;.WAV&quot; 
+    extension.</span></td>
+  </tr>
+  </table>
+<hr>
+<h2 style="text-indent: -25; margin-left: 25; margin-right: 0"><span style="mso-fareast-font-family: MS Mincho"><a name="Usage Examples">Usage
+Examples</a></span></h2>
+<p style="margin-bottom: 0"><span style="mso-fareast-font-family: MS Mincho"><font face="Courier New">
+playwav <o:p>no.wav
+</o:p>
+</font></span></p>
+<p style="margin-bottom: 0"><span style="mso-fareast-font-family: MS Mincho"><font face="Courier New">
+playwav <o:p>&quot;wake up.wav&quot;</o:p></font></span></p>
+<p style="margin-bottom: 0"><font face="Courier New">playwav c:\sound\alert.wav</font><span style="mso-fareast-font-family: MS Mincho"><font face="Courier New"><o:p>
+</o:p>
+</font></span></p>
+<p style="margin-bottom: 0"><font face="Courier New">playwav <span lang="fr-lu">
+&quot;%WINDIR%\Media\chord.wav&quot;</span></font></p>
+<hr>
+<h2><a name="Batch File Integration">Batch File Integration</a></h2>
+<p class="MsoPlainText"><span style="font-family:Arial;mso-fareast-font-family:
+&quot;MS Mincho&quot;">For integration into batch files (.bat or .cmd), the
+following error levels are returned by<span lang="fr-lu"> PlayWav</span>:<o:p>
+</o:p>
+</span></p>
+<div align="left">
+  <table border="1" cellpadding="3">
+    <tr>
+      <td width="30">0</td>
+      <td><span style="font-family: Arial" lang="fr-lu">Error level 0 is 
+      returned if the .WAV file has been played successfully.</span></td>
+    </tr>
+    <tr>
+      <td width="30">1</td>
+      <td><span style="font-family:Arial;mso-fareast-font-family:
+&quot;MS Mincho&quot;"><span style="mso-tab-count:1"></span>Error level 1 is 
+      returned if the <span lang="fr-lu">the .WAV file was not played 
+      successfully.</span></span></td>
+    </tr>
+    </table>
+</div>
+<hr>
+<h2><a name="Web Site Integration"><span lang="fr-lu">Web Site</span> 
+Integration</a></h2>
+
+
+
+      
+<p><font face="Arial">One popular use of this program is to allow a web server 
+application to play a sound <b>on the web server</b>.&nbsp; For instance, 
+imagine that you are running a web cam on your home computer so that you can 
+watch and listen to your baby, kids, or pets.&nbsp; By setting up a web server 
+(such as Microsoft Personal Web Server or Internet Information Server) on your 
+home computer, you can create a simple web page with hyperlinks that cause 
+pre-defined .WAV audio files to be played on your home computer's speakers.&nbsp; 
+For instance, when you hear your dog start barking, just click the<i> No </i>
+button on your web site and your dog will hear the correction and (hopefully) 
+stop barking.</font></p>
+
+
+
+      
+<p><span lang="fr-lu"><font face="Arial">Since PlayWav is a command-line 
+application, it can be easily integrated into a web site.&nbsp; Below is a 
+sample CGI Perl script that can be run on any Windows web server that supports 
+Perl.&nbsp; This file is also included in the PlayWav zip file. Please note that 
+due to the complexities of web server configurations, no support is provided for 
+the following Perl script.&nbsp; Of course, bug reports and suggestions are 
+always welcome.&nbsp; </font></span></p>
+
+
+
+      
+<table border="0" width="100%">
+  <tr>
+    <td width="100%" bgcolor="#C0C0C0"><font face="Courier New">
+    <span style="background-color: #C0C0C0"># playwav.pl<br>
+    # CGI Perl script that uses <span lang="fr-lu">p</span>lay<span lang="fr-lu">w</span>av.exe 
+    to play a wave file on a web server.<br>
+    # Copyright (c) 2001 by <span lang="fr-lu">Mu-Consulting 
+    (www.muconsulting.com)</span><br>
+    # This Perl script may be modified freely for your own needs.<br>
+    <br>
+    # The following two variables must changed to reflect your file paths.<br>
+    <br>
+    # This is the directory where wav files are located in.<br>
+    # Make sure to keep the trailing &quot;\\&quot; characters.<br>
+    $mediafileprefix = &quot;<span lang="fr-lu">c</span>:\\inetpub\\wwwroot\\media\\&quot;;<br>
+    <br>
+    # This is the full path to the playwav.exe file.<br>
+    $playwaveexepath = &quot;<span lang="fr-lu">c</span>:\\inetpub\\wwwroot\\bin\\playwav.exe&quot;;<br>
+    <br>
+    # Parse HTTP parameters<br>
+    $querystring = $ENV{'QUERY_STRING'};<br>
+    @pairs = split(/&amp;/, $querystring);<br>
+    foreach $pair (@pairs)<br>
+    <span lang="fr-lu">&nbsp;&nbsp;&nbsp; </span>{<br>
+    <span lang="fr-lu">&nbsp;&nbsp;&nbsp; </span>($name, $value) = split(/=/, 
+    $pair);<br>
+    <span lang="fr-lu">&nbsp;&nbsp;&nbsp; </span>$value =~ tr/+/ /;<br>
+    <span lang="fr-lu">&nbsp;&nbsp;&nbsp; </span>$value =~ 
+    s/%([a-fA-F0-9][a-fA-F0-9])/pack(&quot;C&quot;, hex($1))/eg;<br>
+    <span lang="fr-lu">&nbsp;&nbsp;&nbsp; </span>$FORM{$name} = $value;<br>
+    <span lang="fr-lu">&nbsp;&nbsp;&nbsp; </span>}<br>
+    <br>
+    if (($#argv &lt; 0) &amp; $querystring eq &quot;&quot;)<br>
+    <span lang="fr-lu">&nbsp;&nbsp;&nbsp; </span>{<br>
+    <span lang="fr-lu">&nbsp;&nbsp;&nbsp; </span>&amp;PrintForm;<br>
+    <span lang="fr-lu">&nbsp;&nbsp;&nbsp; </span>}<br>
+    <br>
+    $mediafile = $FORM{'f'};<br>
+    <br>
+    print &quot;Content-type: text/html\n&quot;;<br>
+    print &quot;Cache-Control: no-cache\n\n&quot;;<br>
+    print &quot;&lt;html&gt;\n&lt;head&gt;\n&quot;;<br>
+    print &quot;&lt;title&gt;Play Wav File&lt;/title&gt;\n&quot;;<br>
+    print &quot;&lt;/head&gt;\n&quot;;<br>
+    print &quot;&lt;body&gt;\n&quot;;<br>
+    <br>
+    if ($mediafile =~ /[^a-zA-z0-9-]/)<br>
+    <span lang="fr-lu">&nbsp;&nbsp;&nbsp; </span>{<br>
+    <span lang="fr-lu">&nbsp;&nbsp;&nbsp; </span>print &quot;You entered an invalid 
+    media file name.\n&quot;;<br>
+    <span lang="fr-lu">&nbsp;&nbsp;&nbsp; </span>print &quot;&lt;/body&gt;\n&quot;;<br>
+    <span lang="fr-lu">&nbsp;&nbsp;&nbsp; </span>print &quot;&lt;/html&gt;\n&quot;;<br>
+    <span lang="fr-lu">&nbsp;&nbsp;&nbsp; </span>exit;<br>
+    <span lang="fr-lu">&nbsp;&nbsp;&nbsp; </span>}<br>
+    <br>
+    print &quot;&lt;font size=+2&gt;\n&quot;;<br>
+    print &quot;Playing media file \&quot;$mediafile\&quot;...&lt;br&gt;\n&quot;;<br>
+    print &quot;&lt;/font&gt;\n&quot;;<br>
+    <br>
+    $mediafilepath = &quot;$mediafileprefix$mediafile.wav&quot;;<br>
+    <br>
+    print &quot;&lt;pre&gt;\n&quot;;<br>
+    <br>
+    # Run playwav.exe and output results<br>
+    print `$playwaveexepath \&quot;$mediafilepath\&quot;`;<br>
+    <br>
+    print &quot;&lt;/pre&gt;\n&quot;;<br>
+    print &quot;&lt;br&gt;&lt;hr&gt;\n&quot;;<br>
+    print &quot;&lt;/body&gt;\n&quot;;<br>
+    print &quot;&lt;/html&gt;\n&quot;;<br>
+    <br>
+    sub PrintForm<br>
+    <span lang="fr-lu">&nbsp;&nbsp;&nbsp; </span>{<br>
+    <span lang="fr-lu">&nbsp;&nbsp;&nbsp; </span>print &quot;Content-type: 
+    text/html\n\n&quot;;<br>
+    <span lang="fr-lu">&nbsp;&nbsp;&nbsp; </span>print &quot;&lt;html&gt;\n&lt;head&gt;\n&quot;;<br>
+    <span lang="fr-lu">&nbsp;&nbsp;&nbsp; </span>print &quot;&lt;title&gt;Play Wav 
+    File&lt;/title&gt;\n&quot;;<br>
+    <span lang="fr-lu">&nbsp;&nbsp;&nbsp; </span>print &quot;&lt;/head&gt;\n&quot;;<br>
+    <span lang="fr-lu">&nbsp;&nbsp;&nbsp; </span>print &quot;&lt;body&gt;\n&quot;;<br>
+    <span lang="fr-lu">&nbsp;&nbsp;&nbsp; </span>print &quot;You entered an invalid 
+    command.\n&quot;;<br>
+    <span lang="fr-lu">&nbsp;&nbsp;&nbsp; </span>print &quot;&lt;/body&gt;\n&quot;;<br>
+    <span lang="fr-lu">&nbsp;&nbsp;&nbsp; </span>print &quot;&lt;/html&gt;\n&quot;;<br>
+    <span lang="fr-lu">&nbsp;&nbsp;&nbsp; </span>exit;<br>
+    <span lang="fr-lu">&nbsp;&nbsp;&nbsp; </span>}</span></font></td>
+  </tr>
+</table>
+<hr>
+<h2><a name="Revision History">Revision History</a></h2>
+<h3><span style="font-family: Arial" lang="fr-lu">PlayWav</span><span style="font-family:Arial;mso-fareast-font-family:
+&quot;MS Mincho&quot;"> 1.0 (11/0<span lang="fr-lu">4</span>/<span lang="fr-lu">2001</span>):<o:p>
+</o:p>
+</span></h3>
+<ul>
+  <li>
+    <p style="mso-list: l0 level1 lfo1; tab-stops: list .5in"><span style="font-family:Arial;mso-fareast-font-family:
+&quot;MS Mincho&quot;">Initial release of freeware version.</span></li>
+</ul>
+<hr>
+<h2 style="mso-list: l0 level1 lfo1; tab-stops: list .5in"><span style="font-family: Arial; mso-fareast-font-family: MS Mincho"><a name="Distribution">Distribution</a></span></h2>
+<p style="mso-list: l0 level1 lfo1; tab-stops: list .5in"><font face="Arial"><span style="mso-fareast-font-family:&quot;MS Mincho&quot;">
+<span lang="fr-lu">PlayWav 1.0</span> may be freely distributed, provided that the
+distribution is unmodified and complete with its documentation and
+<span lang="fr-lu">playwav.exe</span></span></font></p>
+<hr>
+<h2><a name="How To Contact µ-Consulting">How To Contact µ-Consulting</a></h2>
+<table border="1" cellpadding="4">
+  <tr>
+    <td><font face="Arial">Web Site</font></td>
+    <td><font face="Arial"><a href="http://www.muconsulting.com">www.muconsulting.com</a></font></td>
+  </tr>
+  <tr>
+    <td><font face="Arial">Technical Support</font></td>
+    <td><font face="Arial"><a href="mailto:support@muconsulting.com">support@muconsulting.com</a></font></td>
+  </tr>
+  <tr>
+    <td><font face="Arial">General Information</font></td>
+    <td><font face="Arial"><a href="mailto:info@muconsulting.com">info@muconsulting.com</a></font></td>
+  </tr>
+</table></body>
+
+</html>

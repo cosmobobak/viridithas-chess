@@ -1,0 +1,13 @@
+1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 a6 6. Be3 e5 7. Nb3 Be6 8. f3 Be7 9. Qd2 O-O 10. O-O-O Nbd7 11. g4 b5 12. g5 b4 13. Ne2 Ne8 14. f4 a5 15. f5 a4 16. Nbd4 exd4 17. Nxd4 b3 18. Kb1 bxc2+ 19. Nxc2 Bb3 20. axb3 axb3 21. Na3 Ne5 22. h4 Ra4 23. Rh3 Qa8 24. Qd5 Rxa3 25. bxa3 Qxa3 26. Rd2 Nc7 27. Qb7 Qa5 28. Qb6 Qc3 29. Qd4 Qc6 30. f6 Rc8 31. fxe7 Re8 32. Qb4 Nd7 33. Qc4 Qxc4 34. Bxc4 Rxe7 35. Rd4 Nc5 36. Rxd6 Nb7 37. Rd4 Ne6 38. Rd1 Na5 39. Bxe6 fxe6 40. Rd8+ Kf7 41. h5 Rb7 42. Bc5 e5 43. Rh8 Nc4 44. Rf3+ Ke6 45. Re8+ Kd7 46. Re7+ Kc6 47. Rxb7 Kxb7 48. Rxb3+ Kc8 49. Bb4 Kb8 50. Bf8+ Ka8 51. Bb4 h6 52. gxh6 gxh6 53. Bc3 Ka7 54. Bb4 Kb8 55. Bf8+ Ka8 56. Rd3 Kb7 57. Bxh6 Ka8 58. Bg5 Kb7 59. h6 Nb2 60. Kxb2 Kc8 61. h7 Kb8 62. h8=Q+ Kc7 63. Qxe5+ Kb7 64. Rd7+ Kc6 65. Qd6+ Kb5 66. Rb7+ Ka5 67. Qa3#
+
+game ends with white mate
+
+white:
+5innac
+0mistakes
+0blunders
+
+black:
+4innac
+0mistakes
+1blunders
