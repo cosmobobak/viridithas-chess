@@ -16,41 +16,6 @@ from flask import url_for
 from dotenv import load_dotenv
 from authlib.integrations.flask_client import OAuth
 
-app = Flask(__name__)
-app.secret_key = b'd\xd5J\xa0\xad\x14\xb3\xc1\xbfA\x93e\x8e\xe1\x89\xc7\xa5\x88\xbeEI\x85\xd8\xdc'
-app.config['LICHESS_CLIENT_ID'] =  "tndReTnAkbBEl4lA"
-app.config['LICHESS_CLIENT_SECRET'] = "akWiSvFUMOvMfU8gov4I0tHPhRicbDoR"
-app.config['LICHESS_ACCESS_TOKEN_URL'] = 'https://oauth.lichess.org/oauth'
-app.config['LICHESS_AUTHORIZE_URL'] = 'https://oauth.lichess.org/oauth/authorize'
-
-oauth = OAuth(app)
-oauth.register('lichess')
-
-@app.route('/')
-def login():
-    redirect_uri = url_for("authorize", _external=True)
-    """
-    If you need to append scopes to your requests, add the `scope=...` named argument
-    to the `.authorize_redirect()` method. For admissible values refer to https://lichess.org/api#section/Authentication.
-    Example with scopes for allowing the app to read the user's email address:
-    `return oauth.lichess.authorize_redirect(redirect_uri, scope="email:read")`
-    """
-    return oauth.lichess.authorize_redirect(redirect_uri)
-
-@app.route('/authorize')
-def authorize():
-    token = oauth.lichess.authorize_access_token()
-    bearer = token['access_token']
-    headers = {'Authorization': f'Bearer lc03sMGM7WpfsymS'}
-    response = requests.get("https://lichess.org/api/account", headers=headers)
-    return jsonify(**response.json())
-
-if __name__ == '__main__':
-    app.run()
-
-
-whiteTime = 0.0
-
 if True:
     pawnSpacesB =  [0,0,0,0,0,0,0,0,50,50,50,50,50,50,50,50,10,10,20,30,30,20,10,10,5,5,10,25,25,10,5,5,0,0,0,20,20,0,0,0,5,-5,-10,0,0,-10,-5,5,5,10,10,-20,-20,10,10,5,0,0,0,0,0,0,0,0]
     knightSpacesB = [-50,-40,-30,-30,-30,-30,-40,-50,-40,-20,0,0,0,0,-20,-40,-30,0,10,15,15,10,0,-30,-30,5,15,20,20,15,5,-30,-30,0,15,20,20,15,0,-30,-30,5,10,15,15,10,5,-30,-40,-20,0,5,5,0,-20,-40,-50,-40,-30,-30,-30,-30,-40,-50,]
@@ -68,6 +33,30 @@ if True:
     kingSpacesW = list(reversed(kingSpacesB))
     kingSpacesEndgameW = list(reversed(kingSpacesEndgameB))
 
+def pieceDiff(board, a, b):
+    count = 0
+    for piece in board.pieces(chess.PAWN, chess.BLACK):
+        count += -1
+    for piece in board.pieces(chess.PAWN, chess.WHITE):
+        count += 1
+    for piece in board.pieces(chess.KNIGHT, chess.BLACK):
+        count += -1
+    for piece in board.pieces(chess.KNIGHT, chess.WHITE):
+        count += 1
+    for piece in board.pieces(chess.BISHOP, chess.BLACK):
+        count += -1
+    for piece in board.pieces(chess.BISHOP, chess.WHITE):
+        count += 1
+    for piece in board.pieces(chess.ROOK, chess.BLACK):
+        count += -1
+    for piece in board.pieces(chess.ROOK, chess.WHITE):
+        count += 1
+    for piece in board.pieces(chess.QUEEN, chess.BLACK):
+        count += -1
+    for piece in board.pieces(chess.QUEEN, chess.WHITE):
+        count += 1
+    return count
+
 #@profile
 def evaluate(board, depth, endgame):
     if board.turn:
@@ -83,18 +72,18 @@ def evaluate(board, depth, endgame):
     rating = 0.0
 
     rating += sum([pawnSpacesB[i]+1000 for i in board.pieces(chess.PAWN, chess.BLACK)])-sum([pawnSpacesW[i]+1000 for i in board.pieces(chess.PAWN, chess.WHITE)])
-    rating += sum([knightSpacesB[i]+3200 for i in board.pieces(chess.KNIGHT, chess.BLACK)])-sum([knightSpacesW[i]+3200 for i in board.pieces(chess.KNIGHT, chess.WHITE)])
-    rating += sum([bishopSpacesB[i]+3330 for i in board.pieces(chess.BISHOP, chess.BLACK)])-sum([bishopSpacesW[i]+3330 for i in board.pieces(chess.BISHOP, chess.WHITE)])
-    rating += sum([rookSpacesB[i]+5100 for i in board.pieces(chess.ROOK, chess.BLACK)])-sum([rookSpacesW[i]+5100 for i in board.pieces(chess.ROOK, chess.WHITE)])
-    rating += sum([queenSpacesB[i]+8800 for i in board.pieces(chess.QUEEN, chess.BLACK)])-sum([queenSpacesW[i]+8800 for i in board.pieces(chess.QUEEN, chess.WHITE)])
+    rating += sum([knightSpacesB[i]+1000 for i in board.pieces(chess.KNIGHT, chess.BLACK)])-sum([knightSpacesW[i]+3200 for i in board.pieces(chess.KNIGHT, chess.WHITE)])
+    rating += sum([bishopSpacesB[i]+3000 for i in board.pieces(chess.BISHOP, chess.BLACK)])-sum([bishopSpacesW[i]+3330 for i in board.pieces(chess.BISHOP, chess.WHITE)])
+    rating += sum([rookSpacesB[i]+5000 for i in board.pieces(chess.ROOK, chess.BLACK)])-sum([rookSpacesW[i]+5100 for i in board.pieces(chess.ROOK, chess.WHITE)])
+    rating += sum([queenSpacesB[i]+500 for i in board.pieces(chess.QUEEN, chess.BLACK)])-sum([queenSpacesW[i]+8800 for i in board.pieces(chess.QUEEN, chess.WHITE)])
     if endgame:
-        rating += sum([kingSpacesEndgameB[i] for i in board.pieces(chess.KING, chess.BLACK)])-sum([kingSpacesEndgameW[i] for i in board.pieces(chess.KING, chess.WHITE)])
+        rating += sum([kingSpacesEndgameB[i]+1000 for i in board.pieces(chess.KING, chess.BLACK)])-sum([kingSpacesEndgameW[i] for i in board.pieces(chess.KING, chess.WHITE)])
         #if pieceCount(board) <= 3:
             #with chess.syzygy.open_tablebase(r'C:\Users\Cosmo\Documents\GitHub\Chess\3-4-5piecesSyzygy\3-4-5') as tablebase:
                 #WDL = tablebase.probe_wdl(board)
                 #return WDL*10000*board.turn
     else:
-        rating += sum([kingSpacesB[i] for i in board.pieces(chess.KING, chess.BLACK)])-sum([kingSpacesW[i] for i in board.pieces(chess.KING, chess.WHITE)])
+        rating += sum([kingSpacesB[i]+1000 for i in board.pieces(chess.KING, chess.BLACK)])-sum([kingSpacesW[i] for i in board.pieces(chess.KING, chess.WHITE)])
 
     return rating*0.001
 
@@ -114,25 +103,11 @@ def orderedMoves(board):
 
     return first + last
 
-#@profile
-def negamax_killer(node, depth, a, b, colour, endgame):
-    if depth == 0 or node.is_game_over():
-        return colour * evaluate(node, depth, endgame)
-    value = -1337000.0
-    moves = orderedMoves(node)
-    for move in moves:
-        node.push(move)
-        value = max(value, -negamax_killer(node, depth - 1, -b, -a, -colour, endgame))
-        a = max(a, value)
-        node.pop()
-        if a >= b:
-            break
-    return value
-
-#@profile
 def pvs(node, depth, a, b, colour, endgame):
-    if depth == 0 or node.is_game_over():
-        return colour * evaluate(node, depth, endgame)
+    if depth == 0:
+        return colour * pieceDiff(node, depth, endgame)
+    if node.is_game_over():
+        return colour*-1000
     moves = orderedMoves(node)
     firstmove = True
     for move in moves:
@@ -161,30 +136,6 @@ def moveLister(moves):
 
 def showIterationData(board, moves, values, depth, startTime):
     print(board.san(moves[0]),'|',round(values[0], 3),'|',str(round(time.time()-startTime, 2))+'s at depth',depth)
-
-def search(node, timeLimit):
-    startTime = time.time()
-    depth = 1
-    a, b = -1337000, 1337000
-    colour = node.turn
-    endgame = False
-    if pieceCount(node) <= 6:
-        endgame = True
-
-    moves = orderedMoves(node)
-    values = [0.0]*len(moves)
-
-    while timeLimit > time.time()-startTime:
-        for i, move in enumerate(moves):
-            node.push(move)
-            values[i] = negamax_killer(node, depth, a, b, colour, endgame)
-            node.pop()
-            if timeLimit < time.time()-startTime:
-                return moves[0]
-        moves, values = moveSort(moves, values)
-        showIterationData(node, moves, values, depth, startTime)
-        depth += 1
-    return moves[0]
 
 def pvsearch(node, timeLimit):
     startTime = time.time()
@@ -253,57 +204,8 @@ def pieceCount(board):
         count += 1
     return count
 
-#@profile
-def pushMove(board, depth, debug):
-    start = time.time()
-
-    moves = []
-    for move in board.legal_moves:
-        moves.append(move)
-
-    endgame = False
-    if pieceCount(board) <= 6:
-        endgame = True
-
-    if board.turn:
-        turn = 1
-    else:
-        turn = -1
-
-    boards = []
-    moveRatings = []
-    RESET = board.copy()
-
-    try:
-        best = getBookMove(board)
-        board.push(best)
-        print(best)
-        print(chess.pgn.Game.from_board(board)[-1])
-    except Exception:
-        for move in moves:
-            board.push(move)
-            moveRatings.append(negamax_killer(board, depth, -1337000, 1337000, turn, endgame))
-            board.pop()
-
-        if debug:
-            moves, moveRatings = moveSort(moves, moveRatings)
-            moveLister(moves)
-            print(moveRatings)
-
-        best = moves[moveRatings.index(min(moveRatings))]
-
-        board.push(best)
-        print(best)
-        print(chess.pgn.Game.from_board(board)[-1])
-
-    end = time.time()
-    global whiteTime
-    print(end-start)
-    whiteTime += (end-start)
-    return boards,moveRatings
-
 def getBookMove(node):
-    book = chess.polyglot.open_reader(r"C:\Users\Cosmo\Documents\GitHub\Chess\ProDeo292\ProDeo292\books\elo2500.bin")
+    book = chess.polyglot.open_reader(r"C:\Users\Cosmo\Documents\GitHub\Chess\ProDeo292\ProDeo292\books\elo25aaaa00.bin")
     main_entry = book.find(node)
     return main_entry.move
 
@@ -316,9 +218,10 @@ def play(board, timeLimit):
         print(best)
         print(chess.pgn.Game.from_board(board)[-1])
     except Exception:
-        best1 = pvsearch(board, timeLimit)
-        #best2 = search(board,timeLimit)
-        best = best1
+        if len(moves) == 1:
+            best = moves[0]
+        else:
+            best = pvsearch(board, timeLimit)
         board.push(best)
         print(best)
         print(chess.pgn.Game.from_board(board)[-1])
@@ -351,80 +254,27 @@ def endingPrinter(board):
     else:
         print('END BY UNKNOWN REASON')
 
-def main(string,rounds,debug,human,side,depth):
-    for game in range(rounds):
-        board = chess.Board(str(string))
-        win = 1
-
-        boardArrays = []
-        ratingArrays = []
-
-        while not board.is_game_over():
-            show(board)
-
-            #boards,ratings = pushMove(board,depth,debug)
-            play(board,10)
-            #usermoveKermit(board,1,1)
-
-            #boardArrays.append(boards)
-            #ratingArrays.append(ratings)
-
-            if board.is_game_over():
-                break
-
-            show(board)
-
-            #boards,ratings = pushMove(board,depth,debug)
-            play(board,10)
-            #usermoveKermit(board,1,1)
-
-            #boardArrays.append(boards)
-            #ratingArrays.append(ratings)
-
-        endingPrinter(board)
-
+def main(debug,human,side,depth):
+    board = chess.variant.AntichessBoard()
+    win = 1
+    boardArrays = []
+    ratingArrays = []
+    while not board.is_game_over():
+        show(board)
+        #boards,ratings = pushMove(board,depth,debug)
+        #play(board,10)
+        usermoveKermit(board,1,1)
+        #boardArrays.append(boards)
+        if board.is_game_over():
+            break
+        show(board)
+        #boards,ratings = pushMove(board,depth,debug)
+        play(board,10)
+        #usermoveKermit(board,1,1)
+    endingPrinter(board)
     return boardArrays,ratingArrays,board.move_stack
 
-standard = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
-
-whiteMate1 = '8/8/8/8/8/4R1K1/8/6k1 w - - 0 1'
-blackMate1 = '8/8/8/8/8/4r1k1/8/6K1 b - - 0 1'
-
-openings = ['rnbqkbnr/pppppppp/8/8/8/6P1/PPPPPP1P/RNBQKBNR b KQkq - 0 1',
-            'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
-            'rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1',
-            'rnbqkbnr/pppppppp/8/8/8/5N2/PPPPPPPP/RNBQKB1R b KQkq - 1 1',
-            'rnbqkbnr/pppppppp/8/8/2P5/8/PP1PPPPP/RNBQKBNR b KQkq c3 0 1',
-            'rnbqkbnr/pppppppp/8/8/8/N7/PPPPPPPP/R1BQKBNR b KQkq - 1 1',
-            'rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2']
-
-#g3
-#e4
-#d4
-#Nf3
-#c4
-#Na3
-#sicilian (1. e4 c5)
-'''
-resp = requests.get('https://todolist.example.com/tasks/')
-if resp.status_code != 200:
-    # This means something went wrong.
-    raise ApiError('GET /tasks/ {}'.format(resp.status_code))
-for todo_item in resp.json():
-    print('{} {}'.format(todo_item['id'], todo_item['summary']))
-'''
-
-headers = {
-    'Authorization': 'Bearer lc03sMGM7WpfsymS',
-}
-
-response = requests.get('https://lichess.org/api/account', headers=headers)
-
-print(response)
-
 if True:
-    test = '8/2p5/8/5p1p/2p2PPP/1k6/1p6/1K6 w - - 0 1'
-
-    boardArrays,ratingArrays,stack = main(test,1,True,True,True,4)
+    boardArrays,ratingArrays,stack = main(True,True,True,4)
     print('time elapsed while thinking:',whiteTime)
     print(stack)
