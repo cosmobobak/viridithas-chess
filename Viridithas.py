@@ -17,9 +17,10 @@ from dotenv import load_dotenv
 from authlib.integrations.flask_client import OAuth
 
 app = Flask(__name__)
-app.secret_key = b'd\xd5J\xa0\xad\x14\xb3\xc1\xbfA\x93e\x8e\xe1\x89\xc7\xa5\x88\xbeEI\x85\xd8\xdc'
-app.config['LICHESS_CLIENT_ID'] =  "tndReTnAkbBEl4lA"
-app.config['LICHESS_CLIENT_SECRET'] = "akWiSvFUMOvMfU8gov4I0tHPhRicbDoR"
+app.secret_key = os.getenv("SECRET_KEY")
+print(app.secret_key)
+app.config['LICHESS_CLIENT_ID'] =  os.getenv("LICHESS_CLIENT_ID")
+app.config['LICHESS_CLIENT_SECRET'] = os.getenv("LICHESS_CLIENT_SECRET")
 app.config['LICHESS_ACCESS_TOKEN_URL'] = 'https://oauth.lichess.org/oauth'
 app.config['LICHESS_AUTHORIZE_URL'] = 'https://oauth.lichess.org/oauth/authorize'
 
@@ -41,7 +42,7 @@ def login():
 def authorize():
     token = oauth.lichess.authorize_access_token()
     bearer = token['access_token']
-    headers = {'Authorization': f'Bearer lc03sMGM7WpfsymS'}
+    headers = {'Authorization': f'Bearer {bearer}'}
     response = requests.get("https://lichess.org/api/account", headers=headers)
     return jsonify(**response.json())
 
