@@ -6,7 +6,6 @@ import chess.syzygy
 import random
 import chess.variant
 import time
-import operator
 #import line_profiler
 from operator import itemgetter
 import requests
@@ -110,10 +109,30 @@ def orderedMoves(board):
 
     return first + last
 
+def isLateCandidate(depth, node, move, set):
+    if depth < 3:
+        return False
+    if move in set[0:4]:
+        return False
+    if node.is_check():
+        return False
+    if node.gives_check(move):
+        return False
+    if node.is_capture(move):
+        return False
+    if move.promotion:
+        return False
+    return True
+
 #@profile
 def pvs(node, depth, a, b, colour, endgame):
-    if depth <= 0 or node.is_game_over():
+    if node.is_game_over():
         return colour * evaluate(node, depth, endgame)
+    if depth <= 0:
+        if node.is_check():
+            depth+=1
+        else:
+            return colour * evaluate(node, depth, endgame)
 
     if not node.is_check():
         node.push(chess.Move.null())
@@ -141,8 +160,13 @@ def pvs(node, depth, a, b, colour, endgame):
     return a
 
 def pvsTest(node, depth, a, b, colour, endgame):
-    if depth <= 0 or node.is_game_over():
+    if node.is_game_over():
         return colour * evaluate(node, depth, endgame)
+    if depth <= 0:
+        if node.is_check():
+            depth+=1
+        else:
+            return colour * evaluate(node, depth, endgame)
 
     if not node.is_check():
         node.push(chess.Move.null())
@@ -155,6 +179,7 @@ def pvsTest(node, depth, a, b, colour, endgame):
     moves = orderedMoves(node)
     firstmove = True
     for move in moves:
+        savenode = node.copy()
         node.push(move)
         if firstmove:
             value = -pvsTest(node, depth - 1, -b, -a, -colour, endgame)
@@ -162,6 +187,8 @@ def pvsTest(node, depth, a, b, colour, endgame):
         else:
             value = -pvsTest(node, depth - 1, -a - 1, -a, -colour, endgame)
             if a < value and value < b:
+                if isLateCandidate(depth, savenode, move, moves):
+                    value = -pvsTest(node, depth - 2, -b, -value, -colour, endgame)
                 value = -pvsTest(node, depth - 1, -b, -value, -colour, endgame)
         a = max(a, value)
         node.pop()
@@ -262,7 +289,7 @@ def pieceCount(board):
     return count
 
 def getBookMove(node):
-    book = chess.polyglot.open_reader(r"C:\Users\Cosmo\Documents\GitHub\Chess\ProDeo292\ProDeo292\books\elo2500.bin")
+    book = chess.polyglot.open_reader(r"ProDeo292/ProDeo292/books/elo2500.bin")
     main_entry = book.find(node)
     return main_entry.move
 
@@ -276,7 +303,7 @@ def play(board, timeLimit):
         print(chess.pgn.Game.from_board(board)[-1])
     except Exception:
         best = pvsearch(board, timeLimit)
-        #best2 = testsearch(board, timeLimit)
+        best2 = testsearch(board, timeLimit)
         board.push(best)
         print(best)
         print(chess.pgn.Game.from_board(board)[-1])
