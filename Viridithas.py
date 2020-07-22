@@ -13,9 +13,9 @@ import requests
 import os
 from flask import Flask, jsonify
 from flask import url_for
-from dotenv import load_dotenv
-from authlib.integrations.flask_client import OAuth
-
+#from dotenv import load_dotenv
+#from authlib.integrations.flask_client import OAuth
+'''
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
 print(app.secret_key)
@@ -48,7 +48,7 @@ def authorize():
 
 if __name__ == '__main__':
     app.run()
-
+'''
 
 whiteTime = 0.0
 
@@ -99,9 +99,6 @@ def evaluate(board, depth, endgame):
 
     return rating*0.001
 
-def antiEval(board,depth,endgame):
-    return -evaluate(board,depth,endgame)
-
 #@profile
 def orderedMoves(board):
     first = []
@@ -114,21 +111,6 @@ def orderedMoves(board):
             last.append(move)
 
     return first + last
-
-#@profile
-def negamax_killer(node, depth, a, b, colour, endgame):
-    if depth == 0 or node.is_game_over():
-        return colour * evaluate(node, depth, endgame)
-    value = -1337000.0
-    moves = orderedMoves(node)
-    for move in moves:
-        node.push(move)
-        value = max(value, -negamax_killer(node, depth - 1, -b, -a, -colour, endgame))
-        a = max(a, value)
-        node.pop()
-        if a >= b:
-            break
-    return value
 
 #@profile
 def pvs(node, depth, a, b, colour, endgame):
@@ -163,30 +145,6 @@ def moveLister(moves):
 def showIterationData(board, moves, values, depth, startTime):
     print(board.san(moves[0]),'|',round(values[0], 3),'|',str(round(time.time()-startTime, 2))+'s at depth',depth)
 
-def search(node, timeLimit):
-    startTime = time.time()
-    depth = 1
-    a, b = -1337000, 1337000
-    colour = node.turn
-    endgame = False
-    if pieceCount(node) <= 6:
-        endgame = True
-
-    moves = orderedMoves(node)
-    values = [0.0]*len(moves)
-
-    while timeLimit > time.time()-startTime:
-        for i, move in enumerate(moves):
-            node.push(move)
-            values[i] = negamax_killer(node, depth, a, b, colour, endgame)
-            node.pop()
-            if timeLimit < time.time()-startTime:
-                return moves[0]
-        moves, values = moveSort(moves, values)
-        showIterationData(node, moves, values, depth, startTime)
-        depth += 1
-    return moves[0]
-
 def pvsearch(node, timeLimit):
     startTime = time.time()
     depth = 1
@@ -214,21 +172,6 @@ def pvsearch(node, timeLimit):
         showIterationData(node, moves, values, depth, startTime)
         depth += 1
     return moves[0]
-
-def minimax(node, depth, colour, tablebase):
-    DTZ = tablebase.probe_dtz(node)
-    if DTZ == 0 or depth == 0:
-        return 0
-    if colour:
-        value = -123456789
-        for move in node.legal_moves:
-            value = max(value, minimax(node, depth - 1, False, tablebase))
-        return value
-    else:
-        value = 123456789
-        for move in node.legal_moves:
-            value = min(value, minimax(node, depth - 1, True, tablebase))
-        return value
 
 def pieceCount(board):
     count = 0
@@ -364,7 +307,7 @@ def main(string,rounds,debug,human,side,depth):
             show(board)
 
             #boards,ratings = pushMove(board,depth,debug)
-            play(board,10)
+            play(board,600)
             #usermoveKermit(board,1,1)
 
             #boardArrays.append(boards)
@@ -424,7 +367,7 @@ response = requests.get('https://lichess.org/api/account', headers=headers)
 print(response)
 
 if True:
-    test = '8/2p5/8/5p1p/2p2PPP/1k6/1p6/1K6 w - - 0 1'
+    test = '7b/3bkp1p/4p3/1n6/3P4/3RP3/2rn1PPP/R5K1 w - - 0 1'
 
     boardArrays,ratingArrays,stack = main(test,1,True,True,True,4)
     print('time elapsed while thinking:',whiteTime)
