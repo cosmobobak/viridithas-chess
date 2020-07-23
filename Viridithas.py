@@ -8,10 +8,10 @@ import chess.variant
 import time
 #import line_profiler
 from operator import itemgetter
-import requests
-import os
-from flask import Flask, jsonify
-from flask import url_for
+#import requests
+#import os
+#from flask import Flask, jsonify
+#from flask import url_for
 #from dotenv import load_dotenv
 #from authlib.integrations.flask_client import OAuth
 '''
@@ -109,7 +109,7 @@ def orderedMoves(board):
 
     return first + last
 
-@profile
+#@profile
 def isLateCandidate(depth, node, move, set):
     if depth < 3:
         return False
@@ -125,11 +125,11 @@ def isLateCandidate(depth, node, move, set):
         return False
     return True
 
-@profile
+#@profile
 def pvs(node, depth, a, b, colour, endgame):
-    if node.is_game_over():
-        return colour * evaluate(node, depth, endgame)
     if depth <= 0:
+        return colour * evaluate(node, depth, endgame)
+    if node.is_game_over():
         return colour * evaluate(node, depth, endgame)
 
     if not node.is_check():
@@ -157,23 +157,12 @@ def pvs(node, depth, a, b, colour, endgame):
             return a
     return a
 
-@profile
+#@profile
 def pvsTest(node, depth, a, b, colour, endgame):
+    if depth <= 0:
+        return colour * evaluate(node, depth, endgame)
     if node.is_game_over():
         return colour * evaluate(node, depth, endgame)
-    if depth <= 0:
-        if node.is_check():
-            depth+=1
-        else:
-            return colour * evaluate(node, depth, endgame)
-
-    if not node.is_check():
-        node.push(chess.Move.null())
-        value = -pvsTest(node, depth - 3, -b, -a, -colour, endgame)
-        a = max(a, value)
-        node.pop()
-        if a >= b:
-            return a
 
     moves = orderedMoves(node)
     firstmove = True
@@ -185,16 +174,7 @@ def pvsTest(node, depth, a, b, colour, endgame):
         else:
             value = -pvsTest(node, depth - 1, -a - 1, -a, -colour, endgame)
             if a < value and value < b:
-                node.pop()
-                if isLateCandidate(depth, node, move, moves):
-                    node.push(move)
-                    if i < 6:
-                        value = -pvsTest(node, depth - 2, -b, -value, -colour, endgame)
-                    else:
-                        value = -pvsTest(node, depth - 1 - int(depth/3+0.5), -b, -value, -colour, endgame)
-                else:
-                    node.push(move)
-                    value = -pvsTest(node, depth - 1, -b, -value, -colour, endgame)
+                value = -pvsTest(node, depth - 1, -b, -value, -colour, endgame)
         a = max(a, value)
         node.pop()
         if a >= b:
@@ -213,7 +193,7 @@ def moveLister(moves):
 def showIterationData(board, moves, values, depth, startTime):
     print(board.san(moves[0]),'|',round(-values[0], 3),'|',str(round(time.time()-startTime, 2))+'s at depth',depth)
 
-@profile
+#@profile
 def pvsearch(node, timeLimit):
     startTime = time.time()
     depth = 1
@@ -242,7 +222,7 @@ def pvsearch(node, timeLimit):
         depth += 1
     return moves[0]
 
-@profile
+#@profile
 def testsearch(node, timeLimit):
     startTime = time.time()
     depth = 1
@@ -300,7 +280,7 @@ def getBookMove(node):
     main_entry = book.find(node)
     return main_entry.move
 
-@profile
+#@profile
 def play(board, timeLimit):
     start = time.time()
     moves = orderedMoves(board)
@@ -311,7 +291,7 @@ def play(board, timeLimit):
         print(chess.pgn.Game.from_board(board)[-1])
     except Exception:
         best = pvsearch(board, timeLimit)
-        best2 = testsearch(board, timeLimit)
+        #best2 = testsearch(board, timeLimit)
         board.push(best)
         print(best)
         print(chess.pgn.Game.from_board(board)[-1])
@@ -358,8 +338,8 @@ def main(string, debug, human, side, timeLimit):
         if board.is_game_over():
             break
         show(board)
-        play(board,timeLimit)
-        #usermoveKermit(board,1,1)
+        #play(board,timeLimit)
+        usermoveKermit(board,1,1)
     endingPrinter(board)
     return str(chess.pgn.Game.from_board(board)[-1])
 
@@ -379,7 +359,7 @@ names = ['#g3', '#e4', '#d4', '#Nf3', '#c4', '#Na3']
 
 test = '7b/3bkp1p/4p3/1n6/3P4/3RP3/2rn1PPP/R5K1 w - - 0 1'
 
-timeLimit = 30
+timeLimit = 20
 stacks = []
 for i, opening in enumerate(openings):
     stacks.append(main(standard, True, True, True, timeLimit))
