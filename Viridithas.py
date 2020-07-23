@@ -14,42 +14,48 @@ from flask import Flask, jsonify
 from flask import url_for
 #from dotenv import load_dotenv
 #from authlib.integrations.flask_client import OAuth
-'''
-app = Flask(__name__)
-app.secret_key = os.getenv("SECRET_KEY")
-print(app.secret_key)
-app.config['LICHESS_CLIENT_ID'] =  os.getenv("LICHESS_CLIENT_ID")
-app.config['LICHESS_CLIENT_SECRET'] = os.getenv("LICHESS_CLIENT_SECRET")
-app.config['LICHESS_ACCESS_TOKEN_URL'] = 'https://oauth.lichess.org/oauth'
-app.config['LICHESS_AUTHORIZE_URL'] = 'https://oauth.lichess.org/oauth/authorize'
+if True:
+    '''
+    app = Flask(__name__)
+    app.secret_key = os.getenv("SECRET_KEY")
+    print(app.secret_key)
+    app.config['LICHESS_CLIENT_ID'] =  os.getenv("LICHESS_CLIENT_ID")
+    app.config['LICHESS_CLIENT_SECRET'] = os.getenv("LICHESS_CLIENT_SECRET")
+    app.config['LICHESS_ACCESS_TOKEN_URL'] = 'https://oauth.lichess.org/oauth'
+    app.config['LICHESS_AUTHORIZE_URL'] = 'https://oauth.lichess.org/oauth/authorize'
 
-oauth = OAuth(app)
-oauth.register('lichess')
+    oauth = OAuth(app)
+    oauth.register('lichess')
 
-@app.route('/')
-def login():
-    redirect_uri = url_for("authorize", _external=True)
-    """
-    If you need to append scopes to your requests, add the `scope=...` named argument
-    to the `.authorize_redirect()` method. For admissible values refer to https://lichess.org/api#section/Authentication.
-    Example with scopes for allowing the app to read the user's email address:
-    `return oauth.lichess.authorize_redirect(redirect_uri, scope="email:read")`
-    """
-    return oauth.lichess.authorize_redirect(redirect_uri)
+    @app.route('/')
+    def login():
+        redirect_uri = url_for("authorize", _external=True)
+        """
+        If you need to append scopes to your requests, add the `scope=...` named argument
+        to the `.authorize_redirect()` method. For admissible values refer to https://lichess.org/api#section/Authentication.
+        Example with scopes for allowing the app to read the user's email address:
+        `return oauth.lichess.authorize_redirect(redirect_uri, scope="email:read")`
+        """
+        return oauth.lichess.authorize_redirect(redirect_uri)
 
-@app.route('/authorize')
-def authorize():
-    token = oauth.lichess.authorize_access_token()
-    bearer = token['access_token']
-    headers = {'Authorization': f'Bearer {bearer}'}
-    response = requests.get("https://lichess.org/api/account", headers=headers)
-    return jsonify(**response.json())
+    @app.route('/authorize')
+    def authorize():
+        token = oauth.lichess.authorize_access_token()
+        bearer = token['access_token']
+        headers = {'Authorization': f'Bearer {bearer}'}
+        response = requests.get("https://lichess.org/api/account", headers=headers)
+        return jsonify(**response.json())
 
-if __name__ == '__main__':
-    app.run()
-'''
+    if __name__ == '__main__':
+        app.run()
+    '''
 
 whiteTime = 0.0
+
+variations = dict()
+
+table = dict()
+#this will be a transposition table, storing evaluations, and the depth at which the evaluation was calculated, keyed by the Zobrist hash.
 
 if True:
     pawnSpacesB =  [0,0,0,0,0,0,0,0,50,50,50,50,50,50,50,50,10,10,20,30,30,20,10,10,5,5,10,25,25,10,5,5,0,0,0,20,20,0,0,0,5,-5,-10,0,0,-10,-5,5,5,10,10,-20,-20,10,10,5,0,0,0,0,0,0,0,0]
@@ -68,7 +74,6 @@ if True:
     kingSpacesW = list(reversed(kingSpacesB))
     kingSpacesEndgameW = list(reversed(kingSpacesEndgameB))
 
-#@profile
 def evaluate(board, depth, endgame):
     if board.turn:
         mod = 1
@@ -96,109 +101,97 @@ def evaluate(board, depth, endgame):
         rating += sum([kingSpacesB[i] for i in board.pieces(chess.KING, chess.BLACK)])-sum([kingSpacesW[i] for i in board.pieces(chess.KING, chess.WHITE)])
     return rating*0.001
 
-#@profile
-def orderedMoves(board):
-    first = []
+def orderedMoves(board, oldcuts):
+    cuts = []
+    takes = []
     last = []
 
     for move in board.legal_moves:
-        if board.is_capture(move):
-            first.append(move)
+        if move.uci() in oldcuts:
+            cuts.append(move)
+        elif board.is_capture(move):
+            takes.append(move)
         else:
             last.append(move)
 
-    return first + last
+    return cuts + takes + last
 
-@profile
 def isLateCandidate(depth, node, move, set):
     if depth < 3:
-        return False
-    if move in set[0:4]:
-        return False
-    if node.is_check():
-        return False
-    if node.gives_check(move):
         return False
     if node.is_capture(move):
         return False
     if move.promotion:
         return False
+    if move in set[0:2]:
+        return False
+    if node.is_check():
+        return False
+    if node.gives_check(move):
+        return False
     return True
 
-@profile
-def pvs(node, depth, a, b, colour, endgame):
-    if node.is_game_over():
-        return colour * evaluate(node, depth, endgame)
+def pvs(node, depth, a, b, colour):
     if depth <= 0:
-        return colour * evaluate(node, depth, endgame)
+        return colour * evaluate(node, depth, False)
+    if node.is_game_over():
+        return colour * evaluate(node, depth, False)
 
     if not node.is_check():
         node.push(chess.Move.null())
-        value = -pvs(node, depth - 3, -b, -a, -colour, endgame)
+        value = -pvs(node, depth - 3, -b, -a, -colour)
         a = max(a, value)
         node.pop()
         if a >= b:
             return a
 
-    moves = orderedMoves(node)
+    moves = orderedMoves(node, [])
     firstmove = True
     for i, move in enumerate(moves):
         node.push(move)
         if firstmove:
-            value = -pvs(node, depth - 1, -b, -a, -colour, endgame)
+            value = -pvs(node, depth - 1, -b, -a, -colour)
             firstmove = False
         else:
-            value = -pvs(node, depth - 1, -a - 1, -a, -colour, endgame)
+            value = -pvs(node, depth - 1, -a - 1, -a, -colour)
             if a < value and value < b:
-                value = -pvs(node, depth - 1, -b, -value, -colour, endgame)
+                value = -pvs(node, depth - 1, -b, -value, -colour)
         a = max(a, value)
         node.pop()
         if a >= b:
-            return a
+            break
     return a
 
-@profile
-def pvsTest(node, depth, a, b, colour, endgame):
-    if node.is_game_over():
-        return colour * evaluate(node, depth, endgame)
+def pvsTest(node, depth, a, b, colour):
     if depth <= 0:
-        if node.is_check():
-            depth+=1
-        else:
-            return colour * evaluate(node, depth, endgame)
+        return colour * evaluate(node, depth, False)
+    if node.is_game_over():
+        return colour * evaluate(node, depth, False)
 
+    #NULLMOVE PRUNING
     if not node.is_check():
         node.push(chess.Move.null())
-        value = -pvsTest(node, depth - 3, -b, -a, -colour, endgame)
+        value = -pvsTest(node, depth - 3, -b, -a, -colour)
         a = max(a, value)
         node.pop()
         if a >= b:
             return a
 
-    moves = orderedMoves(node)
+    moves = orderedMoves(node) #MOVE ORDERING
     firstmove = True
     for i, move in enumerate(moves):
         node.push(move)
         if firstmove:
-            value = -pvsTest(node, depth - 1, -b, -a, -colour, endgame)
+            value = -pvsTest(node, depth - 1, -b, -a, -colour)
             firstmove = False
         else:
-            value = -pvsTest(node, depth - 1, -a - 1, -a, -colour, endgame)
+            value = -pvsTest(node, depth - 1, -a - 1, -a, -colour) #NULLWINDOW SEARCH
             if a < value and value < b:
-                node.pop()
-                if isLateCandidate(depth, node, move, moves):
-                    node.push(move)
-                    if i < 6:
-                        value = -pvsTest(node, depth - 2, -b, -value, -colour, endgame)
-                    else:
-                        value = -pvsTest(node, depth - 1 - int(depth/3+0.5), -b, -value, -colour, endgame)
-                else:
-                    node.push(move)
-                    value = -pvsTest(node, depth - 1, -b, -value, -colour, endgame)
+                value = -pvsTest(node, depth - 1, -b, -value, -colour) #RE-SEARCH ON FAIL
         a = max(a, value)
         node.pop()
         if a >= b:
-            return a
+            break
     return a
 
 def moveSort(moves, ratings):
@@ -213,7 +206,6 @@ def moveLister(moves):
 def showIterationData(board, moves, values, depth, startTime):
     print(board.san(moves[0]),'|',round(-values[0], 3),'|',str(round(time.time()-startTime, 2))+'s at depth',depth)
 
-@profile
 def pvsearch(node, timeLimit):
     startTime = time.time()
     depth = 1
@@ -227,13 +219,13 @@ def pvsearch(node, timeLimit):
     if pieceCount(node) <= 6:
         endgame = True
 
-    moves = orderedMoves(node)
+    moves = orderedMoves(node, [])
     values = [0.0]*len(moves)
 
     while timeLimit > time.time()-startTime:
         for i, move in enumerate(moves):
             node.push(move)
-            values[i] = pvs(node, depth, a, b, colour, endgame)
+            values[i] = pvs(node, depth, a, b, colour)
             node.pop()
             if timeLimit < time.time()-startTime:
                 return moves[0]
@@ -242,7 +234,6 @@ def pvsearch(node, timeLimit):
         depth += 1
     return moves[0]
 
-@profile
 def testsearch(node, timeLimit):
     startTime = time.time()
     depth = 1
@@ -256,13 +247,13 @@ def testsearch(node, timeLimit):
     if pieceCount(node) <= 6:
         endgame = True
 
-    moves = orderedMoves(node)
+    moves = orderedMoves(node, [])
     values = [0.0]*len(moves)
 
     while timeLimit > time.time()-startTime:
         for i, move in enumerate(moves):
             node.push(move)
-            values[i] = pvsTest(node, depth, a, b, colour, endgame)
+            values[i] = pvsTest(node, depth, a, b, colour)
             node.pop()
             if timeLimit < time.time()-startTime:
                 return moves[0]
@@ -298,22 +289,21 @@ def pieceCount(board):
 def getBookMove(node):
     book = chess.polyglot.open_reader(r"ProDeo292/ProDeo292/books/elo2500.bin")
     main_entry = book.find(node)
-    return main_entry.move
+    choice = book.weighted_choice(node)
+    book.close()
+    return main_entry.move, choice.move
 
-@profile
 def play(board, timeLimit):
     start = time.time()
-    moves = orderedMoves(board)
+    moves = orderedMoves(board, [])
     try:
-        best = getBookMove(board)
-        board.push(best)
-        print(best)
+        best, choice = getBookMove(board)
+        board.push(choice)
         print(chess.pgn.Game.from_board(board)[-1])
     except Exception:
         best = pvsearch(board, timeLimit)
         best2 = testsearch(board, timeLimit)
         board.push(best)
-        print(best)
         print(chess.pgn.Game.from_board(board)[-1])
 
 def show(board):
