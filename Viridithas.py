@@ -49,11 +49,10 @@ if True:
     if __name__ == '__main__':
         app.run()
     '''
-
+http://web.archive.org/web/20080315233307/http://www.seanet.com/~brucemo/topics/hashing.htm
 whiteTime = 0.0
 
-variations = dict()
-
+tableSize = 2^24
 table = dict()
 #this will be a transposition table, storing evaluations, and the depth at which the evaluation was calculated, keyed by the Zobrist hash.
 
@@ -101,20 +100,34 @@ def evaluate(board, depth, endgame):
         rating += sum([kingSpacesB[i] for i in board.pieces(chess.KING, chess.BLACK)])-sum([kingSpacesW[i] for i in board.pieces(chess.KING, chess.WHITE)])
     return rating*0.001
 
-def orderedMoves(board, oldcuts):
-    cuts = []
+def orderedMoves(board):
+    hashmoves = []
+    scores = []
+    nomoves = []
+    for move in board.legal_moves:
+        board.push(move)
+        try:
+            entry = table[hash]
+            hashmoves.append(move)
+            scores.append(entry[1])
+        except Exception:
+            nomoves.append(move)
+        board.pop()
+    try:
+        hashmoves, scores = moveSort(hashmoves, scores)
+    except Exception:
+        pass
+
     takes = []
     last = []
 
-    for move in board.legal_moves:
-        if move.uci() in oldcuts:
-            cuts.append(move)
-        elif board.is_capture(move):
+    for move in nomoves:
+        if board.is_capture(move):
             takes.append(move)
         else:
             last.append(move)
 
-    return cuts + takes + last
+    return hashmoves + takes + last
 
 def isLateCandidate(depth, node, move, set):
     if depth < 3:
@@ -130,7 +143,45 @@ def isLateCandidate(depth, node, move, set):
     if node.gives_check(move):
         return False
     return True
+#@profile
+def probeHash(node, depth, a, b):
+    global tableSize
+    global table
+    try:
+        key = chess.polyglot.zobrist_hash(node)
+        hash = key%tableSize
+        entry = table[hash]
+    except KeyError:
+        return None
+    if key == entry[4]:
+        if entry[0] >= depth:
+            if entry[2] == 0:
+                return entry[1]
+            if entry[2] == 1 and entry[1] <= a:
+                return a
+            if entry[2] == 2 and entry[1] >= b:
+                return b
+    else:
+        return None
 
+#@profile
+def recordHash(node, depth, a, hashf):
+    global table
+    global tableSize
+    key = chess.polyglot.zobrist_hash(node)
+    hash = key%tableSize
+    '''
+    try:
+        entry = table[hash]
+        if entry[2] != 0 and hashf == 0:#IF OLD ENTRY IS INEXACT AND NEW ENTRY IS EXACT
+            table[hash] = (depth, a, hashf, colour, key)
+        elif entry[0] <= depth:#IF OLD ENTRY IS SHALLOWER
+            table[hash] = (depth, a, hashf, colour, key)
+    except Exception:
+        table[hash] = (depth, a, hashf, colour, key)
+    '''
+    table[hash] = (depth, a, hashf, node.turn, key)
+#@profile
 def pvs(node, depth, a, b, colour):
     if depth <= 0:
         return colour * evaluate(node, depth, False)
@@ -145,7 +196,7 @@ def pvs(node, depth, a, b, colour):
         if a >= b:
             return a
 
-    moves = orderedMoves(node, [])
+    moves = orderedMoves(node)
     firstmove = True
     for i, move in enumerate(moves):
         node.push(move)
@@ -161,12 +212,25 @@ def pvs(node, depth, a, b, colour):
         if a >= b:
             break
     return a
-
+#@profile
 def pvsTest(node, depth, a, b, colour):
+    hashfEXACT = 0
+    hashfALPHA = 1
+    hashfBETA = 2
+    hashf = hashfALPHA
+
+    value = probeHash(node, depth, a, b)
+    if value != None:
+        return value
+
     if depth <= 0:
-        return colour * evaluate(node, depth, False)
+        value = colour * evaluate(node, depth, False)
+        recordHash(node, depth, value, hashfEXACT)
+        return value
     if node.is_game_over():
-        return colour * evaluate(node, depth, False)
+        value = colour * evaluate(node, depth, False)
+        recordHash(node, depth, value, hashfEXACT)
+        return value
 
     #NULLMOVE PRUNING
     if not node.is_check():
@@ -178,20 +242,22 @@ def pvsTest(node, depth, a, b, colour):
             return a
 
     moves = orderedMoves(node) #MOVE ORDERING
-    firstmove = True
     for i, move in enumerate(moves):
         node.push(move)
-        if firstmove:
+        if i == 0:
             value = -pvsTest(node, depth - 1, -b, -a, -colour)
-            firstmove = False
         else:
             value = -pvsTest(node, depth - 1, -a - 1, -a, -colour) #NULLWINDOW SEARCH
             if a < value and value < b:
                 value = -pvsTest(node, depth - 1, -b, -value, -colour) #RE-SEARCH ON FAIL
-        a = max(a, value)
         node.pop()
-        if a >= b:
-            break
+        if value >= b:
+            recordHash(node, depth, b, hashfBETA)
+            return b
+        if value > a:
+            hashf = hashfEXACT
+            a = value
+    recordHash(node, depth, a, hashf)
     return a
 
 def moveSort(moves, ratings):
@@ -219,7 +285,7 @@ def pvsearch(node, timeLimit):
     if pieceCount(node) <= 6:
         endgame = True
 
-    moves = orderedMoves(node, [])
+    moves = orderedMoves(node)
     values = [0.0]*len(moves)
 
     while timeLimit > time.time()-startTime:
@@ -238,16 +304,12 @@ def testsearch(node, timeLimit):
     startTime = time.time()
     depth = 1
     a, b = -1337000, 1337000
-    colour = node.turn
-    if colour:
+    if node.turn:
         colour = 1
     else:
         colour = -1
-    endgame = False
-    if pieceCount(node) <= 6:
-        endgame = True
 
-    moves = orderedMoves(node, [])
+    moves = orderedMoves(node)
     values = [0.0]*len(moves)
 
     while timeLimit > time.time()-startTime:
@@ -295,14 +357,14 @@ def getBookMove(node):
 
 def play(board, timeLimit):
     start = time.time()
-    moves = orderedMoves(board, [])
+    moves = orderedMoves(board)
     try:
         best, choice = getBookMove(board)
         board.push(choice)
         print(chess.pgn.Game.from_board(board)[-1])
     except Exception:
+        best2 = testsearch(board, timeLimit)
         best = pvsearch(board, timeLimit)
-        #best2 = testsearch(board, timeLimit)
         board.push(best)
         print(chess.pgn.Game.from_board(board)[-1])
 
@@ -348,8 +410,8 @@ def main(string, debug, human, side, timeLimit):
         if board.is_game_over():
             break
         show(board)
-        #play(board,timeLimit)
-        usermoveKermit(board,1,1)
+        play(board,timeLimit)
+        #usermoveKermit(board,1,1)
     endingPrinter(board)
     return str(chess.pgn.Game.from_board(board)[-1])
 
@@ -367,12 +429,12 @@ openings = ['rnbqkbnr/pppppppp/8/8/8/6P1/PPPPPP1P/RNBQKBNR b KQkq - 0 1',
 
 names = ['#g3', '#e4', '#d4', '#Nf3', '#c4', '#Na3']
 
-test = '7b/3bkp1p/4p3/1n6/3P4/3RP3/2rn1PPP/R5K1 w - - 0 1'
+test = 'r7/p1qb1r1k/2pp3B/2p1b3/2P5/3P1pN1/PP3Q1P/3R1RK1 w - - 2 27'
 
-timeLimit = 20
+timeLimit = 10
 stacks = []
 for i, opening in enumerate(openings):
-    stacks.append(main(standard, True, True, True, timeLimit))
+    stacks.append(main(test, True, True, True, timeLimit))
     print('time elapsed while thinking:',whiteTime)
     print(stacks[i])
 
