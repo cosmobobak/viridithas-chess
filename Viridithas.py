@@ -49,21 +49,61 @@ if True:
     if __name__ == '__main__':
         app.run()
     '''
-http://web.archive.org/web/20080315233307/http://www.seanet.com/~brucemo/topics/hashing.htm
+
 whiteTime = 0.0
 
-tableSize = 2^24
+tableSize = 2**29+49
 table = dict()
 #this will be a transposition table, storing evaluations, and the depth at which the evaluation was calculated, keyed by the Zobrist hash.
+colourBools = [1, -1]
+PMV = {
+    chess.Piece.from_symbol('p'):1000,
+    chess.Piece.from_symbol('n'):3200,
+    chess.Piece.from_symbol('b'):3330,
+    chess.Piece.from_symbol('r'):5100,
+    chess.Piece.from_symbol('q'):8800,
+    chess.Piece.from_symbol('k'):0,
+    chess.Piece.from_symbol('P'):1000,
+    chess.Piece.from_symbol('N'):3200,
+    chess.Piece.from_symbol('B'):3330,
+    chess.Piece.from_symbol('R'):5100,
+    chess.Piece.from_symbol('Q'):8800,
+    chess.Piece.from_symbol('K'):0,
+    }
+PST = {
+    chess.Piece.from_symbol('p'):(0,0,0,0,0,0,0,0,50,50,50,50,50,50,50,50,10,10,20,30,30,20,10,10,5,5,10,25,25,10,5,5,0,0,0,20,20,0,0,0,5,-5,-10,0,0,-10,-5,5,5,10,10,-20,-20,10,10,5,0,0,0,0,0,0,0,0),
+    chess.Piece.from_symbol('n'):(-50,-40,-30,-30,-30,-30,-40,-50,-40,-20,0,0,0,0,-20,-40,-30,0,10,15,15,10,0,-30,-30,5,15,20,20,15,5,-30,-30,0,15,20,20,15,0,-30,-30,5,10,15,15,10,5,-30,-40,-20,0,5,5,0,-20,-40,-50,-40,-30,-30,-30,-30,-40,-50),
+    chess.Piece.from_symbol('b'):(-20,-10,-10,-10,-10,-10,-10,-20,-10,0,0,0,0,0,0,-10,-10,0,5,10,10,5,0,-10,-10,5,5,10,10,5,5,-10,-10,0,10,10,10,10,0,-10,-10,10,10,10,10,10,10,-10,-10,5,0,0,0,0,5,-10,-20,-10,-10,-10,-10,-10,-10,-20,),
+    chess.Piece.from_symbol('r'):(0,0,0,0,0,0,0,0,5,10,10,10,10,10,10,5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,0,0,0,5,5,0,0,0),
+    chess.Piece.from_symbol('q'):(-20,-10,-10,-5,-5,-10,-10,-20,-10,0,0,0,0,0,0,-10,-10,0,5,5,5,5,0,-10,-5,0,5,5,5,5,0,-5,0,0,5,5,5,5,0,-5,-10,5,5,5,5,5,0,-10,-10,0,5,0,0,0,0,-10,-20,-10,-10,-5,-5,-10,-10,-20),
+    chess.Piece.from_symbol('k'):(-30,-40,-40,-50,-50,-40,-40,-30,-30,-40,-40,-50,-50,-40,-40,-30,-30,-40,-40,-50,-50,-40,-40,-30,-30,-40,-40,-50,-50,-40,-40,-30,-20,-30,-30,-40,-40,-30,-30,-20,-10,-20,-20,-20,-20,-20,-20,-10,20,20,0,0,0,0,20,20,20,30,10,0,0,10,30,20),
+    chess.Piece.from_symbol('P'):(0, 0, 0, 0, 0, 0, 0, 0, 5, 10, 10, -20, -20, 10, 10, 5, 5, -5, -10, 0, 0, -10, -5, 5, 0, 0, 0, 20, 20, 0, 0, 0, 5, 5, 10, 25, 25, 10, 5, 5, 10, 10, 20, 30, 30, 20, 10, 10, 50, 50, 50, 50, 50, 50, 50, 50, 0, 0, 0, 0, 0, 0, 0, 0),
+    chess.Piece.from_symbol('N'):(-50, -40, -30, -30, -30, -30, -40, -50, -40, -20, 0, 5, 5, 0, -20, -40, -30, 5, 10, 15, 15, 10, 5, -30, -30, 0, 15, 20, 20, 15, 0, -30, -30, 5, 15, 20, 20, 15, 5, -30, -30, 0, 10, 15, 15, 10, 0, -30, -40, -20, 0, 0, 0, 0, -20, -40, -50, -40, -30, -30, -30, -30, -40, -50),
+    chess.Piece.from_symbol('B'):(-20, -10, -10, -10, -10, -10, -10, -20, -10, 5, 0, 0, 0, 0, 5, -10, -10, 10, 10, 10, 10, 10, 10, -10, -10, 0, 10, 10, 10, 10, 0, -10, -10, 5, 5, 10, 10, 5, 5, -10, -10, 0, 5, 10, 10, 5, 0, -10, -10, 0, 0, 0, 0, 0, 0, -10, -20, -10, -10, -10, -10, -10, -10, -20),
+    chess.Piece.from_symbol('R'):(0, 0, 0, 5, 5, 0, 0, 0, -5, 0, 0, 0, 0, 0, 0, -5, -5, 0, 0, 0, 0, 0, 0, -5, -5, 0, 0, 0, 0, 0, 0, -5, -5, 0, 0, 0, 0, 0, 0, -5, -5, 0, 0, 0, 0, 0, 0, -5, 5, 10, 10, 10, 10, 10, 10, 5, 0, 0, 0, 0, 0, 0, 0, 0),
+    chess.Piece.from_symbol('Q'):(-20, -10, -10, -5, -5, -10, -10, -20, -10, 0, 0, 0, 0, 5, 0, -10, -10, 0, 5, 5, 5, 5, 5, -10, -5, 0, 5, 5, 5, 5, 0, 0, -5, 0, 5, 5, 5, 5, 0, -5, -10, 0, 5, 5, 5, 5, 0, -10, -10, 0, 0, 0, 0, 0, 0, -10, -20, -10, -10, -5, -5, -10, -10, -20),
+    chess.Piece.from_symbol('K'):(20, 30, 10, 0, 0, 10, 30, 20, 20, 20, 0, 0, 0, 0, 20, 20, -10, -20, -20, -20, -20, -20, -20, -10, -20, -30, -30, -40, -40, -30, -30, -20, -30, -40, -40, -50, -50, -40, -40, -30, -30, -40, -40, -50, -50, -40, -40, -30, -30, -40, -40, -50, -50, -40, -40, -30, -30, -40, -40, -50, -50, -40, -40, -30)
+}
+for k, z in PST.items():
+    row = []
+    for square in PST[k]:
+        square += PMV[k]
+        if k.color:
+            row.append(square*-1)
+        else:
+            row.append(square)
+    PST[k]=row
+#print(PST)
+#print(chess.Board().piece_map())
 
 if True:
-    pawnSpacesB =  [0,0,0,0,0,0,0,0,50,50,50,50,50,50,50,50,10,10,20,30,30,20,10,10,5,5,10,25,25,10,5,5,0,0,0,20,20,0,0,0,5,-5,-10,0,0,-10,-5,5,5,10,10,-20,-20,10,10,5,0,0,0,0,0,0,0,0]
-    knightSpacesB = [-50,-40,-30,-30,-30,-30,-40,-50,-40,-20,0,0,0,0,-20,-40,-30,0,10,15,15,10,0,-30,-30,5,15,20,20,15,5,-30,-30,0,15,20,20,15,0,-30,-30,5,10,15,15,10,5,-30,-40,-20,0,5,5,0,-20,-40,-50,-40,-30,-30,-30,-30,-40,-50,]
-    bishopSpacesB = [-20,-10,-10,-10,-10,-10,-10,-20,-10,0,0,0,0,0,0,-10,-10,0,5,10,10,5,0,-10,-10,5,5,10,10,5,5,-10,-10,0,10,10,10,10,0,-10,-10,10,10,10,10,10,10,-10,-10,5,0,0,0,0,5,-10,-20,-10,-10,-10,-10,-10,-10,-20,]
-    rookSpacesB = [0,0,0,0,0,0,0,0,5,10,10,10,10,10,10,5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,0,0,0,5,5,0,0,0]
-    queenSpacesB = [-20,-10,-10,-5,-5,-10,-10,-20,-10,0,0,0,0,0,0,-10,-10,0,5,5,5,5,0,-10,-5,0,5,5,5,5,0,-5,0,0,5,5,5,5,0,-5,-10,5,5,5,5,5,0,-10,-10,0,5,0,0,0,0,-10,-20,-10,-10,-5,-5,-10,-10,-20]
-    kingSpacesB = [-30,-40,-40,-50,-50,-40,-40,-30,-30,-40,-40,-50,-50,-40,-40,-30,-30,-40,-40,-50,-50,-40,-40,-30,-30,-40,-40,-50,-50,-40,-40,-30,-20,-30,-30,-40,-40,-30,-30,-20,-10,-20,-20,-20,-20,-20,-20,-10,20,20,0,0,0,0,20,20,20,30,10,0,0,10,30,20]
-    kingSpacesEndgameB = [-50,-40,-30,-20,-20,-30,-40,-50,-30,-20,-10,0,0,-10,-20,-30,-30,-10,20,30,30,20,-10,-30,-30,-10,30,40,40,30,-10,-30,-30,-10,30,40,40,30,-10,-30,-30,-10,20,30,30,20,-10,-30,-30,-30,0,0,0,0,-30,-30,-50,-30,-30,-30,-30,-30,-30,-50]
+    pawnSpacesB =  (0,0,0,0,0,0,0,0,50,50,50,50,50,50,50,50,10,10,20,30,30,20,10,10,5,5,10,25,25,10,5,5,0,0,0,20,20,0,0,0,5,-5,-10,0,0,-10,-5,5,5,10,10,-20,-20,10,10,5,0,0,0,0,0,0,0,0)
+    knightSpacesB = (-50,-40,-30,-30,-30,-30,-40,-50,-40,-20,0,0,0,0,-20,-40,-30,0,10,15,15,10,0,-30,-30,5,15,20,20,15,5,-30,-30,0,15,20,20,15,0,-30,-30,5,10,15,15,10,5,-30,-40,-20,0,5,5,0,-20,-40,-50,-40,-30,-30,-30,-30,-40,-50,)
+    bishopSpacesB = (-20,-10,-10,-10,-10,-10,-10,-20,-10,0,0,0,0,0,0,-10,-10,0,5,10,10,5,0,-10,-10,5,5,10,10,5,5,-10,-10,0,10,10,10,10,0,-10,-10,10,10,10,10,10,10,-10,-10,5,0,0,0,0,5,-10,-20,-10,-10,-10,-10,-10,-10,-20,)
+    rookSpacesB = (0,0,0,0,0,0,0,0,5,10,10,10,10,10,10,5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,0,0,0,5,5,0,0,0)
+    queenSpacesB = (-20,-10,-10,-5,-5,-10,-10,-20,-10,0,0,0,0,0,0,-10,-10,0,5,5,5,5,0,-10,-5,0,5,5,5,5,0,-5,0,0,5,5,5,5,0,-5,-10,5,5,5,5,5,0,-10,-10,0,5,0,0,0,0,-10,-20,-10,-10,-5,-5,-10,-10,-20)
+    kingSpacesB = (-30,-40,-40,-50,-50,-40,-40,-30,-30,-40,-40,-50,-50,-40,-40,-30,-30,-40,-40,-50,-50,-40,-40,-30,-30,-40,-40,-50,-50,-40,-40,-30,-20,-30,-30,-40,-40,-30,-30,-20,-10,-20,-20,-20,-20,-20,-20,-10,20,20,0,0,0,0,20,20,20,30,10,0,0,10,30,20)
+    kingSpacesEndgameB = (-50,-40,-30,-20,-20,-30,-40,-50,-30,-20,-10,0,0,-10,-20,-30,-30,-10,20,30,30,20,-10,-30,-30,-10,30,40,40,30,-10,-30,-30,-10,30,40,40,30,-10,-30,-30,-10,20,30,30,20,-10,-30,-30,-30,0,0,0,0,-30,-30,-50,-30,-30,-30,-30,-30,-30,-50)
 
     pawnSpacesW = list(reversed(pawnSpacesB))
     knightSpacesW = list(reversed(knightSpacesB))
@@ -72,7 +112,7 @@ if True:
     queenSpacesW = list(reversed(queenSpacesB))
     kingSpacesW = list(reversed(kingSpacesB))
     kingSpacesEndgameW = list(reversed(kingSpacesEndgameB))
-
+#@profile
 def evaluate(board, depth, endgame):
     if board.turn:
         mod = 1
@@ -100,43 +140,44 @@ def evaluate(board, depth, endgame):
         rating += sum([kingSpacesB[i] for i in board.pieces(chess.KING, chess.BLACK)])-sum([kingSpacesW[i] for i in board.pieces(chess.KING, chess.WHITE)])
     return rating*0.001
 
-def orderedMoves(board):
-    hashmoves = []
-    scores = []
-    nomoves = []
-    for move in board.legal_moves:
-        board.push(move)
-        try:
-            entry = table[hash]
-            hashmoves.append(move)
-            scores.append(entry[1])
-        except Exception:
-            nomoves.append(move)
-        board.pop()
-    try:
-        hashmoves, scores = moveSort(hashmoves, scores)
-    except Exception:
-        pass
+#@profile
+def evaluate2(board, depth, endgame):
+    if board.turn:
+        mod = 1
+    else:
+        mod = -1
 
+    if board.is_checkmate():
+        return 1000000.0*(depth+1)*mod
+    #if board.is_repetition(2) or board.can_claim_fifty_moves():
+        #return -20001.0*mod
+
+    rating = 0.0
+    rating += sum([PST[k][i] for i, k in board.piece_map().items()])
+    return rating*0.001
+
+#@profile
+def orderedMoves(board, best):
+    moves = [move for move in board.legal_moves]
+
+    hash = []
     takes = []
     last = []
 
-    for move in nomoves:
-        if board.is_capture(move):
+    for move in moves:
+        if move.uci() == best:
+            hash.append(move)
+        elif board.is_capture(move):
             takes.append(move)
         else:
             last.append(move)
 
-    return hashmoves + takes + last
-
-def isLateCandidate(depth, node, move, set):
-    if depth < 3:
-        return False
+    return hash + takes + last
+#@profile
+def isLateCandidate(node, move):
     if node.is_capture(move):
         return False
     if move.promotion:
-        return False
-    if move in set[0:2]:
         return False
     if node.is_check():
         return False
@@ -144,50 +185,45 @@ def isLateCandidate(depth, node, move, set):
         return False
     return True
 #@profile
-def probeHash(node, depth, a, b):
-    global tableSize
-    global table
+def probeHash(key, hash, depth, a, b):
     try:
-        key = chess.polyglot.zobrist_hash(node)
-        hash = key%tableSize
         entry = table[hash]
     except KeyError:
-        return None
-    if key == entry[4]:
-        if entry[0] >= depth:
-            if entry[2] == 0:
-                return entry[1]
-            if entry[2] == 1 and entry[1] <= a:
-                return a
-            if entry[2] == 2 and entry[1] >= b:
-                return b
-    else:
-        return None
-
+        return (None, None)
+    if entry['key'] == key:
+        if entry['depth'] >= depth:
+            if entry['type'] == 0:
+                return (entry['score'], True)
+            if entry['type'] == 1 and entry['score'] <= a:
+                return (a, True)
+            if entry['type'] == 2 and entry['score'] >= b:
+                return (b, True)
+            return (entry['bestMove'], False)
+        return (entry['bestMove'], False)
+    return (None, None)
 #@profile
-def recordHash(node, depth, a, hashf):
-    global table
-    global tableSize
-    key = chess.polyglot.zobrist_hash(node)
-    hash = key%tableSize
-    '''
-    try:
-        entry = table[hash]
-        if entry[2] != 0 and hashf == 0:#IF OLD ENTRY IS INEXACT AND NEW ENTRY IS EXACT
-            table[hash] = (depth, a, hashf, colour, key)
-        elif entry[0] <= depth:#IF OLD ENTRY IS SHALLOWER
-            table[hash] = (depth, a, hashf, colour, key)
-    except Exception:
-        table[hash] = (depth, a, hashf, colour, key)
-    '''
-    table[hash] = (depth, a, hashf, node.turn, key)
+def recordHash(key, hash, bestMove, depth, a, hashf):
+    table[hash] = {'key':key, 'bestMove':bestMove, 'depth':depth, 'score':a, 'type':hashf}
 #@profile
 def pvs(node, depth, a, b, colour):
+    hashf = 1
     if depth <= 0:
-        return colour * evaluate(node, depth, False)
+        #evaluate2(node, depth, False)
+        value = colour * evaluate(node, depth, False)
+        return value
     if node.is_game_over():
-        return colour * evaluate(node, depth, False)
-
+        #evaluate2(node, depth, False)
+        value = colour * evaluate(node, depth, False)
+        return value
+    key = chess.polyglot.zobrist_hash(node)
+    hash = key%tableSize
+    probe = probeHash(key, hash, depth, a, b)
+    if probe[0] != None:
+        if probe[1]:
+            return probe[0]
+        else:
+            bestMove = probe[0]
+    #NULLMOVE PRUNING
     if not node.is_check():
         node.push(chess.Move.null())
         value = -pvs(node, depth - 3, -b, -a, -colour)
@@ -195,8 +231,11 @@ def pvs(node, depth, a, b, colour):
         node.pop()
         if a >= b:
             return a
-
-    moves = orderedMoves(node)
+    if 'bestMove' in locals():
+        moves = orderedMoves(node, bestMove) #MOVE ORDERING
+    else:
+        moves = orderedMoves(node, '')
+    currentBest = moves[0].uci()
     firstmove = True
     for i, move in enumerate(moves):
         node.push(move)
@@ -207,57 +246,15 @@ def pvs(node, depth, a, b, colour):
             value = -pvs(node, depth - 1, -a - 1, -a, -colour)
             if a < value and value < b:
                 value = -pvs(node, depth - 1, -b, -value, -colour)
-        a = max(a, value)
-        node.pop()
-        if a >= b:
-            break
-    return a
-#@profile
-def pvsTest(node, depth, a, b, colour):
-    hashfEXACT = 0
-    hashfALPHA = 1
-    hashfBETA = 2
-    hashf = hashfALPHA
-
-    value = probeHash(node, depth, a, b)
-    if value != None:
-        return value
-
-    if depth <= 0:
-        value = colour * evaluate(node, depth, False)
-        recordHash(node, depth, value, hashfEXACT)
-        return value
-    if node.is_game_over():
-        value = colour * evaluate(node, depth, False)
-        recordHash(node, depth, value, hashfEXACT)
-        return value
-
-    #NULLMOVE PRUNING
-    if not node.is_check():
-        node.push(chess.Move.null())
-        value = -pvsTest(node, depth - 3, -b, -a, -colour)
-        a = max(a, value)
-        node.pop()
-        if a >= b:
-            return a
-
-    moves = orderedMoves(node) #MOVE ORDERING
-    for i, move in enumerate(moves):
-        node.push(move)
-        if i == 0:
-            value = -pvsTest(node, depth - 1, -b, -a, -colour)
-        else:
-            value = -pvsTest(node, depth - 1, -a - 1, -a, -colour) #NULLWINDOW SEARCH
-            if a < value and value < b:
-                value = -pvsTest(node, depth - 1, -b, -value, -colour) #RE-SEARCH ON FAIL
         node.pop()
         if value >= b:
-            recordHash(node, depth, b, hashfBETA)
+            recordHash(key, hash, currentBest, depth, b, 2)
             return b
         if value > a:
-            hashf = hashfEXACT
+            hashf = 0
             a = value
-    recordHash(node, depth, a, hashf)
+            currentBest = moves[i].uci()
+    recordHash(key, hash, currentBest, depth, a, hashf)
     return a
 
 def moveSort(moves, ratings):
@@ -275,7 +272,7 @@ def showIterationData(board, moves, values, depth, startTime):
 def pvsearch(node, timeLimit):
     startTime = time.time()
     depth = 1
-    a, b = -1337000, 1337000
+    a, b = -1337000000000, 1337000000000
     colour = node.turn
     if colour:
         colour = 1
@@ -285,10 +282,10 @@ def pvsearch(node, timeLimit):
     if pieceCount(node) <= 6:
         endgame = True
 
-    moves = orderedMoves(node)
+    moves = orderedMoves(node, '')
     values = [0.0]*len(moves)
 
-    while timeLimit > time.time()-startTime:
+    for depth in range(1, 20):
         for i, move in enumerate(moves):
             node.push(move)
             values[i] = pvs(node, depth, a, b, colour)
@@ -297,31 +294,6 @@ def pvsearch(node, timeLimit):
                 return moves[0]
         moves, values = moveSort(moves, values)
         showIterationData(node, moves, values, depth, startTime)
-        depth += 1
-    return moves[0]
-
-def testsearch(node, timeLimit):
-    startTime = time.time()
-    depth = 1
-    a, b = -1337000, 1337000
-    if node.turn:
-        colour = 1
-    else:
-        colour = -1
-
-    moves = orderedMoves(node)
-    values = [0.0]*len(moves)
-
-    while timeLimit > time.time()-startTime:
-        for i, move in enumerate(moves):
-            node.push(move)
-            values[i] = pvsTest(node, depth, a, b, colour)
-            node.pop()
-            if timeLimit < time.time()-startTime:
-                return moves[0]
-        moves, values = moveSort(moves, values)
-        showIterationData(node, moves, values, depth, startTime)
-        depth += 1
     return moves[0]
 
 def pieceCount(board):
@@ -356,14 +328,12 @@ def getBookMove(node):
     return main_entry.move, choice.move
 
 def play(board, timeLimit):
-    start = time.time()
-    moves = orderedMoves(board)
     try:
         best, choice = getBookMove(board)
-        board.push(choice)
+        #board.push(choice)
+        board.push(best)
         print(chess.pgn.Game.from_board(board)[-1])
     except Exception:
-        best2 = testsearch(board, timeLimit)
         best = pvsearch(board, timeLimit)
         board.push(best)
         print(chess.pgn.Game.from_board(board)[-1])
@@ -398,19 +368,21 @@ def endingPrinter(board):
 
 def main(string, debug, human, side, timeLimit):
     board = chess.Board(str(string))
+    #board = chess.variant.CrazyhouseBoard(str(string))
     win = 1
 
     boardArrays = []
     ratingArrays = []
-
     while not board.is_game_over():
         show(board)
         play(board,timeLimit)
+        #print(table)
         #usermoveKermit(board,1,1)
         if board.is_game_over():
             break
         show(board)
         play(board,timeLimit)
+        #print(table)
         #usermoveKermit(board,1,1)
     endingPrinter(board)
     return str(chess.pgn.Game.from_board(board)[-1])
@@ -429,16 +401,19 @@ openings = ['rnbqkbnr/pppppppp/8/8/8/6P1/PPPPPP1P/RNBQKBNR b KQkq - 0 1',
 
 names = ['#g3', '#e4', '#d4', '#Nf3', '#c4', '#Na3']
 
-test = 'r7/p1qb1r1k/2pp3B/2p1b3/2P5/3P1pN1/PP3Q1P/3R1RK1 w - - 2 27'
+test = '8/k7/3p4/p2P1p2/P2P1P2/8/8/K7 w - -'
 
-timeLimit = 10
-stacks = []
-for i, opening in enumerate(openings):
-    stacks.append(main(test, True, True, True, timeLimit))
-    print('time elapsed while thinking:',whiteTime)
-    print(stacks[i])
+#testsearch(chess.Board(), 3600)
 
-filename = 'games'+str(timeLimit)+'.txt'
-with open(filename, 'w') as games:
-    for i, game in enumerate(stacks):
-        games.write(names[i]+' '+game+'\n')
+if True:
+    timeLimit = 10
+    stacks = []
+    for i, opening in enumerate(openings):
+        stacks.append(main(opening, True, True, True, timeLimit))
+        print('time elapsed while thinking:',whiteTime)
+        print(stacks[i])
+
+    filename = 'games'+str(timeLimit)+'.txt'
+    with open(filename, 'w') as games:
+        for i, game in enumerate(stacks):
+            games.write(names[i]+' '+game+'\n')
