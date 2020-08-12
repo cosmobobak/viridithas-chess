@@ -6,6 +6,7 @@ import chess.syzygy
 import random
 import chess.variant
 import time
+'import gmpy'
 from operator import itemgetter
 
 whiteTime = 0.0
@@ -63,21 +64,24 @@ def evaluate(board, depth, endgame):
 
     if board.is_checkmate(): return 1000000.0*(depth+1)*mod
     if board.is_repetition(2): return -20001.0*mod
-    if board.can_claim_fifty_moves(): return -20001.0*mod
 
     rating = 0.0
-    rating += sum([pawnSpacesB[i] for i in board.pieces(chess.PAWN, chess.BLACK)])-sum([pawnSpacesW[i] for i in board.pieces(chess.PAWN, chess.WHITE)])
-    rating += sum([knightSpacesB[i] for i in board.pieces(chess.KNIGHT, chess.BLACK)])-sum([knightSpacesW[i] for i in board.pieces(chess.KNIGHT, chess.WHITE)])
-    rating += sum([bishopSpacesB[i] for i in board.pieces(chess.BISHOP, chess.BLACK)])-sum([bishopSpacesW[i] for i in board.pieces(chess.BISHOP, chess.WHITE)])
-    rating += sum([rookSpacesB[i] for i in board.pieces(chess.ROOK, chess.BLACK)])-sum([rookSpacesW[i] for i in board.pieces(chess.ROOK, chess.WHITE)])
-    rating += sum([queenSpacesB[i] for i in board.pieces(chess.QUEEN, chess.BLACK)])-sum([queenSpacesW[i] for i in board.pieces(chess.QUEEN, chess.WHITE)])
-    if endgame:
-        rating += sum([kingSpacesEndgameB[i] for i in board.pieces(chess.KING, chess.BLACK)])-sum([kingSpacesEndgameW[i] for i in board.pieces(chess.KING, chess.WHITE)])
-    else:
-        rating += sum([kingSpacesB[i] for i in board.pieces(chess.KING, chess.BLACK)])-sum([kingSpacesW[i] for i in board.pieces(chess.KING, chess.WHITE)])
+    '''
+    rating += popcount(board.pawns)*1000
+    '''
+    rating -= bin(board.pawns & board.occupied_co[True]).count('1')*1000
+    rating += bin(board.pawns & board.occupied_co[False]).count('1')*1000
+    rating -= bin(board.knights & board.occupied_co[True]).count('1')*3200
+    rating += bin(board.knights & board.occupied_co[False]).count('1')*3200
+    rating -= bin(board.bishops & board.occupied_co[True]).count('1')*3330
+    rating += bin(board.bishops & board.occupied_co[False]).count('1')*3330
+    rating -= bin(board.rooks & board.occupied_co[True]).count('1')*5200
+    rating += bin(board.rooks & board.occupied_co[False]).count('1')*5200
+    rating -= bin(board.queens & board.occupied_co[True]).count('1')*8800
+    rating += bin(board.queens & board.occupied_co[False]).count('1')*8800
     return rating*0.001
 
-def evaluate(board, depth, endgame):
+def evaluate2(board, depth, endgame):
     mod = 1 if board.turn else -1
 
     if board.is_checkmate(): return 1000000.0*(depth+1)*mod
@@ -90,10 +94,7 @@ def evaluate(board, depth, endgame):
     rating += sum([bishopSpacesB[i] for i in board.pieces(chess.BISHOP, chess.BLACK)])-sum([bishopSpacesW[i] for i in board.pieces(chess.BISHOP, chess.WHITE)])
     rating += sum([rookSpacesB[i] for i in board.pieces(chess.ROOK, chess.BLACK)])-sum([rookSpacesW[i] for i in board.pieces(chess.ROOK, chess.WHITE)])
     rating += sum([queenSpacesB[i] for i in board.pieces(chess.QUEEN, chess.BLACK)])-sum([queenSpacesW[i] for i in board.pieces(chess.QUEEN, chess.WHITE)])
-    if endgame:
-        rating += sum([kingSpacesEndgameB[i] for i in board.pieces(chess.KING, chess.BLACK)])-sum([kingSpacesEndgameW[i] for i in board.pieces(chess.KING, chess.WHITE)])
-    else:
-        rating += sum([kingSpacesB[i] for i in board.pieces(chess.KING, chess.BLACK)])-sum([kingSpacesW[i] for i in board.pieces(chess.KING, chess.WHITE)])
+    rating += sum([kingSpacesEndgameB[i] for i in board.pieces(chess.KING, chess.BLACK)])-sum([kingSpacesEndgameW[i] for i in board.pieces(chess.KING, chess.WHITE)])
     return rating*0.001
 #@profile
 def orderedMoves(board, best):
@@ -224,9 +225,6 @@ def pvsearch(node, timeLimit):
         colour = 1
     else:
         colour = -1
-    endgame = False
-    if pieceCount(node) <= 6:
-        endgame = True
 
     moves = orderedMoves(node, '')
     values = [0.0]*len(moves)
@@ -244,26 +242,16 @@ def pvsearch(node, timeLimit):
 
 def pieceCount(board):
     count = 0
-    for piece in board.pieces(chess.PAWN, chess.BLACK):
-        count += 1
-    for piece in board.pieces(chess.PAWN, chess.WHITE):
-        count += 1
-    for piece in board.pieces(chess.KNIGHT, chess.BLACK):
-        count += 1
-    for piece in board.pieces(chess.KNIGHT, chess.WHITE):
-        count += 1
-    for piece in board.pieces(chess.BISHOP, chess.BLACK):
-        count += 1
-    for piece in board.pieces(chess.BISHOP, chess.WHITE):
-        count += 1
-    for piece in board.pieces(chess.ROOK, chess.BLACK):
-        count += 1
-    for piece in board.pieces(chess.ROOK, chess.WHITE):
-        count += 1
-    for piece in board.pieces(chess.QUEEN, chess.BLACK):
-        count += 1
-    for piece in board.pieces(chess.QUEEN, chess.WHITE):
-        count += 1
+    count += len(board.pieces(chess.PAWN, chess.BLACK))
+    count += len(board.pieces(chess.PAWN, chess.WHITE))
+    count += len(board.pieces(chess.KNIGHT, chess.BLACK))
+    count += len(board.pieces(chess.KNIGHT, chess.WHITE))
+    count += len(board.pieces(chess.BISHOP, chess.BLACK))
+    count += len(board.pieces(chess.BISHOP, chess.WHITE))
+    count += len(board.pieces(chess.ROOK, chess.BLACK))
+    count += len(board.pieces(chess.ROOK, chess.WHITE))
+    count += len(board.pieces(chess.QUEEN, chess.BLACK))
+    count += len(board.pieces(chess.QUEEN, chess.WHITE))
     return count
 
 def getBookMove(node):
@@ -276,8 +264,8 @@ def getBookMove(node):
 def play(board, timeLimit):
     try:
         best, choice = getBookMove(board)
-        board.push(choice)
-        #board.push(best)
+        #board.push(choice)
+        board.push(best)
         print(chess.pgn.Game.from_board(board)[-1])
     except Exception:
         best = pvsearch(board, timeLimit)
@@ -315,10 +303,7 @@ def endingPrinter(board):
 def main(string, debug, human, side, timeLimit):
     board = chess.Board(str(string))
     #board = chess.variant.CrazyhouseBoard(str(string))
-    win = 1
 
-    boardArrays = []
-    ratingArrays = []
     while not board.is_game_over():
         show(board)
         play(board,timeLimit)
@@ -349,7 +334,7 @@ names = ['#g3', '#e4', '#d4', '#Nf3', '#c4', '#Na3']
 
 test = 'r1bqkbnr/pp1p1ppp/8/2p5/3QP3/8/PPP2PPP/RNB1KB1R w KQkq - 0 1'
 
-#testsearch(chess.Board(), 3600)
+print(chess.Board().knights)
 
 if True:
     timeLimit = 10
