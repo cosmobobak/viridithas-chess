@@ -6,21 +6,11 @@ import chess.syzygy
 import random
 import chess.variant
 import time
-#import line_profiler
 from operator import itemgetter
-#import requests
-#import os
-#from flask import Flask, jsonify
-#from flask import url_for
-#from dotenv import load_dotenv
-#from authlib.integrations.flask_client import OAuth
 
 whiteTime = 0.0
-
 tableSize = 2**29+49
 table = dict()
-#this will be a transposition table, storing evaluations, and the depth at which the evaluation was calculated, keyed by the Zobrist hash.
-colourBools = [1, -1]
 PMV = {
     chess.Piece.from_symbol('p'):1000,
     chess.Piece.from_symbol('n'):3200,
@@ -49,24 +39,13 @@ PST = {
     chess.Piece.from_symbol('Q'):(-20, -10, -10, -5, -5, -10, -10, -20, -10, 0, 0, 0, 0, 5, 0, -10, -10, 0, 5, 5, 5, 5, 5, -10, -5, 0, 5, 5, 5, 5, 0, 0, -5, 0, 5, 5, 5, 5, 0, -5, -10, 0, 5, 5, 5, 5, 0, -10, -10, 0, 0, 0, 0, 0, 0, -10, -20, -10, -10, -5, -5, -10, -10, -20),
     chess.Piece.from_symbol('K'):(20, 30, 10, 0, 0, 10, 30, 20, 20, 20, 0, 0, 0, 0, 20, 20, -10, -20, -20, -20, -20, -20, -20, -10, -20, -30, -30, -40, -40, -30, -30, -20, -30, -40, -40, -50, -50, -40, -40, -30, -30, -40, -40, -50, -50, -40, -40, -30, -30, -40, -40, -50, -50, -40, -40, -30, -30, -40, -40, -50, -50, -40, -40, -30)
 }
-for k, z in PST.items():
-    row = []
-    for square in PST[k]:
-        square += PMV[k]
-        if k.color:
-            row.append(square*-1)
-        else:
-            row.append(square)
-    PST[k]=row
-#print(PST)
-#print(chess.Board().piece_map())
 
 if True:
-    pawnSpacesB =  (0,0,0,0,0,0,0,0,50,50,50,50,50,50,50,50,10,10,20,30,30,20,10,10,5,5,10,25,25,10,5,5,0,0,0,20,20,0,0,0,5,-5,-10,0,0,-10,-5,5,5,10,10,-20,-20,10,10,5,0,0,0,0,0,0,0,0)
-    knightSpacesB = (-50,-40,-30,-30,-30,-30,-40,-50,-40,-20,0,0,0,0,-20,-40,-30,0,10,15,15,10,0,-30,-30,5,15,20,20,15,5,-30,-30,0,15,20,20,15,0,-30,-30,5,10,15,15,10,5,-30,-40,-20,0,5,5,0,-20,-40,-50,-40,-30,-30,-30,-30,-40,-50,)
-    bishopSpacesB = (-20,-10,-10,-10,-10,-10,-10,-20,-10,0,0,0,0,0,0,-10,-10,0,5,10,10,5,0,-10,-10,5,5,10,10,5,5,-10,-10,0,10,10,10,10,0,-10,-10,10,10,10,10,10,10,-10,-10,5,0,0,0,0,5,-10,-20,-10,-10,-10,-10,-10,-10,-20,)
-    rookSpacesB = (0,0,0,0,0,0,0,0,5,10,10,10,10,10,10,5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,0,0,0,5,5,0,0,0)
-    queenSpacesB = (-20,-10,-10,-5,-5,-10,-10,-20,-10,0,0,0,0,0,0,-10,-10,0,5,5,5,5,0,-10,-5,0,5,5,5,5,0,-5,0,0,5,5,5,5,0,-5,-10,5,5,5,5,5,0,-10,-10,0,5,0,0,0,0,-10,-20,-10,-10,-5,-5,-10,-10,-20)
+    pawnSpacesB =  (1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1050, 1050, 1050, 1050, 1050, 1050, 1050, 1050, 1010, 1010, 1020, 1030, 1030, 1020, 1010, 1010, 1005, 1005, 1010, 1025, 1025, 1010, 1005, 1005, 1000, 1000, 1000, 1020, 1020, 1000, 1000, 1000, 1005, 995, 990, 1000, 1000, 990, 995, 1005, 1005, 1010, 1010, 980, 980, 1010, 1010, 1005, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000)
+    knightSpacesB = (3150, 3160, 3170, 3170, 3170, 3170, 3160, 3150, 3160, 3180, 3200, 3200, 3200, 3200, 3180, 3160, 3170, 3200, 3210, 3215, 3215, 3210, 3200, 3170, 3170, 3205, 3215, 3220, 3220, 3215, 3205, 3170, 3170, 3200, 3215, 3220, 3220, 3215, 3200, 3170, 3170, 3205, 3210, 3215, 3215, 3210, 3205, 3170, 3160, 3180, 3200, 3205, 3205, 3200, 3180, 3160, 3150, 3160, 3170, 3170, 3170, 3170, 3160, 3150)
+    bishopSpacesB = (3310, 3320, 3320, 3320, 3320, 3320, 3320, 3310, 3320, 3330, 3330, 3330, 3330, 3330, 3330, 3320, 3320, 3330, 3335, 3340, 3340, 3335, 3330, 3320, 3320, 3335, 3335, 3340, 3340, 3335, 3335, 3320, 3320, 3330, 3340, 3340, 3340, 3340, 3330, 3320, 3320, 3340, 3340, 3340, 3340, 3340, 3340, 3320, 3320, 3335, 3330, 3330, 3330, 3330, 3335, 3320, 3310, 3320, 3320, 3320, 3320, 3320, 3320, 3310)
+    rookSpacesB = (5100, 5100, 5100, 5100, 5100, 5100, 5100, 5100, 5105, 5110, 5110, 5110, 5110, 5110, 5110, 5105, 5095, 5100, 5100, 5100, 5100, 5100, 5100, 5095, 5095, 5100, 5100, 5100, 5100, 5100, 5100, 5095, 5095, 5100, 5100, 5100, 5100, 5100, 5100, 5095, 5095, 5100, 5100, 5100, 5100, 5100, 5100, 5095, 5095, 5100, 5100, 5100, 5100, 5100, 5100, 5095, 5100, 5100, 5100, 5105, 5105, 5100, 5100, 5100)
+    queenSpacesB = (8780, 8790, 8790, 8795, 8795, 8790, 8790, 8780, 8790, 8800, 8800, 8800, 8800, 8800, 8800, 8790, 8790, 8800, 8805, 8805, 8805, 8805, 8800, 8790, 8795, 8800, 8805, 8805, 8805, 8805, 8800, 8795, 8800, 8800, 8805, 8805, 8805, 8805, 8800, 8795, 8790, 8805, 8805, 8805, 8805, 8805, 8800, 8790, 8790, 8800, 8805, 8800, 8800, 8800, 8800, 8790, 8780, 8790, 8790, 8795, 8795, 8790, 8790, 8780)
     kingSpacesB = (-30,-40,-40,-50,-50,-40,-40,-30,-30,-40,-40,-50,-50,-40,-40,-30,-30,-40,-40,-50,-50,-40,-40,-30,-30,-40,-40,-50,-50,-40,-40,-30,-20,-30,-30,-40,-40,-30,-30,-20,-10,-20,-20,-20,-20,-20,-20,-10,20,20,0,0,0,0,20,20,20,30,10,0,0,10,30,20)
     kingSpacesEndgameB = (-50,-40,-30,-20,-20,-30,-40,-50,-30,-20,-10,0,0,-10,-20,-30,-30,-10,20,30,30,20,-10,-30,-30,-10,30,40,40,30,-10,-30,-30,-10,30,40,40,30,-10,-30,-30,-10,20,30,30,20,-10,-30,-30,-30,0,0,0,0,-30,-30,-50,-30,-30,-30,-30,-30,-30,-50)
 
@@ -77,78 +56,63 @@ if True:
     queenSpacesW = list(reversed(queenSpacesB))
     kingSpacesW = list(reversed(kingSpacesB))
     kingSpacesEndgameW = list(reversed(kingSpacesEndgameB))
+
 #@profile
 def evaluate(board, depth, endgame):
-    if board.turn:
-        mod = 1
-    else:
-        mod = -1
+    mod = 1 if board.turn else -1
 
-    if board.is_checkmate():
-        return 1000000.0*(depth+1)*mod
-    if board.is_repetition(2) or board.can_claim_fifty_moves():
-        return -20001.0*mod
+    if board.is_checkmate(): return 1000000.0*(depth+1)*mod
+    if board.is_repetition(2): return -20001.0*mod
+    if board.can_claim_fifty_moves(): return -20001.0*mod
 
     rating = 0.0
-    rating += sum([pawnSpacesB[i]+1000 for i in board.pieces(chess.PAWN, chess.BLACK)])-sum([pawnSpacesW[i]+1000 for i in board.pieces(chess.PAWN, chess.WHITE)])
-    rating += sum([knightSpacesB[i]+3200 for i in board.pieces(chess.KNIGHT, chess.BLACK)])-sum([knightSpacesW[i]+3200 for i in board.pieces(chess.KNIGHT, chess.WHITE)])
-    rating += sum([bishopSpacesB[i]+3330 for i in board.pieces(chess.BISHOP, chess.BLACK)])-sum([bishopSpacesW[i]+3330 for i in board.pieces(chess.BISHOP, chess.WHITE)])
-    rating += sum([rookSpacesB[i]+5100 for i in board.pieces(chess.ROOK, chess.BLACK)])-sum([rookSpacesW[i]+5100 for i in board.pieces(chess.ROOK, chess.WHITE)])
-    rating += sum([queenSpacesB[i]+8800 for i in board.pieces(chess.QUEEN, chess.BLACK)])-sum([queenSpacesW[i]+8800 for i in board.pieces(chess.QUEEN, chess.WHITE)])
+    rating += sum([pawnSpacesB[i] for i in board.pieces(chess.PAWN, chess.BLACK)])-sum([pawnSpacesW[i] for i in board.pieces(chess.PAWN, chess.WHITE)])
+    rating += sum([knightSpacesB[i] for i in board.pieces(chess.KNIGHT, chess.BLACK)])-sum([knightSpacesW[i] for i in board.pieces(chess.KNIGHT, chess.WHITE)])
+    rating += sum([bishopSpacesB[i] for i in board.pieces(chess.BISHOP, chess.BLACK)])-sum([bishopSpacesW[i] for i in board.pieces(chess.BISHOP, chess.WHITE)])
+    rating += sum([rookSpacesB[i] for i in board.pieces(chess.ROOK, chess.BLACK)])-sum([rookSpacesW[i] for i in board.pieces(chess.ROOK, chess.WHITE)])
+    rating += sum([queenSpacesB[i] for i in board.pieces(chess.QUEEN, chess.BLACK)])-sum([queenSpacesW[i] for i in board.pieces(chess.QUEEN, chess.WHITE)])
     if endgame:
         rating += sum([kingSpacesEndgameB[i] for i in board.pieces(chess.KING, chess.BLACK)])-sum([kingSpacesEndgameW[i] for i in board.pieces(chess.KING, chess.WHITE)])
-        #if pieceCount(board) <= 3:
-            #with chess.syzygy.open_tablebase(r'C:\Users\Cosmo\Documents\GitHub\Chess\3-4-5piecesSyzygy\3-4-5') as tablebase:
-                #WDL = tablebase.probe_wdl(board)
-                #return WDL*10000*board.turn
     else:
         rating += sum([kingSpacesB[i] for i in board.pieces(chess.KING, chess.BLACK)])-sum([kingSpacesW[i] for i in board.pieces(chess.KING, chess.WHITE)])
     return rating*0.001
 
-#@profile
-def evaluate2(board, depth, endgame):
-    if board.turn:
-        mod = 1
-    else:
-        mod = -1
+def evaluate(board, depth, endgame):
+    mod = 1 if board.turn else -1
 
-    if board.is_checkmate():
-        return 1000000.0*(depth+1)*mod
-    #if board.is_repetition(2) or board.can_claim_fifty_moves():
-        #return -20001.0*mod
+    if board.is_checkmate(): return 1000000.0*(depth+1)*mod
+    if board.is_repetition(2): return -20001.0*mod
+    if board.can_claim_fifty_moves(): return -20001.0*mod
 
     rating = 0.0
-    rating += sum([PST[k][i] for i, k in board.piece_map().items()])
+    rating += sum([pawnSpacesB[i] for i in board.pieces(chess.PAWN, chess.BLACK)])-sum([pawnSpacesW[i] for i in board.pieces(chess.PAWN, chess.WHITE)])
+    rating += sum([knightSpacesB[i] for i in board.pieces(chess.KNIGHT, chess.BLACK)])-sum([knightSpacesW[i] for i in board.pieces(chess.KNIGHT, chess.WHITE)])
+    rating += sum([bishopSpacesB[i] for i in board.pieces(chess.BISHOP, chess.BLACK)])-sum([bishopSpacesW[i] for i in board.pieces(chess.BISHOP, chess.WHITE)])
+    rating += sum([rookSpacesB[i] for i in board.pieces(chess.ROOK, chess.BLACK)])-sum([rookSpacesW[i] for i in board.pieces(chess.ROOK, chess.WHITE)])
+    rating += sum([queenSpacesB[i] for i in board.pieces(chess.QUEEN, chess.BLACK)])-sum([queenSpacesW[i] for i in board.pieces(chess.QUEEN, chess.WHITE)])
+    if endgame:
+        rating += sum([kingSpacesEndgameB[i] for i in board.pieces(chess.KING, chess.BLACK)])-sum([kingSpacesEndgameW[i] for i in board.pieces(chess.KING, chess.WHITE)])
+    else:
+        rating += sum([kingSpacesB[i] for i in board.pieces(chess.KING, chess.BLACK)])-sum([kingSpacesW[i] for i in board.pieces(chess.KING, chess.WHITE)])
     return rating*0.001
-
 #@profile
 def orderedMoves(board, best):
-    moves = [move for move in board.legal_moves]
-
     hash = []
     takes = []
     last = []
-
-    for move in moves:
+    for move in board.legal_moves:
         if move.uci() == best:
             hash.append(move)
         elif board.is_capture(move):
             takes.append(move)
         else:
             last.append(move)
-
     return hash + takes + last
-#@profile
-def isLateCandidate(node, move):
-    if node.is_capture(move):
-        return False
-    if move.promotion:
-        return False
-    if node.is_check():
-        return False
-    if node.gives_check(move):
-        return False
-    return True
+def orderedMoves(board, best):
+    moves = [move for move in board.legal_moves]
+    hash = [moves.pop(i) for i, move in enumerate(moves) if move.uci()==best]
+    takes = [moves.pop(i) for i, move in enumerate(moves) if board.is_capture(move)]
+    return hash + takes + moves
 #@profile
 def probeHash(key, hash, depth, a, b):
     try:
@@ -168,17 +132,27 @@ def probeHash(key, hash, depth, a, b):
     return (None, None)
 #@profile
 def recordHash(key, hash, bestMove, depth, a, hashf):
-    table[hash] = {'key':key, 'bestMove':bestMove, 'depth':depth, 'score':a, 'type':hashf}
+    if abs(a) > 999999: 999999*a/abs(a)
+    try:
+        entry = table[hash]
+        if entry['depth'] >= depth:
+            table[hash] = {'key':key, 'bestMove':bestMove, 'depth':depth, 'score':a, 'type':hashf}
+        else:
+            return
+    except Exception:
+        table[hash] = {'key':key, 'bestMove':bestMove, 'depth':depth, 'score':a, 'type':hashf}
 #@profile
 def pvs(node, depth, a, b, colour):
     hashf = 1
     if depth <= 0:
         #evaluate2(node, depth, False)
         value = colour * evaluate(node, depth, False)
+        #value = colour * qsearch(a, b, node, depth, False)
         return value
     if node.is_game_over():
         #evaluate2(node, depth, False)
         value = colour * evaluate(node, depth, False)
+        #value = colour * qsearch(a, b, node, depth, False)
         return value
     key = chess.polyglot.zobrist_hash(node)
     hash = key%tableSize
@@ -189,6 +163,7 @@ def pvs(node, depth, a, b, colour):
         else:
             bestMove = probe[0]
     #NULLMOVE PRUNING
+    check = False
     if not node.is_check():
         node.push(chess.Move.null())
         value = -pvs(node, depth - 3, -b, -a, -colour)
@@ -196,6 +171,8 @@ def pvs(node, depth, a, b, colour):
         node.pop()
         if a >= b:
             return a
+    else:
+        check = True
     if 'bestMove' in locals():
         moves = orderedMoves(node, bestMove) #MOVE ORDERING
     else:
@@ -203,6 +180,8 @@ def pvs(node, depth, a, b, colour):
     currentBest = moves[0].uci()
     firstmove = True
     for i, move in enumerate(moves):
+        if check:
+            depth+=1
         node.push(move)
         if firstmove:
             value = -pvs(node, depth - 1, -b, -a, -colour)
@@ -212,6 +191,8 @@ def pvs(node, depth, a, b, colour):
             if a < value and value < b:
                 value = -pvs(node, depth - 1, -b, -value, -colour)
         node.pop()
+        if check:
+            depth-=1
         if value >= b:
             recordHash(key, hash, currentBest, depth, b, 2)
             return b
@@ -250,7 +231,7 @@ def pvsearch(node, timeLimit):
     moves = orderedMoves(node, '')
     values = [0.0]*len(moves)
 
-    for depth in range(1, 20):
+    for depth in range(1, 20, 2):
         for i, move in enumerate(moves):
             node.push(move)
             values[i] = pvs(node, depth, a, b, colour)
@@ -295,8 +276,8 @@ def getBookMove(node):
 def play(board, timeLimit):
     try:
         best, choice = getBookMove(board)
-        #board.push(choice)
-        board.push(best)
+        board.push(choice)
+        #board.push(best)
         print(chess.pgn.Game.from_board(board)[-1])
     except Exception:
         best = pvsearch(board, timeLimit)
@@ -366,7 +347,7 @@ openings = ['rnbqkbnr/pppppppp/8/8/8/6P1/PPPPPP1P/RNBQKBNR b KQkq - 0 1',
 
 names = ['#g3', '#e4', '#d4', '#Nf3', '#c4', '#Na3']
 
-test = '8/k7/3p4/p2P1p2/P2P1P2/8/8/K7 w - -'
+test = 'r1bqkbnr/pp1p1ppp/8/2p5/3QP3/8/PPP2PPP/RNB1KB1R w KQkq - 0 1'
 
 #testsearch(chess.Board(), 3600)
 
@@ -374,7 +355,7 @@ if True:
     timeLimit = 10
     stacks = []
     for i, opening in enumerate(openings):
-        stacks.append(main(opening, True, True, True, timeLimit))
+        stacks.append(main(standard, True, True, True, timeLimit))
         print('time elapsed while thinking:',whiteTime)
         print(stacks[i])
 
