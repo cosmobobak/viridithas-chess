@@ -58,44 +58,41 @@ if True:
     kingSpacesW = list(reversed(kingSpacesB))
     kingSpacesEndgameW = list(reversed(kingSpacesEndgameB))
 
-#@profile
 def evaluate(board, depth, endgame):
     mod = 1 if board.turn else -1
+    
+    if board.can_claim_fifty_moves(): return -20001000*mod
 
-    if board.is_checkmate(): return 1000000.0*(depth+1)*mod
-    if board.is_repetition(2): return -20001.0*mod
+    white = board.occupied_co[True]
+    black = board.occupied_co[False]
 
-    rating = 0.0
+    rating = 0
     '''
     rating += popcount(board.pawns)*1000
     '''
-    rating -= bin(board.pawns & board.occupied_co[True]).count('1')*1000
-    rating += bin(board.pawns & board.occupied_co[False]).count('1')*1000
-    rating -= bin(board.knights & board.occupied_co[True]).count('1')*3200
-    rating += bin(board.knights & board.occupied_co[False]).count('1')*3200
-    rating -= bin(board.bishops & board.occupied_co[True]).count('1')*3330
-    rating += bin(board.bishops & board.occupied_co[False]).count('1')*3330
-    rating -= bin(board.rooks & board.occupied_co[True]).count('1')*5200
-    rating += bin(board.rooks & board.occupied_co[False]).count('1')*5200
-    rating -= bin(board.queens & board.occupied_co[True]).count('1')*8800
-    rating += bin(board.queens & board.occupied_co[False]).count('1')*8800
-    return rating*0.001
+    rating -= bin(board.pawns & white).count('1')*1000-bin(board.pawns & black).count('1')*1000
+    rating -= bin(board.knights & white).count('1')*3200-bin(board.knights & black).count('1')*3200
+    rating -= bin(board.bishops & white).count('1')*3330-bin(board.bishops & black).count('1')*3330
+    rating -= bin(board.rooks & white).count('1')*5200-bin(board.rooks & black).count('1')*5200
+    rating -= bin(board.queens & white).count('1')*8800-bin(board.queens & black).count('1')*8800
+    rating -= bin(board.kings & white).count('1')*200000-bin(board.kings & black).count('1')*200000
+    return rating
 
 def evaluate2(board, depth, endgame):
     mod = 1 if board.turn else -1
 
-    if board.is_checkmate(): return 1000000.0*(depth+1)*mod
-    if board.is_repetition(2): return -20001.0*mod
-    if board.can_claim_fifty_moves(): return -20001.0*mod
+    if board.is_checkmate(): return 1000000000*(depth+1)*mod
+    if board.is_repetition(2): return -20001000*mod
+    if board.can_claim_fifty_moves(): return -20001000*mod
 
-    rating = 0.0
+    rating = 0
     rating += sum([pawnSpacesB[i] for i in board.pieces(chess.PAWN, chess.BLACK)])-sum([pawnSpacesW[i] for i in board.pieces(chess.PAWN, chess.WHITE)])
     rating += sum([knightSpacesB[i] for i in board.pieces(chess.KNIGHT, chess.BLACK)])-sum([knightSpacesW[i] for i in board.pieces(chess.KNIGHT, chess.WHITE)])
     rating += sum([bishopSpacesB[i] for i in board.pieces(chess.BISHOP, chess.BLACK)])-sum([bishopSpacesW[i] for i in board.pieces(chess.BISHOP, chess.WHITE)])
     rating += sum([rookSpacesB[i] for i in board.pieces(chess.ROOK, chess.BLACK)])-sum([rookSpacesW[i] for i in board.pieces(chess.ROOK, chess.WHITE)])
     rating += sum([queenSpacesB[i] for i in board.pieces(chess.QUEEN, chess.BLACK)])-sum([queenSpacesW[i] for i in board.pieces(chess.QUEEN, chess.WHITE)])
     rating += sum([kingSpacesEndgameB[i] for i in board.pieces(chess.KING, chess.BLACK)])-sum([kingSpacesEndgameW[i] for i in board.pieces(chess.KING, chess.WHITE)])
-    return rating*0.001
+    return rating
 #@profile
 def orderedMoves(board, best):
     hash = []
@@ -133,7 +130,8 @@ def probeHash(key, hash, depth, a, b):
     return (None, None)
 #@profile
 def recordHash(key, hash, bestMove, depth, a, hashf):
-    if abs(a) > 999999: 999999*a/abs(a)
+    if abs(a) > 999999000: 
+        a = 999999000*a/abs(a)
     try:
         entry = table[hash]
         if entry['depth'] >= depth:
@@ -142,7 +140,7 @@ def recordHash(key, hash, bestMove, depth, a, hashf):
             return
     except Exception:
         table[hash] = {'key':key, 'bestMove':bestMove, 'depth':depth, 'score':a, 'type':hashf}
-#@profile
+
 def pvs(node, depth, a, b, colour):
     hashf = 1
     if depth <= 0:
@@ -219,7 +217,7 @@ def showIterationData(board, moves, values, depth, startTime):
 def pvsearch(node, timeLimit):
     startTime = time.time()
     depth = 1
-    a, b = -1337000000000, 1337000000000
+    a, b = -1337000000000000, 1337000000000000
     colour = node.turn
     if colour:
         colour = 1
@@ -337,7 +335,7 @@ test = 'r1bqkbnr/pp1p1ppp/8/2p5/3QP3/8/PPP2PPP/RNB1KB1R w KQkq - 0 1'
 print(chess.Board().knights)
 
 if True:
-    timeLimit = 10
+    timeLimit = 60
     stacks = []
     for i, opening in enumerate(openings):
         stacks.append(main(standard, True, True, True, timeLimit))
