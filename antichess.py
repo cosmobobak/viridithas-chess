@@ -57,28 +57,20 @@ if True:
     kingSpacesW = list(reversed(kingSpacesB))
     kingSpacesEndgameW = list(reversed(kingSpacesEndgameB))
 #@profile
+
+
 def pieceDiff(board):
     count = 0
-    for piece in board.pieces(chess.PAWN, chess.BLACK):
-        count += -1
-    for piece in board.pieces(chess.PAWN, chess.WHITE):
-        count += 1
-    for piece in board.pieces(chess.KNIGHT, chess.BLACK):
-        count += -1
-    for piece in board.pieces(chess.KNIGHT, chess.WHITE):
-        count += 1
-    for piece in board.pieces(chess.BISHOP, chess.BLACK):
-        count += -1
-    for piece in board.pieces(chess.BISHOP, chess.WHITE):
-        count += 1
-    for piece in board.pieces(chess.ROOK, chess.BLACK):
-        count += -1
-    for piece in board.pieces(chess.ROOK, chess.WHITE):
-        count += 1
-    for piece in board.pieces(chess.QUEEN, chess.BLACK):
-        count += -1
-    for piece in board.pieces(chess.QUEEN, chess.WHITE):
-        count += 1
+    count -= len(board.pieces(chess.PAWN, chess.BLACK))
+    count += len(board.pieces(chess.PAWN, chess.WHITE))
+    count -= len(board.pieces(chess.KNIGHT, chess.BLACK))
+    count += len(board.pieces(chess.KNIGHT, chess.WHITE))
+    count -= len(board.pieces(chess.BISHOP, chess.BLACK))
+    count += len(board.pieces(chess.BISHOP, chess.WHITE))
+    count -= len(board.pieces(chess.ROOK, chess.BLACK))
+    count += len(board.pieces(chess.ROOK, chess.WHITE))
+    count -= len(board.pieces(chess.QUEEN, chess.BLACK))
+    count += len(board.pieces(chess.QUEEN, chess.WHITE))
     return count
 #@profile
 def orderedMoves(board, best):
@@ -197,9 +189,6 @@ def pvsearch(node, timeLimit):
         colour = 1
     else:
         colour = -1
-    endgame = False
-    if pieceCount(node) <= 6:
-        endgame = True
 
     moves = orderedMoves(node, '')
     values = [0.0]*len(moves)
@@ -217,26 +206,16 @@ def pvsearch(node, timeLimit):
 
 def pieceCount(board):
     count = 0
-    for piece in board.pieces(chess.PAWN, chess.BLACK):
-        count += 1
-    for piece in board.pieces(chess.PAWN, chess.WHITE):
-        count += 1
-    for piece in board.pieces(chess.KNIGHT, chess.BLACK):
-        count += 1
-    for piece in board.pieces(chess.KNIGHT, chess.WHITE):
-        count += 1
-    for piece in board.pieces(chess.BISHOP, chess.BLACK):
-        count += 1
-    for piece in board.pieces(chess.BISHOP, chess.WHITE):
-        count += 1
-    for piece in board.pieces(chess.ROOK, chess.BLACK):
-        count += 1
-    for piece in board.pieces(chess.ROOK, chess.WHITE):
-        count += 1
-    for piece in board.pieces(chess.QUEEN, chess.BLACK):
-        count += 1
-    for piece in board.pieces(chess.QUEEN, chess.WHITE):
-        count += 1
+    count += len(board.pieces(chess.PAWN, chess.BLACK))
+    count += len(board.pieces(chess.PAWN, chess.WHITE))
+    count += len(board.pieces(chess.KNIGHT, chess.BLACK))
+    count += len(board.pieces(chess.KNIGHT, chess.WHITE))
+    count += len(board.pieces(chess.BISHOP, chess.BLACK))
+    count += len(board.pieces(chess.BISHOP, chess.WHITE))
+    count += len(board.pieces(chess.ROOK, chess.BLACK))
+    count += len(board.pieces(chess.ROOK, chess.WHITE))
+    count += len(board.pieces(chess.QUEEN, chess.BLACK))
+    count += len(board.pieces(chess.QUEEN, chess.WHITE))
     return count
 
 def play(board, timeLimit):
@@ -275,10 +254,7 @@ def endingPrinter(board):
 def main(string, debug, human, side, timeLimit):
     board = chess.variant.AntichessBoard(str(string))
     #board = chess.variant.CrazyhouseBoard(str(string))
-    win = 1
 
-    boardArrays = []
-    ratingArrays = []
     while not board.is_game_over():
         show(board)
         play(board,timeLimit)
