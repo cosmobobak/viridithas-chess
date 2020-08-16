@@ -81,7 +81,7 @@ def evaluate(board, depth, endgame):
     rating += bin(board.queens & board.occupied_co[False]).count('1')*8800
     return rating*0.001
 
-def evaluate2(board, depth, endgame):
+def evaluate(board, depth, endgame):
     mod = 1 if board.turn else -1
 
     if board.is_checkmate(): return 1000000.0*(depth+1)*mod
