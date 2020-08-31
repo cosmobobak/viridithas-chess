@@ -1,29 +1,37 @@
 #include <iostream>
+#include <algorithm>
 using namespace std;
-using U64 = uint64_t;
 
-class CBoard
+class Move
 {
-    U64 whitePawns;
-    U64 whiteKnights;
-    U64 whiteBishops;
-    U64 whiteRooks;
-    U64 whiteQueens;
-    U64 whiteKing;
+public:
+    int from_square;
+    int to_square;
+};
 
-    U64 blackPawns;
-    U64 blackKnights;
-    U64 blackBishops;
-    U64 blackRooks;
-    U64 blackQueens;
-    U64 blackKing;
+class Board
+{
+public:
+    long long node[6];
+    bool turn = true;
+
+    bool get_square(long long bb, int squareNum){
+        return (bb & (1 << squareNum));
+    }
+
+    void __repr__(){
+        
+    }
+};
+
+class Vorpal
+{
+public:
+    int nodes = 0;
 };
 
 int main()
 {
-    CBoard board;
-
-    cout << board;
-
+    Vorpal engine;
     return 0;
 }

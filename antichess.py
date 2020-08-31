@@ -58,7 +58,6 @@ if True:
     kingSpacesEndgameW = list(reversed(kingSpacesEndgameB))
 #@profile
 
-
 def pieceDiff(board):
     count = 0
     count -= len(board.pieces(chess.PAWN, chess.BLACK))
