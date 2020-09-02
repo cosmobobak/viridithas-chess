@@ -9,8 +9,6 @@ def points(boardState):
     for letter in board.fen()[:-12]:
         if letter == 'p':
             rating += 1
-        elif letter == 'k':
-            rating += 1000
         elif letter == 'n':
             rating += 3
         elif letter == 'b':
@@ -21,8 +19,6 @@ def points(boardState):
             rating += 5
         elif letter == 'P':
             rating -= 1
-        elif letter == 'K':
-            rating -= 1000
         elif letter == 'N':
             rating -= 3
         elif letter == 'B':
@@ -82,10 +78,6 @@ def bestMove2(board):
         newRatings.append(move+(random.randint(1,99)/1000))
 
     return moves[newRatings.index(max(newRatings))]
-
-def bestMove3(board):
-    for move in board.legal_moves:
-        pass
 
 def userMove(board):
     move = input("enter move: ")
