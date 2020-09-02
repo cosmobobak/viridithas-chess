@@ -29,6 +29,7 @@ class Viridithas():
             self.oddeven = self.human
         else:
             self.oddeven = oddeven
+        self.c = len(list(self.position.legal_moves))
         self.tableSize = 2**29+49
         self.hashtable = dict()
         self.hashstack = dict()
@@ -98,6 +99,7 @@ class Viridithas():
         rating -= sum([self.evaltable['Q'][i] for i in self.position.pieces(chess.QUEEN, chess.WHITE)])
         rating += sum([self.evaltable['k'][i] for i in self.position.pieces(chess.KING, chess.BLACK)])
         rating -= sum([self.evaltable['K'][i] for i in self.position.pieces(chess.KING, chess.WHITE)])
+        
         return rating
 
     def record_stack(self):
@@ -146,6 +148,9 @@ class Viridithas():
         takes = [moves.pop(i) for i, move in enumerate(moves) if self.position.is_capture(move)]
         return hashmove + takes + moves
 
+    def captures(self):
+        return [move for move in self.position.legal_moves if self.position.is_capture(move)]
+
     def obj_legal_moves(self):
         return self.position.legal_moves
 
@@ -155,12 +160,26 @@ class Viridithas():
         key = hash(self.position._transposition_key())
         small = key % self.tableSize
         return key, small
+    
+    def qsearch(self, depth, colour, a, b):
+        if self.position.is_game_over():
+            return colour * self.evaluate(depth)
+        for move in self.captures():
+            self.position.push(move)
+            value = - self.qsearch(depth, -colour, -b, -a)
+            self.position.pop()
+            if value >= b:
+                return b
+            if value > a:
+                a = value
+        return a
 
     #@profile
-    def principal_variation_search(self, depth, colour, a=-1337000000000000, b=1337000000000000):
+    def principal_variation_search(self, depth, colour, a=-1337000000, b=1337000000):
         hashDataType = 1
         if depth < 1:
             return colour * self.evaluate(depth)
+            #return colour * self.qsearch(depth, colour, a, b)
         if self.position.is_game_over():
             return colour * self.evaluate(depth)
         #key = chess.polyglot.zobrist_hash(self.position)
@@ -173,7 +192,6 @@ class Viridithas():
             else:
                 self.best = probe[0]
         # NULLMOVE PRUNING
-        
         if not self.position.is_check():
             self.position.push(chess.Move.null()) # MAKE A NULL MOVE
             value = - self.principal_variation_search(depth - 3, -colour, -b, -a) # PERFORM A LIMITED SEARCH
@@ -185,7 +203,8 @@ class Viridithas():
         else:
             check = True
         moves = self.ordered_moves()  # MOVE ORDERING (HASH -> TAKES -> OTHERS)
-        self.best = moves[0] 
+        self.c = len(moves)
+        self.best = moves[0]
         firstmove = True
         for i, move in enumerate(moves):
             if check: # CHECK EXTENSION ON MOVES FROM THIS NODE
@@ -318,8 +337,8 @@ games = []
 
 init = '2kr1b1r/1pp1qppp/p1n1p1b1/3P4/2N3P1/P1N4P/1PPQ1P2/2KR1B1R b - - 0 1'
 
-for i in range(5):
-    engine.__init__(fun=False, timeLimit=1, book=True, oddeven=True, human=False)
+for i in range(1):
+    engine.__init__(fun=False, timeLimit=15, book=True, oddeven=True, human=False)
     game = engine.run_game()
     games.append(game)
 for game in games:
