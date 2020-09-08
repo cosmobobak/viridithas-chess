@@ -184,7 +184,7 @@ Line #      Hits         Time  Per Hit   % Time  Line Contents
     74                                           @profile
     75                                           def negamax_killer(node, depth, a, b, colour):
     76  21037412 2445472268.0    116.2      4.3      if depth == 0 or node.is_game_over():
-    77  18994263 35221779525.0   1854.3    62.4          return colour * evaluate(node,depth)
+    77  18994263 35221779525.0  1854.3     62.4          return colour * evaluate(node,depth)
     78   2043149   12506665.0      6.1      0.0      value = -1337000.0
     79   2043149 7940280471.0   3886.3     14.1      moves = orderedMoves(node)
     80  21704408  109664238.0      5.1      0.2      for move in moves:
