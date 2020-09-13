@@ -10,7 +10,7 @@ import operator
 import pickle
 
 class Viridithas():
-    def __init__(self, human=False, fen='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', pgn='', timeLimit=15, fun=False, contempt=3000, book=True, oddeven='unspec'):
+    def __init__(self, human=False, fen='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', pgn='', timeLimit=15, fun=False, contempt=3000, book=True, oddeven='unspec', advancedTC=False):
         if pgn == '':
             self.node = chess.Board(fen)
         else:
@@ -22,15 +22,25 @@ class Viridithas():
                     continue
         self.timeLimit = timeLimit
         self.startTime = time.time()
+        if advancedTC:
+            if not human:
+                advancedTC[0] = advancedTC[0]*2
+            self.endpoint = time.time()+advancedTC[0]*60
+            self.increment = advancedTC[1]
+        else:
+            self.endpoint = 0
+            self.increment = 0
         self.fun = fun
         self.contempt = contempt
         self.human = human
+        self.nodes = 0
+        self.advancedTC = advancedTC
         if oddeven == 'unspec':
             self.oddeven = self.human
         else:
             self.oddeven = oddeven
         self.c = len(list(self.node.legal_moves))
-        self.tableSize = 2**29+49
+        self.tableSize = 2**31+49
         self.hashtable = dict()
         self.hashstack = dict()
         self.pieces = range(1, 7)
@@ -56,18 +66,63 @@ class Viridithas():
                 self.evaltable[key] = dict()
             for i, square in enumerate(self.PST[key]):
                 self.evaltable[key][i] = square+self.PMV[key]
+        self.ext = False
 
     def __repr__(self):
         try:
             display(chess.svg.board(board=self.node,
                                     size=400,
                                     flipped=not self.node.turn)) # FOR A JUPYTER NOTEBOOK
-            return "Viridithas-engine at position "+str(self.node.fen())
+            return self.__class__.__name__+"-engine at position "+str(self.node.fen())
         except Exception:
-            return str(self.node) + '\n' + "Viridithas-engine at position " + str(self.node.fen())
+            return str(self.node) + '\n' + self.__class__.__name__+"-engine at position " + str(self.node.fen())
 
     def __str__(self):
         return "please don't try to make a chess engine into a string"
+
+    def user_setup(self):
+        if input("Do you want to configure the bot? (Y/N) ") == 'Y':
+            pass
+        else:
+            return 0
+        print("BEGINNING USER CONFIGURATION OF " + self.__class__.__name__.upper() + "-BOT")
+        human = True if input("Is there a human opponent? (Y/N) ").upper() == "Y" else False
+        fen = True if input("Would you like to set a position from FEN? (Y/N) ").upper() == "Y" else False
+        if fen:
+            fen = input("FEN: ")
+            pgn = ""
+        else:
+            fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+            pgn = True if input("Would you like to set a position from PGN? (Y/N) ").upper() == "Y" else False
+            if pgn:
+                pgn = input("PGN: ")
+            else:
+                pgn = ""
+
+        timeLimit = 15
+        advancedTC = False
+        controlType = input("Advanced, Simple, or Infinite time control? [A/S/I]: ").upper()
+        while controlType not in ["A", "S", "I"]:
+            controlType = input("[A/S/I]: ").upper()
+        if controlType == 'S':
+            timeLimit = int(input("Enter time limit in seconds: "))
+        elif controlType == 'A':
+            advancedTC = [0, 0]
+            advancedTC[0] = int(input("Enter minutes: "))
+            advancedTC[1] = int(input("Enter increment: "))
+        else:
+            timeLimit = 10000000000
+
+        book = True if input("Would you like to use an opening book? (Y/N) ") == 'Y' else False
+        if book:
+            fun = True if input("Would you like to pick varied openings? (Y/N) ") == 'Y' else False
+        else:
+            fun = False
+
+        contempt = int(input("Enter contempt in millipawns: "))
+        oddeven = True if input("Would you like to use double depth increment? (Y/N) ") =='Y' else False
+        self.__init__(human=human, fen=fen, pgn=pgn, timeLimit=timeLimit, fun=fun, contempt=contempt, book=book, oddeven=oddeven, advancedTC=advancedTC)
+        return 0
 
     #@profile
     def evaluate(self, depth):
@@ -75,9 +130,7 @@ class Viridithas():
 
         if self.node.is_checkmate():
             return 1000000000*(depth+1)*mod
-        if self.node.is_repetition():
-            rating = -self.contempt*mod
-        elif self.node.can_claim_fifty_moves():
+        if self.node.can_claim_draw():
             rating = -self.contempt*mod
         else:
             rating = 0
@@ -104,8 +157,6 @@ class Viridithas():
             self.hashstack[key] = 1
 
     def record_hash(self, key, hash, depth, a, hashDataType):
-        if abs(a) > 999999000:
-            a = 999999000*a/abs(a)
         try:
             entry = self.hashtable[hash]
             if entry['depth'] >= depth:
@@ -118,7 +169,7 @@ class Viridithas():
             except MemoryError:
                 self.hashtable.clear()
 
-    def probe_hash(self, key, hash, depth, a, b):
+    def probe_hash(self, key, hash, depth=0, a=-1000, b=1000):
         try:
             entry = self.hashtable[hash]
         except KeyError:
@@ -135,6 +186,15 @@ class Viridithas():
             return (entry['bestMove'], False)
         return (None, None)
 
+    def get_pv_move(self):
+        key, hash = self.pos_hash()
+        try:
+            entry = self.hashtable[hash]
+        except KeyError:
+            return False
+        else:
+            return entry["bestMove"] if entry["key"] == key else False
+
     #@profile
     def ordered_moves(self):
         moves = list(self.node.legal_moves)
@@ -142,13 +202,16 @@ class Viridithas():
         takes = [moves.pop(i) for i, move in enumerate(moves) if self.node.is_capture(move)]
         return hashmove + takes + moves
 
-    def pos_hash(self):
-        key = hash(self.node._transposition_key())
+    def pos_hash(self, node=False):
+        if not node:
+            node = self.node
+        key = hash(node._transposition_key())
         small = key % self.tableSize
         return key, small
 
     #@profile
     def principal_variation_search(self, depth, colour, a=-1337000000, b=1337000000):
+        self.nodes+=1
         hashDataType = 1
         if depth < 1:
             return colour * self.evaluate(depth)
@@ -176,8 +239,9 @@ class Viridithas():
         self.best = moves[0]
         firstmove = True
         for i, move in enumerate(moves):
-            if check: # CHECK EXTENSION ON MOVES FROM THIS NODE
-                depth += 1
+            #if check and not self.ext: # CHECK EXTENSION ON MOVES FROM THIS NODE
+                #depth += 2 if self.oddeven else 1
+                #self.ext = True
             self.node.push(move) # MAKE MOVE
             if firstmove:
                 value = - self.principal_variation_search(depth - 1, -colour, -b, -a) # FULL SEARCH ON MOVE 1
@@ -187,8 +251,9 @@ class Viridithas():
                 if a < value and value < b: # CHECK IF NULLWINDOW FAILED
                     value = - self.principal_variation_search(depth - 1, -colour, - b, -value) # RE-SEARCH
             self.node.pop()  # UNMAKE MOVE
-            if check: # CHECK NODE FINISHED, UNEXTEND
-                depth -= 1
+            #if check: # CHECK NODE FINISHED, UNEXTEND
+                #depth -= 2 if self.oddeven else 1
+                #self.ext = False
             if value >= b:
                 self.record_hash(key, hash, depth, b, 2)
                 return b
@@ -209,27 +274,44 @@ class Viridithas():
 
     def show_iteration_data(self, moves, values, depth):
         print(self.node.san(moves[0]), '|', round(self.turnmod()*values[0], 3), '|',
-              str(round(time.time()-self.startTime, 2))+'s at depth', depth + 1)
+              str(round(time.time()-self.startTime, 2))+'s at depth', str(depth + 1)+", "+str(self.nodes), "nodes processed.")
+        pvLen = 1
+        self.node.push(moves[0])
+        while self.get_pv_move():
+            move = self.get_pv_move()
+            self.node.push(move)
+            pvLen += 1
+        print(chess.pgn.Game.from_board(self.node)[-1])
+        for c in range(pvLen):
+            self.node.pop()
 
-    def search(self):
+    def search(self, ponder=False):
         self.startTime = time.time()
-
+        self.nodes = 0
         moves = self.ordered_moves()
+        if len(moves) == 1:
+            return moves[0]
         values = [0.0]*len(moves)
         step = 2 if self.oddeven else 1
-
-        for depth in range(1, 30, step):
-            if self.timeLimit*2/3 < time.time()-self.startTime:
+        start = 2 if ponder else 1
+        for depth in range(start, 30, step):
+            if self.timeLimit*2/3 < time.time()-self.startTime and not ponder:
                 return moves[0]
             for i, move in enumerate(moves):
                 self.node.push(move)
                 values[i] = self.principal_variation_search(depth, self.turnmod())
                 self.node.pop()
-                if self.timeLimit < time.time()-self.startTime:
+                if self.timeLimit < time.time()-self.startTime and not ponder:
                     return moves[0]
             moves, values = self.move_sort(moves, values)
             self.show_iteration_data(moves, values, depth)
+            #if depth < 7 and abs(values[0]) > 300000000:
+                #return moves[0]
         return moves[0]
+
+    def ponder(self):
+        self.origin = self.node.copy()
+        self.search(ponder=True)
 
     def get_book_move(self):
         book = chess.polyglot.open_reader(
@@ -240,6 +322,10 @@ class Viridithas():
         return main_entry.move, choice.move
 
     def play(self):
+        # add flag_func for egtb mode
+        if self.advancedTC:
+            self.timeLimit = (self.endpoint-time.time())/20
+        print("Time for move: " + str(round(self.timeLimit,2)) + "s")
         if self.inbook:
             try:
                 best, choice = self.get_book_move()
@@ -260,6 +346,7 @@ class Viridithas():
             self.node.push(best)
             print(chess.pgn.Game.from_board(self.node)[-1])
         self.record_stack()
+        self.endpoint+=self.increment
 
     def display_ending(self):
         if self.node.is_stalemate():
@@ -287,7 +374,11 @@ class Viridithas():
         while not self.node.is_game_over():
             print(self.__repr__())
             if self.human and self.node.turn:
-                self.user_move()
+                try:
+                    self.ponder()
+                except KeyboardInterrupt:
+                    self.node = self.origin
+                    self.user_move()
             else: # SWAP THESE ASAP
                 self.play()
         self.display_ending()
@@ -313,40 +404,18 @@ class Antichess(Viridithas):
     def __init__(self, human=False, fen='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', pgn='', timeLimit=15, fun=False, contempt=3000, book=True, oddeven='unspec'):
         super().__init__(human, fen, pgn, timeLimit, fun, contempt, False, oddeven)
         self.node = chess.variant.AntichessBoard(fen)
-        try:  # THIS DOES NOT SEEM TO WORK YET
-            f = open("antichess_hash.pkl", "wb")
-            self.hashtable = pickle.load(f)
-            f.close()
-        except Exception:
-            try:
-                f.close()
-            except Exception:
-                pass
-    
-    def pickle_populate(self):  # THIS DOES NOT SEEM TO WORK YET
-        try:
-            save = self.timeLimit
-            self.timeLimit = 10000000000
-            self.search()
-        except KeyboardInterrupt:
-            self.timeLimit = save
-            f = open("antichess_hash.pkl", "wb")
-            pickle.dump(self.hashtable, f)
-            f.close()
 
     def evaluate(self, depth):
-        #ADD WHITE, SUB BLACK
-
         mod = 1 if self.node.turn else -1
-        if self.node.is_repetition():
-            return -self.contempt*mod
-        elif self.node.can_claim_fifty_moves():
+        if self.node.can_claim_draw():
             return -self.contempt*mod
         else:
             return sum([-1 for i in chess.SquareSet(self.node.occupied_co[0])])+sum([1 for i in chess.SquareSet(self.node.occupied_co[1])])
 
-init = "r2qk2r/p1p2ppp/2b1pn2/p2p4/3P1B2/2P1PN2/P3QPPP/RN2K2R w KQkq - 0 1"
 
-engine = Antichess(oddeven=True, timeLimit=5, human=True)
+init = "r1b1k1nr/1pp2ppp/p1n1pq2/3p4/3P1b2/2PBPN2/PP3PPP/RN1QK2R w KQkq - 0 1"
+
+engine = Viridithas(pgn="1. e4", book=False, contempt=0, timeLimit=100000000, oddeven=True)
+#engine.user_setup()
 
 engine.run_game()
