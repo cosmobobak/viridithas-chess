@@ -82,7 +82,7 @@ class Viridithas():
         return "please don't try to make a chess engine into a string"
 
     def user_setup(self):
-        if input("Do you want to configure the bot? (Y/N) ") == 'Y':
+        if input("Do you want to configure the bot? (Y/N) ").upper() == 'Y':
             pass
         else:
             return 0
@@ -114,9 +114,9 @@ class Viridithas():
         else:
             timeLimit = 10000000000
 
-        book = True if input("Would you like to use an opening book? (Y/N) ") == 'Y' else False
+        book = True if input("Would you like to use an opening book? (Y/N) ").upper() == 'Y' else False
         if book:
-            fun = True if input("Would you like to pick varied openings? (Y/N) ") == 'Y' else False
+            fun = True if input("Would you like to pick varied openings? (Y/N) ").upper() == 'Y' else False
         else:
             fun = False
 
