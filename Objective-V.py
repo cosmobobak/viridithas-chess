@@ -8,6 +8,7 @@ import chess.variant
 import time
 import operator
 import pickle
+from __future__ import annotations
 
 class Viridithas():
     def __init__(self, human=False, fen='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', pgn='', timeLimit=15, fun=False, contempt=3000, book=True, oddeven='unspec', advancedTC=False, tt=True):
@@ -69,7 +70,7 @@ class Viridithas():
                 self.evaltable[key][i] = square+self.PMV[key]
         self.ext = False
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         try:
             display(chess.svg.board(board=self.node,
                                     size=400,
@@ -78,10 +79,10 @@ class Viridithas():
         except Exception:
             return str(self.node) + '\n' + self.__class__.__name__+"-engine at position " + str(self.node.fen())
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "please don't try to make a chess engine into a string"
 
-    def user_setup(self):
+    def user_setup(self) -> int:
         if input("Do you want to configure the bot? (Y/N) ").upper() == 'Y':
             pass
         else:
@@ -126,7 +127,7 @@ class Viridithas():
         return 0
 
     #@profile
-    def evaluate(self, depth):
+    def evaluate(self, depth: int) -> int:
         mod = 1 if self.node.turn else -1
         rating = 0
         if self.node.is_checkmate():
@@ -155,15 +156,34 @@ class Viridithas():
         rating -= sum([self.evaltable['K'][i] for i in self.node.pieces(chess.KING, chess.WHITE)])
         
         return rating
-
-    def record_stack(self):
+    '''
+    def evaluate(self, depth):
+        mod = 1 if self.node.turn else -1
+        rating = 0
+        if self.node.is_checkmate():
+            return 1000000000*(depth+1)*mod
+        if self.node.can_claim_fifty_moves():
+            rating = -self.contempt*mod
+        try:
+            key, hash = self.pos_hash()
+            reps = self.hashstack[hash]
+        except KeyError:
+            pass
+        else:
+            rating = -self.contempt*mod
+        
+        
+        
+        return rating
+    '''
+    def record_stack(self) -> None:
         key, small = self.pos_hash()
         try:
             self.hashstack[small] += 1
         except Exception:
             self.hashstack[small] = 1
 
-    def record_hash(self, key, hash, depth, a, hashDataType):
+    def record_hash(self, key: int, hash: int, depth: int, a: int, hashDataType: int) -> int:
         if not self.tt:
             return 0
         try:
@@ -179,7 +199,7 @@ class Viridithas():
                 self.hashtable.clear()
         return 0
 
-    def probe_hash(self, key, hash, depth=0, a=-1000, b=1000):
+    def probe_hash(self, key: int, hash: int, depth=0, a: int = -1000, b: int = 1000) -> tuple:
         try:
             entry = self.hashtable[hash]
         except KeyError:
@@ -206,7 +226,7 @@ class Viridithas():
             return entry["bestMove"] if entry["key"] == key else False
 
     #@profile
-    def ordered_moves(self):
+    def ordered_moves(self) -> list:
         moves = list(self.node.legal_moves)
         hashmove = [moves.pop(i) for i, move in enumerate(moves) if move == self.best]
         takes = [moves.pop(i) for i, move in enumerate(moves) if self.node.is_capture(move)]
@@ -219,11 +239,11 @@ class Viridithas():
         small = key % self.tableSize
         return key, small
 
-    def pass_turn(self):
+    def pass_turn(self) -> None:
         self.node.turn = not self.node.turn
 
     #@profile
-    def principal_variation_search(self, depth, colour, a=-1337000000, b=1337000000):
+    def principal_variation_search(self, depth: int, colour: int, a: int = -1337000000, b: int = 1337000000) -> int:
         self.nodes+=1
         hashDataType = 1
         if depth < 1:
@@ -277,15 +297,15 @@ class Viridithas():
         self.record_hash(key, hash, depth, a, hashDataType)
         return a
 
-    def move_sort(self, moves, ratings):
+    def move_sort(self, moves: list, ratings: list[int]):
         pairs = zip(*sorted(zip(moves, ratings), key=operator.itemgetter(1)))
         moves, ratings = [list(pair) for pair in pairs]
         return moves, ratings
 
-    def turnmod(self):
+    def turnmod(self) -> int:
         return -1 if self.node.turn else 1
 
-    def show_iteration_data(self, moves, values, depth):
+    def show_iteration_data(self, moves: list, values: list, depth: int) -> None:
         print(self.node.san(moves[0]), '|', round(self.turnmod()*values[0], 3), '|',
               str(round(time.time()-self.startTime, 2))+'s at depth', str(depth + 1)+", "+str(self.nodes), "nodes processed.")
         '''pvLen = 1
@@ -299,7 +319,7 @@ class Viridithas():
             self.node.pop()'''
     
     #@profile
-    def search(self, ponder=False):
+    def search(self, ponder: bool = False):
         self.startTime = time.time()
         self.nodes = 0
         moves = self.ordered_moves()
@@ -323,7 +343,7 @@ class Viridithas():
                 #return moves[0]
         return moves[0]
 
-    def ponder(self):
+    def ponder(self) -> None:
         self.origin = self.node.copy()
         self.search(ponder=True)
 
@@ -335,7 +355,7 @@ class Viridithas():
         book.close()
         return main_entry.move, choice.move
 
-    def play(self):
+    def play(self) -> None:
         # add flag_func for egtb mode
         if self.advancedTC:
             self.timeLimit = (self.endpoint-time.time())/20
@@ -362,7 +382,7 @@ class Viridithas():
         self.record_stack()
         self.endpoint+=self.increment
 
-    def display_ending(self):
+    def display_ending(self) -> None:
         if self.node.is_stalemate():
             print('END BY STALEMATE')
         elif self.node.is_insufficient_material():
@@ -375,7 +395,7 @@ class Viridithas():
         else:
             print('END BY UNKNOWN REASON')
 
-    def user_move(self):
+    def user_move(self) -> None:
         move = input("enter move: ")
         while True:
             try:
@@ -384,7 +404,7 @@ class Viridithas():
             except Exception:
                 move = input("enter move: ")
 
-    def run_game(self, string=''):
+    def run_game(self, string: str = '') -> str:
         while not self.node.is_game_over():
             print(self.__repr__())
             if self.human and self.node.turn:
@@ -414,7 +434,7 @@ class Crazyhouse(Viridithas):
         self.node = chess.variant.CrazyhouseBoard(fen)
         self.tracker = (1000, 3200, 3330, 5100, 8800)
     
-    def evaluate(self, depth):
+    def evaluate(self, depth: int) -> int:
         pocketmod = sum([v * self.node.pockets[0].count(i) for i, v in enumerate(self.tracker)])
         pocketmod -= sum([v * self.node.pockets[1].count(i) for i, v in enumerate(self.tracker)])
         return super().evaluate(depth) + pocketmod
@@ -425,7 +445,7 @@ class Antichess(Viridithas):
                          contempt, False, oddeven, advancedTC, tt)
         self.node = chess.variant.AntichessBoard(fen)
 
-    def evaluate(self, depth):
+    def evaluate(self, depth: int) -> int:
         return sum([-1 for i in chess.SquareSet(self.node.occupied_co[0])])+sum([1 for i in chess.SquareSet(self.node.occupied_co[1])])
 
 
