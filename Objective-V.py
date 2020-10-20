@@ -139,7 +139,7 @@ class Viridithas():
                       contempt=contempt, book=book, oddeven=oddeven, advancedTC=advancedTC)
         return 0
 
-    #@profile
+    @profile
     def evaluate(self, depth: int) -> int:
         self.nodes += 1
         mod = 1 if self.node.turn else -1
@@ -156,52 +156,20 @@ class Viridithas():
         else:
             rating = -self.contempt*mod
 
-        rating += sum([self.evaltable['p'][i]
-                       for i in self.node.pieces(chess.PAWN, chess.BLACK)])
-        rating -= sum([self.evaltable['P'][i]
-                       for i in self.node.pieces(chess.PAWN, chess.WHITE)])
-        rating += sum([self.evaltable['n'][i]
-                       for i in self.node.pieces(chess.KNIGHT, chess.BLACK)])
-        rating -= sum([self.evaltable['N'][i]
-                       for i in self.node.pieces(chess.KNIGHT, chess.WHITE)])
-        rating += sum([self.evaltable['b'][i]
-                       for i in self.node.pieces(chess.BISHOP, chess.BLACK)])
-        rating -= sum([self.evaltable['B'][i]
-                       for i in self.node.pieces(chess.BISHOP, chess.WHITE)])
-        rating += sum([self.evaltable['r'][i]
-                       for i in self.node.pieces(chess.ROOK, chess.BLACK)])
-        rating -= sum([self.evaltable['R'][i]
-                       for i in self.node.pieces(chess.ROOK, chess.WHITE)])
-        rating += sum([self.evaltable['q'][i]
-                       for i in self.node.pieces(chess.QUEEN, chess.BLACK)])
-        rating -= sum([self.evaltable['Q'][i]
-                       for i in self.node.pieces(chess.QUEEN, chess.WHITE)])
-        rating += sum([self.evaltable['k'][i]
-                       for i in self.node.pieces(chess.KING, chess.BLACK)])
-        rating -= sum([self.evaltable['K'][i]
-                       for i in self.node.pieces(chess.KING, chess.WHITE)])
+        rating += sum([self.evaltable['p'][i] for i in self.node.pieces(chess.PAWN, chess.BLACK)])
+        rating -= sum([self.evaltable['P'][i] for i in self.node.pieces(chess.PAWN, chess.WHITE)])
+        rating += sum([self.evaltable['n'][i] for i in self.node.pieces(chess.KNIGHT, chess.BLACK)])
+        rating -= sum([self.evaltable['N'][i] for i in self.node.pieces(chess.KNIGHT, chess.WHITE)])
+        rating += sum([self.evaltable['b'][i] for i in self.node.pieces(chess.BISHOP, chess.BLACK)])
+        rating -= sum([self.evaltable['B'][i] for i in self.node.pieces(chess.BISHOP, chess.WHITE)])
+        rating += sum([self.evaltable['r'][i] for i in self.node.pieces(chess.ROOK, chess.BLACK)])
+        rating -= sum([self.evaltable['R'][i] for i in self.node.pieces(chess.ROOK, chess.WHITE)])
+        rating += sum([self.evaltable['q'][i] for i in self.node.pieces(chess.QUEEN, chess.BLACK)])
+        rating -= sum([self.evaltable['Q'][i] for i in self.node.pieces(chess.QUEEN, chess.WHITE)])
+        rating += sum([self.evaltable['k'][i] for i in self.node.pieces(chess.KING, chess.BLACK)])
+        rating -= sum([self.evaltable['K'][i] for i in self.node.pieces(chess.KING, chess.WHITE)])
 
         return rating
-    '''
-    def evaluate(self, depth):
-        mod = 1 if self.node.turn else -1
-        rating = 0
-        if self.node.is_checkmate():
-            return 1000000000*(depth+1)*mod
-        if self.node.can_claim_fifty_moves():
-            rating = -self.contempt*mod
-        try:
-            key, hash = self.pos_hash()
-            reps = self.hashstack[hash]
-        except KeyError:
-            pass
-        else:
-            rating = -self.contempt*mod
-        
-        
-        
-        return rating
-    '''
 
     def record_stack(self) -> None:
         key, small = self.pos_hash()
@@ -252,7 +220,7 @@ class Viridithas():
         else:
             return entry["bestMove"] if entry["key"] == key else False
 
-    #@profile
+    @profile
     def ordered_moves(self) -> list:
         moves = list(self.node.legal_moves)
         hashmove = [moves.pop(i)
@@ -272,12 +240,13 @@ class Viridithas():
         self.node.turn = not self.node.turn
 
     @profile
-    def principal_variation_search(self, depth: int, colour: int, a: int = -1337000000, b: int = 1337000000) -> int:
+    def negamax_pvs(self, depth: int, colour: int, a: int = -1337000000, b: int = 1337000000) -> int:
         if depth < 1:
             return colour * self.evaluate(depth)
             
         if self.node.is_game_over():
             return colour * self.evaluate(depth)
+
         hashDataType = 1
         key, hash = self.pos_hash()
         probe = self.probe_hash(key, hash, depth, a, b)
@@ -291,7 +260,7 @@ class Viridithas():
             self.pass_turn()  # MAKE A NULL MOVE
             # PERFORM A LIMITED SEARCH
             value = - \
-                self.principal_variation_search(depth - 3, -colour, -b, -a)
+                self.negamax_pvs(depth - 3, -colour, -b, -a)
             self.pass_turn()  # UNMAKE NULL MOVE
             a = max(a, value)
             if a >= b:
@@ -305,18 +274,13 @@ class Viridithas():
             self.node.push(move)  # MAKE MOVE
             if i == 0:
                 # FULL SEARCH ON MOVE 1
-                value = - \
-                    self.principal_variation_search(depth - 1, -colour, -b, -a)
+                value = - self.principal_variation_search(depth - 1, -colour, -b, -a)
             else:
                 # NULL-WINDOW SEARCH
-                value = - \
-                    self.principal_variation_search(
-                        depth - 1, -colour, -a - 1, -a)
+                value = - self.principal_variation_search(depth - 1, -colour, -a - 1, -a)
                 if a < value and value < b:  # CHECK IF NULLWINDOW FAILED
                     # RE-SEARCH
-                    value = - \
-                        self.principal_variation_search(
-                            depth - 1, -colour, - b, -value)
+                    value = - self.principal_variation_search(depth - 1, -colour, - b, -value)
             self.node.pop()  # UNMAKE MOVE
             if value >= b:
                 self.record_hash(key, hash, depth, b, 2)
@@ -340,7 +304,7 @@ class Viridithas():
         print(self.node.san(moves[0]), '|', round(self.turnmod()*values[0], 3), '|',
               str(round(time.time()-self.startTime, 2))+'s at depth', str(depth + 1)+", "+str(self.nodes), "nodes processed.")
 
-    #@profile
+    @profile
     def search(self, ponder: bool = False):
         self.startTime = time.time()
         self.nodes = 0
@@ -355,8 +319,7 @@ class Viridithas():
                 return moves[0]
             for i, move in enumerate(moves):
                 self.node.push(move)
-                values[i] = self.principal_variation_search(
-                    depth, self.turnmod())
+                values[i] = self.negamax_pvs(depth, self.turnmod())
                 self.node.pop()
                 if self.timeLimit < time.time()-self.startTime and not ponder:
                     return moves[0]
