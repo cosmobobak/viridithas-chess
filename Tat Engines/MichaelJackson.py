@@ -222,10 +222,10 @@ def londonMove(board,trackerArray):
         board.push(bestMove2(board))
 
 def main():
-    board = chess.Board('kbK5/pp6/1P6/8/8/8/8/R7 w - -')
+    board = chess.Board()
     n = 40
     blackwin = True
-    while not board.is_checkmate():
+    while not board.is_game_over():
         trackerArray = [False,False,False,False,False,False,False]
         board.push(bestMove2(board))
         standardValue = points(board)
@@ -248,16 +248,16 @@ def main():
             board.push(bestMove2(board))
             print(board.peek())
 
-        display(chess.svg.board(board=board,size=400,flipped=True))
-        #print(board)
+        #display(chess.svg.board(board=board,size=400,flipped=True))
+        print(board)
         #print('WIN PREDICTION:',str(min([round(n+random.randint(1,30)/3,3),100.0]))+'% CHANCE OF WHITE WIN.')
         n += 5
         if not board.is_game_over():
             #print(board.legal_moves)
-            #userMove(board)
-            board.push(bestMove2(board))
-            display(chess.svg.board(board=board,size=400,flipped=True))
-            #print(board)
+            userMove(board)
+            #board.push(bestMove2(board))
+            #display(chess.svg.board(board=board,size=400,flipped=True))
+            print(board)
         elif board.is_checkmate() and not board.turn:
             print('WHITE WINS ON TURN',board.fullmove_number)
             blackwin = False
