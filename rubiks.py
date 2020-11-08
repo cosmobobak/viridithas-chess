@@ -11,7 +11,7 @@ class BaseCube():
         self.state = cube
 
     def __repr__(self):
-        return str([face for face in self.state])
+        return "\n".join([str(face) for face in self.state])
 
     def __str__(self):
         return self.__repr__()
@@ -91,11 +91,12 @@ class Cube(BaseCube):
 if __name__ == "__main__":
     obj = Cube()
     print(obj.is_solved())
-    obj.U()
-    obj.F()
+    #obj.U()
+    #obj.F()
     obj.D()
+    print(obj)
     obj.Dprime()
-    obj.Fprime()
-    obj.Uprime()
+    #obj.Fprime()
+    #obj.Uprime()
     print(obj)
     print(obj.is_solved())

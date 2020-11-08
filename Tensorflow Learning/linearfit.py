@@ -1,3 +1,3 @@
-import keras
+from tensorflow import keras
 
 model = keras

@@ -8,15 +8,15 @@ import random
 import chess.variant
 import time
 import operator
-import pickle
 import sys
+import itertools
+from functools import lru_cache
 print("Python version")
 print(sys.version)
 
 
 class Viridithas():
-    def __init__(self, human=False, fen='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', pgn='', timeLimit=15, fun=False, contempt=3000, book=True, oddeven='unspec', advancedTC=False, tt=True):
-        self.tt = tt
+    def __init__(self, human=False, fen='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', pgn='', timeLimit=15, fun=False, contempt=3000, book=True, advancedTC=False):
         if pgn == '':
             self.node = chess.Board(fen)
         else:
@@ -41,16 +41,13 @@ class Viridithas():
         self.human = human
         self.nodes = 0
         self.advancedTC = advancedTC
-        if oddeven == 'unspec':
-            self.oddeven = self.human
-        else:
-            self.oddeven = oddeven
         self.c = len(list(self.node.legal_moves))
-        self.tableSize = 2**28+49
+        self.tableSize = 2**20+49
         self.hashtable = dict()
+        self.ett = dict()
         self.hashstack = dict()
         self.pieces = range(1, 7)
-        self.best = '0000'
+        self.best = chess.Move.from_uci('0000')
         self.inbook = book
         self.PMV = {'p': 1000, 'n': 3200, 'b': 3330, 'r': 5100, 'q': 8800, 'k': 0,
                     'P': 1000, 'N': 3200, 'B': 3330, 'R': 5100, 'Q': 8800, 'K': 0}
@@ -66,13 +63,14 @@ class Viridithas():
                     'R': (0, 0, 0, 5, 5, 0, 0, 0, -5, 0, 0, 0, 0, 0, 0, -5, -5, 0, 0, 0, 0, 0, 0, -5, -5, 0, 0, 0, 0, 0, 0, -5, -5, 0, 0, 0, 0, 0, 0, -5, -5, 0, 0, 0, 0, 0, 0, -5, 5, 10, 10, 10, 10, 10, 10, 5, 0, 0, 0, 0, 0, 0, 0, 0),
                     'Q': (-20, -10, -10, -5, -5, -10, -10, -20, -10, 0, 0, 0, 0, 5, 0, -10, -10, 0, 5, 5, 5, 5, 5, -10, -5, 0, 5, 5, 5, 5, 0, 0, -5, 0, 5, 5, 5, 5, 0, -5, -10, 0, 5, 5, 5, 5, 0, -10, -10, 0, 0, 0, 0, 0, 0, -10, -20, -10, -10, -5, -5, -10, -10, -20),
                     'K': (20, 30, 10, 0, 0, 10, 30, 20, 20, 20, 0, 0, 0, 0, 20, 20, -10, -20, -20, -20, -20, -20, -20, -10, -20, -30, -30, -40, -40, -30, -30, -20, -30, -40, -40, -50, -50, -40, -40, -30, -30, -40, -40, -50, -50, -40, -40, -30, -30, -40, -40, -50, -50, -40, -40, -30, -30, -40, -40, -50, -50, -40, -40, -30)}
-        self.evaltable = dict()
+        self.piecesquaretable = dict()
         for key in self.PMV:
             for square in self.PST[key]:
-                self.evaltable[key] = dict()
+                self.piecesquaretable[key] = dict()
             for i, square in enumerate(self.PST[key]):
-                self.evaltable[key][i] = square+self.PMV[key]
+                self.piecesquaretable[key][i] = square + self.PMV[key]
         self.ext = False
+        self.searchdata = []
 
     def __repr__(self) -> str:
         try:
@@ -133,10 +131,9 @@ class Viridithas():
             fun = False
 
         contempt = int(input("Enter contempt in millipawns: "))
-        oddeven = True if input(
-            "Would you like to use double depth increment? (Y/N) ").upper() == 'Y' else False
         self.__init__(human=human, fen=fen, pgn=pgn, timeLimit=timeLimit, fun=fun,
-                      contempt=contempt, book=book, oddeven=oddeven, advancedTC=advancedTC)
+                      contempt=contempt, book=book, advancedTC=advancedTC)
+
         return 0
 
     def see_factor(self) -> int:
@@ -153,40 +150,56 @@ class Viridithas():
         return rating
 
     def seepos_factor(self) -> int:
-        rating = sum([self.evaltable['p'][i] for i in self.node.pieces(chess.PAWN, chess.BLACK)])
-        rating -= sum([self.evaltable['P'][i] for i in self.node.pieces(chess.PAWN, chess.WHITE)])
-        rating += sum([self.evaltable['n'][i] for i in self.node.pieces(chess.KNIGHT, chess.BLACK)])
-        rating -= sum([self.evaltable['N'][i] for i in self.node.pieces(chess.KNIGHT, chess.WHITE)])
-        rating += sum([self.evaltable['b'][i] for i in self.node.pieces(chess.BISHOP, chess.BLACK)])
-        rating -= sum([self.evaltable['B'][i] for i in self.node.pieces(chess.BISHOP, chess.WHITE)])
-        rating += sum([self.evaltable['r'][i] for i in self.node.pieces(chess.ROOK, chess.BLACK)])
-        rating -= sum([self.evaltable['R'][i] for i in self.node.pieces(chess.ROOK, chess.WHITE)])
-        rating += sum([self.evaltable['q'][i] for i in self.node.pieces(chess.QUEEN, chess.BLACK)])
-        rating -= sum([self.evaltable['Q'][i] for i in self.node.pieces(chess.QUEEN, chess.WHITE)])
-        rating += sum([self.evaltable['k'][i] for i in self.node.pieces(chess.KING, chess.BLACK)])
-        rating -= sum([self.evaltable['K'][i] for i in self.node.pieces(chess.KING, chess.WHITE)])
+        rating = sum([self.piecesquaretable['p'][i] for i in self.node.pieces(chess.PAWN, chess.BLACK)])
+        rating -= sum([self.piecesquaretable['P'][i] for i in self.node.pieces(chess.PAWN, chess.WHITE)])
+        rating += sum([self.piecesquaretable['n'][i] for i in self.node.pieces(chess.KNIGHT, chess.BLACK)])
+        rating -= sum([self.piecesquaretable['N'][i] for i in self.node.pieces(chess.KNIGHT, chess.WHITE)])
+        rating += sum([self.piecesquaretable['b'][i] for i in self.node.pieces(chess.BISHOP, chess.BLACK)])
+        rating -= sum([self.piecesquaretable['B'][i] for i in self.node.pieces(chess.BISHOP, chess.WHITE)])
+        rating += sum([self.piecesquaretable['r'][i] for i in self.node.pieces(chess.ROOK, chess.BLACK)])
+        rating -= sum([self.piecesquaretable['R'][i] for i in self.node.pieces(chess.ROOK, chess.WHITE)])
+        rating += sum([self.piecesquaretable['q'][i] for i in self.node.pieces(chess.QUEEN, chess.BLACK)])
+        rating -= sum([self.piecesquaretable['Q'][i] for i in self.node.pieces(chess.QUEEN, chess.WHITE)])
+        rating += sum([self.piecesquaretable['k'][i] for i in self.node.pieces(chess.KING, chess.BLACK)])
+        rating -= sum([self.piecesquaretable['K'][i] for i in self.node.pieces(chess.KING, chess.WHITE)])
         return rating
 
-    # @profile
+    def record_eval_hash(self, key: int, smallkey: int, value: int) -> None:
+        self.ett[smallkey] = {'key': key, 'score': value}
+
+    def probe_eval_hash(self, key: int, smallkey: int) -> tuple:
+        if smallkey in self.ett:
+            if self.ett[smallkey]["key"] == key:
+                return True
+        return False
+
+    #@profile
     def evaluate(self, depth: int) -> int:
         self.nodes += 1
-        mod = 1 if self.node.turn else -1
+
+        key, smallkey = self.pos_hash()
+        if self.probe_eval_hash(key, smallkey):
+            return self.ett[smallkey]["score"]
+
         rating = 0
         if self.node.is_checkmate():
-            return 1000000000 * (depth+1) * mod
+            return 1000000000 * (depth+1) * (1 if self.node.turn else -1)
         if self.node.can_claim_fifty_moves():
-            rating = -self.contempt * mod
-        try:
-            key, hash = self.pos_hash()
-            reps = self.hashstack[hash]
-        except KeyError:
-            pass
-        else:
-            rating = -self.contempt * mod
+            rating = -self.contempt * (1 if self.node.turn else -1)
+
+        if self.pos_hash()[1] in self.hashstack:
+            rating = -self.contempt * (1 if self.node.turn else -1)
 
         rating += self.seepos_factor()
 
+        self.record_eval_hash(key, smallkey, rating)
         return rating
+
+    def pos_hash(self, node=False):
+            if not node: node = self.node
+            key = hash(node._transposition_key())
+            smallkey = key % self.tableSize
+            return key, smallkey
 
     def record_stack(self) -> None:
         key, small = self.pos_hash()
@@ -195,26 +208,20 @@ class Viridithas():
         except Exception:
             self.hashstack[small] = 1
 
-    def record_hash(self, key: int, hash: int, depth: int, a: int, hashDataType: int) -> int:
-        if not self.tt:
-            return 0
-        try:
-            entry = self.hashtable[hash]
+    def record_hash(self, key: int, smallkey: int, depth: int, a: int, hashDataType: int) -> None:
+        if smallkey in self.hashtable:
+            entry = self.hashtable[smallkey]
             if entry['depth'] >= depth:
-                self.hashtable[hash] = {
+                self.hashtable[smallkey] = {
                     'key': key, 'bestMove': self.best, 'depth': depth, 'score': a, 'type': hashDataType}
-        except Exception:
-            try:
-                self.hashtable[hash] = {
-                    'key': key, 'bestMove': self.best, 'depth': depth, 'score': a, 'type': hashDataType}
-            except MemoryError:
-                self.hashtable.clear()
-        return 0
+        else:
+            self.hashtable[smallkey] = {
+                'key': key, 'bestMove': self.best, 'depth': depth, 'score': a, 'type': hashDataType}
 
-    def probe_hash(self, key: int, hash: int, depth=0, a: int = -1000, b: int = 1000) -> tuple:
-        try:
-            entry = self.hashtable[hash]
-        except KeyError:
+    def probe_hash(self, key: int, smallkey: int, depth: int = 0, a: int = -1000, b: int = 1000) -> tuple:
+        if smallkey in self.hashtable:
+            entry = self.hashtable[smallkey]
+        else:
             return (None, None)
         if entry['key'] == key:
             if entry['depth'] >= depth:
@@ -228,31 +235,21 @@ class Viridithas():
             return (entry['bestMove'], False)
         return (None, None)
 
-    def get_pv_move(self):
-        key, hash = self.pos_hash()
-        try:
-            entry = self.hashtable[hash]
-        except KeyError:
-            return False
-        else:
-            return entry["bestMove"] if entry["key"] == key else False
+    def clear_tt(self):
+        self.hashtable.clear()
 
     def captures(self):
-        return (m for m in self.node.pseudo_legal_moves if self.node.is_capture(m) and self.node.is_legal(m))
+        return (m for m in self.node.generate_pseudo_legal_captures() if self.node.is_legal(m))
 
-    # @profile
-    def ordered_moves(self) -> list:
-        moves = list(self.node.legal_moves)
-        hashmove = [moves.pop(i) for i, move in enumerate(moves) if move == self.best]
-        takes = [moves.pop(i) for i, move in enumerate(moves) if self.node.is_capture(move)]
-        return hashmove + takes + moves
+    def single_hash_iterator(self):
+        yield self.best
 
-    def pos_hash(self, node=False):
-        if not node:
-            node = self.node
-        key = hash(node._transposition_key())
-        small = key % self.tableSize
-        return key, small
+    def ordered_moves(self):
+        return (m for m in itertools.chain(
+            self.single_hash_iterator(),
+            self.node.generate_pseudo_legal_moves(0xffff_ffff_ffff_ffff, self.node.occupied_co[not self.node.turn]),
+            self.node.generate_pseudo_legal_moves(0xffff_ffff_ffff_ffff, ~self.node.occupied_co[not self.node.turn])
+        ) if self.node.is_legal(m))
 
     def pass_turn(self) -> None:
         self.node.turn = not self.node.turn
@@ -273,7 +270,6 @@ class Viridithas():
         
         return a
 
-    # @profile
     def negamax_pvs(self, depth: int, colour: int, a: int = -1337000000, b: int = 1337000000) -> int:
         if depth < 1:
             #return colour * self.evaluate(depth)
@@ -283,8 +279,8 @@ class Viridithas():
             return colour * self.evaluate(depth)
 
         hashDataType = 1
-        key, hash = self.pos_hash()
-        probe = self.probe_hash(key, hash, depth, a, b)
+        key, smallkey = self.pos_hash()
+        probe = self.probe_hash(key, smallkey, depth, a, b)
         if probe[0] != None:
             if probe[1]:
                 return probe[0]
@@ -303,9 +299,10 @@ class Viridithas():
         else:
             check = True
         moves = self.ordered_moves()  # MOVE ORDERING (HASH -> TAKES -> OTHERS)
-        #moves = self.node.legal_moves
         for i, move in enumerate(moves):
             self.node.push(move)  # MAKE MOVE
+            if check:
+                depth += 1
             if i == 0:
                 self.best = move
                 # FULL SEARCH ON MOVE 1
@@ -316,15 +313,17 @@ class Viridithas():
                 if a < value and value < b:  # CHECK IF NULLWINDOW FAILED
                     # RE-SEARCH
                     value = - self.negamax_pvs(depth - 1, -colour, - b, -value)
+            if check:
+                depth -= 1
             self.node.pop()  # UNMAKE MOVE
             if value >= b:
-                self.record_hash(key, hash, depth, b, 2)
+                self.record_hash(key, smallkey, depth, b, 2)
                 return b
             if value > a:
                 hashDataType = 0
                 a = value
                 self.best = move
-        self.record_hash(key, hash, depth, a, hashDataType)
+        self.record_hash(key, smallkey, depth, a, hashDataType)
         return a
 
     def move_sort(self, moves: list, ratings: list):
@@ -336,17 +335,18 @@ class Viridithas():
         return -1 if self.node.turn else 1
 
     def show_iteration_data(self, moves: list, values: list, depth: int) -> None:
-        print(self.node.san(moves[0]), '|', round(self.turnmod()*values[0], 3), '|',
-              str(round(time.time()-self.startTime, 2))+'s at depth', str(depth + 1)+", "+str(self.nodes), "nodes processed.")
+        t = round(time.time()-self.startTime, 2)
+        print(self.node.san(moves[0]), '|', round((self.turnmod()*values[0])/1000, 3), '|',
+              str(t)+'s at depth', str(depth + 1)+", "+str(self.nodes), "nodes processed, at " + str(int(self.nodes / (t+0.00001)))+"NPS.")
+        return (self.node.san(moves[0]), self.turnmod()*values[0], self.nodes, depth+1, t)
 
-    # @profile
     def search(self, ponder: bool = False):
         self.startTime = time.time()
         self.nodes = 0
         moves = list(self.ordered_moves())
         values = [0.0 for m in moves]
-        step = 2 if self.oddeven else 1
-        for depth in range(1, 30, step):
+        for depth in range(0, 40):
+            self.ett.clear()
             if self.timeLimit*2/3 < time.time()-self.startTime and not ponder:
                 return moves[0]
             for i, move in enumerate(moves):
@@ -356,7 +356,7 @@ class Viridithas():
                 if self.timeLimit < time.time()-self.startTime and not ponder:
                     return moves[0]
             moves, values = self.move_sort(moves, values)
-            self.show_iteration_data(moves, values, depth)
+            self.searchdata.append(self.show_iteration_data(moves, values, depth))
             # if depth < 7 and abs(values[0]) > 300000000 and not ponder:
             # return moves[0]
         return moves[0]
@@ -426,7 +426,7 @@ class Viridithas():
         else:
             print('END BY UNKNOWN REASON')
 
-    def run_game(self, string: str = '') -> str:
+    def run_game(self, indefinite=True) -> str:
         while not self.node.is_game_over():
             print(self.__repr__())
             if self.human and self.node.turn:
@@ -437,131 +437,187 @@ class Viridithas():
                     self.user_move()
             else:  # SWAP THESE ASAP
                 self.engine_move()
+            if not indefinite:
+                break
         self.display_ending()
         try:
             return str(chess.pgn.Game.from_board(self.node)[-1])
         except Exception:
             return "PGN ERROR"
+        
+    def perftx(self, n):
+        if n == 0:
+            self.nodes += 1
+        else:
+            for move in self.ordered_moves():
+                self.node.push(move)
+                self.perftx(n - 1)
+                self.node.pop()
+
+    def perft(self, n):
+        self.nodes = 0
+        self.perftx(n)
+        print(self.nodes)
 
 class Fork(Viridithas):
-    def __init__(self, human=False, fen='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', pgn='', timeLimit=15, fun=False, contempt=3000, book=True, oddeven='unspec', advancedTC=False, tt=True):
+    def __init__(self, human=False, fen='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', pgn='', timeLimit=15, fun=False, contempt=3000, book=True, advancedTC=False):
         super().__init__(human, fen, pgn, timeLimit, fun,
-                         contempt, book, oddeven, advancedTC, tt)
+                         contempt, book, advancedTC)
+    
+    def negamax_pvs(self, depth: int, colour: int, a: int = -1337000000, b: int = 1337000000) -> int:
+        if depth < 1:
+            #return colour * self.evaluate(depth)
+            return self.qsearch(a, b, depth, colour)
 
-    #def generate_pseudo_legal_captures(self, from_mask: Bitboard = BB_ALL, to_mask: Bitboard = BB_ALL) -> Iterator[Move]:
-    #    return itertools.chain(
-    #        self.generate_pseudo_legal_moves(
-    #            from_mask, to_mask & self.occupied_co[not self.turn]),
-    #        self.generate_pseudo_legal_ep(from_mask, to_mask))
+        if self.node.is_game_over():
+            return colour * self.evaluate(depth)
 
-    #@profile
-    #def ordered_moves(self):
-    #    moves = list(self.node.pseudo_legal_moves)
-    #    hashmove = [moves.pop(i) for i, move in enumerate(moves) if move == self.best]
-    #    takes = [moves.pop(i) for i, move in enumerate(moves) if self.node.is_capture(move)]
-    #    for move in (hashmove + takes + moves):
-    #        if self.node.is_legal(move):
-    #            yield move
+        hashDataType = 1
+        key, smallkey = self.pos_hash()
+        probe = self.probe_hash(key, smallkey, depth, a, b)
+        if probe[0] != None:
+            if probe[1]:
+                return probe[0]
+            else:
+                self.best = probe[0]
+
+        # NULLMOVE PRUNING
+        if not self.node.is_check():
+            self.pass_turn()  # MAKE A NULL MOVE
+            # PERFORM A LIMITED SEARCH
+            value = - self.negamax_pvs(depth - 3, -colour, -b, -a)
+            self.pass_turn()  # UNMAKE NULL MOVE
+            a = max(a, value)
+            if a >= b:
+                return a
+            check = False
+        else:
+            check = True
+
+        for move in self.ordered_moves():
+            self.node.push(move)  # MAKE MOVE
+            if check: depth += 1
+            value = - self.negamax_pvs(depth - 1, -colour, -b, -a)
+            if check: depth -= 1
+            self.node.pop()  # UNMAKE MOVE
+            if value >= b:
+                self.record_hash(key, smallkey, depth, b, 2)
+                return b
+            if value > a:
+                hashDataType = 0
+                a = value
+                self.best = move
+                
+        self.record_hash(key, smallkey, depth, a, hashDataType)
+        return a
 
 class Atomic(Viridithas):
-    def __init__(self, human=False, fen='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', pgn='', timeLimit=15, fun=False, contempt=3000, book=True, oddeven='unspec', advancedTC=False, tt=True):
+    def __init__(self, human=False, fen='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', pgn='', timeLimit=15, fun=False, contempt=3000, book=True, advancedTC=False,):
         super().__init__(human, fen, pgn, timeLimit, fun,
-                         contempt, False, oddeven, advancedTC, tt)
+                         contempt, False, advancedTC)
         self.node = chess.variant.AtomicBoard(fen)
 
 
 class Crazyhouse(Viridithas):
-    def __init__(self, human=False, fen='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', pgn='', timeLimit=15, fun=False, contempt=3000, book=True, oddeven='unspec', advancedTC=False, tt=True):
+    def __init__(self, human=False, fen='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', pgn='', timeLimit=15, fun=False, contempt=3000, book=True, advancedTC=False):
         super().__init__(human, fen, pgn, timeLimit, fun,
-                         contempt, book, oddeven, advancedTC, tt)
+                         contempt, book, advancedTC)
         self.node = chess.variant.CrazyhouseBoard(fen)
-        self.tracker = (1000, 3200, 3330, 5100, 8800)
 
     def evaluate(self, depth: int) -> int:
-        pocketmod = sum([v * self.node.pockets[0].count(i)
-                         for i, v in enumerate(self.tracker)])
-        pocketmod -= sum([v * self.node.pockets[1].count(i)
-                          for i, v in enumerate(self.tracker)])
-        return super().evaluate(depth) + pocketmod
+        self.nodes += 1
+
+        rating = 0
+        if self.node.is_checkmate():
+            return 1000000000 * (depth+1) * (1 if self.node.turn else -1)
+        if self.node.can_claim_fifty_moves():
+            rating = -self.contempt * (1 if self.node.turn else -1)
+
+        if self.pos_hash()[1] in self.hashstack:
+            rating = -self.contempt * (1 if self.node.turn else -1)
+
+        rating += self.seepos_factor()
+
+        return rating
 
 
 class Antichess(Viridithas):
-    def __init__(self, human=False, fen='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', pgn='', timeLimit=15, fun=False, contempt=3000, book=True, oddeven='unspec', advancedTC=False, tt=True):
+    def __init__(self, human=False, fen='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', pgn='', timeLimit=15, fun=False, contempt=3000, book=True, advancedTC=False):
         super().__init__(human, fen, pgn, timeLimit, fun,
-                         contempt, False, oddeven, advancedTC, tt)
+                         contempt, False, advancedTC)
         self.node = chess.variant.AntichessBoard(fen)
 
     def evaluate(self, depth: int) -> int:
         return sum([-1 for i in chess.SquareSet(self.node.occupied_co[0])])+sum([1 for i in chess.SquareSet(self.node.occupied_co[1])])
 
-def selfplay(time=15, position="", usebook=False):
-    game = position
-    engine1 = Viridithas(book=usebook, fun=True, contempt=0, oddeven=True, fen=game, timeLimit=time)
-    engine2 = Viridithas(book=usebook, fun=True, contempt=0, oddeven=False, fen=game, timeLimit=time)
+def selfplay(time=15, position="", usebook=False, player1=Viridithas, player2=Fork):
+    e1 = player1(book=usebook, fun=True, contempt=0, fen=position, timeLimit=time)
+    e2 = player2(book=usebook, fun=True, contempt=0, fen=position, timeLimit=time)
 
-    try:
-        while (not engine1.node.is_game_over()) and (not engine2.node.is_game_over()):
-            print(engine1.__repr__())
-            engine2.node.push(engine1.engine_move())
-            print(engine2.__repr__())
-            engine1.node.push(engine2.engine_move())
+    while (not e1.node.is_game_over()) and (not e2.node.is_game_over()):
+        print(e1.__repr__())
+        e2.node.push(e1.engine_move())
+        if e1.node.is_game_over() or e2.node.is_game_over():
+            break
+        print(e2.__repr__())
+        e1.node.push(e2.engine_move())
 
-        engine1.display_ending()
-    except Exception:
-        pass
-    game1 = engine1.node.result()
+    e1.display_ending()
+    game1 = e1.node.result()
 
-    engine2 = Viridithas(book=usebook, fun=True, contempt=0, oddeven=True, fen=game, timeLimit=time)
-    engine1 = Viridithas(book=usebook, fun=True, contempt=0, oddeven=False, fen=game, timeLimit=time)
+    e1.clear_tt()
+    e2.clear_tt()
 
-    try:
-        while (not engine1.node.is_game_over()) and (not engine2.node.is_game_over()):
-            print(engine1.__repr__())
-            engine2.node.push(engine1.engine_move())
-            print(engine2.__repr__())
-            engine1.node.push(engine2.engine_move())
+    e2 = player1(book=usebook, fun=True, contempt=0, fen=position, timeLimit=time)
+    e1 = player2(book=usebook, fun=True, contempt=0, fen=position, timeLimit=time)
+    
+    while (not e1.node.is_game_over()) and (not e2.node.is_game_over()):
+        print(e1.__repr__())
+        e2.node.push(e1.engine_move())
+        if e1.node.is_game_over() or e2.node.is_game_over():
+            break
+        print(e2.__repr__())
+        e1.node.push(e2.engine_move())
 
-        engine1.display_ending()
-    except Exception:
-        pass
+    e1.display_ending()
+    game2 = e1.node.result()
 
-    game2 = engine1.node.result()
+    e1.clear_tt()
+    e2.clear_tt()
     
     return game1, game2
 
 def general_purpose():
     init = "r1b1k1nr/1pp2ppp/p1n1pq2/3p4/3P1b2/2PBPN2/PP3PPP/RN1QK2R w KQkq - 0 1"
 
-    engineType = input(
-        "Enter variant: Regular, Atomic, Crazyhouse, Antichess, Fork [1/2/3/4/5]: ")
+    engineType = input("Enter variant: Regular, Atomic, Crazyhouse, Antichess, Fork [1/2/3/4/5]: ")
     while engineType not in ['1', '2', '3', '4', '5']:
-        engineType = input(
-            "Enter variant: Regular, Atomic, Crazyhouse, Antichess, Fork [1/2/3/4/5]: ")
-    engineType = int(engineType)
-    if engineType == 1:
-        engine = Viridithas(book=True, contempt=3000, timeLimit=10, oddeven=True, fun=True)
-    elif engineType == 2:
-        engine = Atomic(book=False, contempt=3000, timeLimit=20, oddeven=True, fun=False)
-    elif engineType == 3:
-        engine = Crazyhouse(book=True, contempt=3000, timeLimit=20, oddeven=True, fun=True)
-    elif engineType == 4:
-        engine = Antichess(book=False, contempt=3000, timeLimit=20, oddeven=False, fun=False)
-    elif engineType == 5:
-        engine = Fork(book=False, contempt=3000,
-                           timeLimit=20, oddeven=False, fun=False)
+        engineType = input("Enter variant: Regular, Atomic, Crazyhouse, Antichess, Fork [1/2/3/4/5]: ")
+    
+    engines = [Viridithas, Atomic, Crazyhouse, Antichess, Fork]
+    engine = engines[int(engineType)-1]
+
     engine.user_setup()
     engine.run_game()
 
-def analysis(engineType, pos="", usebook=True):
+def analysis(engineType, pos="", usebook=True, limit=1000000000000, indef=False):
     engine = engineType(book=usebook, contempt=0,
-                        timeLimit=1000000000000, oddeven=False, fun=False, fen=pos)
-    engine.run_game()
+                        timeLimit=limit, fun=False, fen=pos)
+    engine.run_game(indefinite=indef)
+    return [elem[3:] for elem in engine.searchdata]
 
 if __name__ == "__main__":
+    #general_purpose()
     #fen = input("enter fen for analysis: ")
     fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
-    analysis(Fork, fen, False)
-    #position = "r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3"
-    #print([selfplay(0.01, position, usebook=True) for i in range(5)])
+    #fen = "r1bqkb1r/ppp2ppp/2p2n2/8/4P3/8/PPPP1PPP/RNBQKB1R w KQkq - 0 5" # stafford accepted
+    analysis(Viridithas, fen, False, indef=True)
+    #print(selfplay(60, position=fen, player1=Viridithas, player2=Fork))
+
+    #general_purpose()
 
 # add a sorting comparison function based on moved piece
+# add a separate qsearch hashtable
+# add an eval hashtable -- semidone
+# reimplement check ext
+
