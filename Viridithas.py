@@ -150,19 +150,33 @@ class Viridithas():
         return rating
 
     def seepos_factor(self) -> int:
-        rating = sum([self.piecesquaretable['p'][i] for i in self.node.pieces(chess.PAWN, chess.BLACK)])
-        rating -= sum([self.piecesquaretable['P'][i] for i in self.node.pieces(chess.PAWN, chess.WHITE)])
-        rating += sum([self.piecesquaretable['n'][i] for i in self.node.pieces(chess.KNIGHT, chess.BLACK)])
-        rating -= sum([self.piecesquaretable['N'][i] for i in self.node.pieces(chess.KNIGHT, chess.WHITE)])
-        rating += sum([self.piecesquaretable['b'][i] for i in self.node.pieces(chess.BISHOP, chess.BLACK)])
-        rating -= sum([self.piecesquaretable['B'][i] for i in self.node.pieces(chess.BISHOP, chess.WHITE)])
-        rating += sum([self.piecesquaretable['r'][i] for i in self.node.pieces(chess.ROOK, chess.BLACK)])
-        rating -= sum([self.piecesquaretable['R'][i] for i in self.node.pieces(chess.ROOK, chess.WHITE)])
-        rating += sum([self.piecesquaretable['q'][i] for i in self.node.pieces(chess.QUEEN, chess.BLACK)])
-        rating -= sum([self.piecesquaretable['Q'][i] for i in self.node.pieces(chess.QUEEN, chess.WHITE)])
-        rating += sum([self.piecesquaretable['k'][i] for i in self.node.pieces(chess.KING, chess.BLACK)])
-        rating -= sum([self.piecesquaretable['K'][i] for i in self.node.pieces(chess.KING, chess.WHITE)])
-        return rating
+        white = self.node.occupied_co[chess.WHITE]
+        black = self.node.occupied_co[chess.BLACK]
+        return sum(itertools.chain(
+            (self.piecesquaretable['p'][i] for i in chess.scan_forward(
+                self.node.pawns & black)),
+            (-self.piecesquaretable['P'][i] for i in chess.scan_forward(
+                self.node.pawns & white)),
+            (self.piecesquaretable['n'][i] for i in chess.scan_forward(
+                self.node.knights & black)),
+            (-self.piecesquaretable['N'][i] for i in chess.scan_forward(
+                self.node.knights & white)),
+            (self.piecesquaretable['b'][i] for i in chess.scan_forward(
+                self.node.bishops & black)),
+            (-self.piecesquaretable['B'][i] for i in chess.scan_forward(
+                self.node.bishops & white)),
+            (self.piecesquaretable['r'][i] for i in chess.scan_forward(
+                self.node.rooks & black)),
+            (-self.piecesquaretable['R'][i] for i in chess.scan_forward(
+                self.node.rooks & white)),
+            (self.piecesquaretable['q'][i] for i in chess.scan_forward(
+                self.node.queens & black)),
+            (-self.piecesquaretable['Q'][i] for i in chess.scan_forward(
+                self.node.queens & white)),
+            (self.piecesquaretable['k'][i] for i in chess.scan_forward(
+                self.node.kings & black)),
+            (-self.piecesquaretable['K'][i] for i in chess.scan_forward(
+                self.node.kings & white))))
 
     def record_eval_hash(self, key: int, smallkey: int, value: int) -> None:
         self.ett[smallkey] = {'key': key, 'score': value}
@@ -173,7 +187,6 @@ class Viridithas():
                 return True
         return False
 
-    #@profile
     def evaluate(self, depth: int) -> int:
         self.nodes += 1
 
@@ -457,71 +470,46 @@ class Viridithas():
         self.perftx(n)
         print(self.nodes)
 
+
 class Fork(Viridithas):
     def __init__(self, human=False, fen='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', pgn='', timeLimit=15, fun=False, contempt=3000, book=True, advancedTC=False):
         super().__init__(human, fen, pgn, timeLimit, fun,
                          contempt, book, advancedTC)
 
-    def captures(self):
+    def captures(self):  # (MVV/LVA)
         return (m for m in itertools.chain(
-            self.captures_piece(self.node.queens),
-            self.captures_piece(self.node.rooks),
-            self.captures_piece(self.node.bishops),
-            self.captures_piece(self.node.knights),
-            self.captures_piece(self.node.pawns),
+            self.captures_piece(
+                self.node.occupied_co[not self.node.turn] & self.node.queens),
+            self.captures_piece(
+                self.node.occupied_co[not self.node.turn] & self.node.rooks),
+            self.captures_piece(
+                self.node.occupied_co[not self.node.turn] & self.node.bishops),
+            self.captures_piece(
+                self.node.occupied_co[not self.node.turn] & self.node.knights),
+            self.captures_piece(
+                self.node.occupied_co[not self.node.turn] & self.node.pawns),
         ) if self.node.is_legal(m))
 
-    def single_hash_iterator(self):
-        yield self.best
-
-    def captures_piece(self, p): # concentrate on MVV, then LVA
+    def captures_piece(self, p):  # concentrate on MVV, then LVA
         return itertools.chain(
-            self.node.generate_pseudo_legal_moves(self.node.occupied_co[not self.node.turn] & self.node.pawns, p),
-            self.node.generate_pseudo_legal_moves(self.node.occupied_co[not self.node.turn] & self.node.knights, p),
-            self.node.generate_pseudo_legal_moves(self.node.occupied_co[not self.node.turn] & self.node.bishops, p),
-            self.node.generate_pseudo_legal_moves(self.node.occupied_co[not self.node.turn] & self.node.rooks, p),
-            self.node.generate_pseudo_legal_moves(self.node.occupied_co[not self.node.turn] & self.node.queens, p),
-            )
+            self.node.generate_pseudo_legal_moves(self.node.kings, p),
+            self.node.generate_pseudo_legal_moves(self.node.pawns, p),
+            self.node.generate_pseudo_legal_moves(self.node.knights, p),
+            self.node.generate_pseudo_legal_moves(self.node.bishops, p),
+            self.node.generate_pseudo_legal_moves(self.node.rooks, p),
+            self.node.generate_pseudo_legal_moves(self.node.queens, p),
+        )
 
     def ordered_moves(self):
         return (m for m in itertools.chain(
             self.single_hash_iterator(),
-            self.captures_piece(self.node.queens),
-            self.captures_piece(self.node.rooks),
-            self.captures_piece(self.node.bishops),
-            self.captures_piece(self.node.knights),
-            self.captures_piece(self.node.pawns),
+            self.captures_piece(self.node.occupied_co[not self.node.turn] & self.node.queens),
+            self.captures_piece(self.node.occupied_co[not self.node.turn] & self.node.rooks),
+            self.captures_piece(self.node.occupied_co[not self.node.turn] & self.node.bishops),
+            self.captures_piece(self.node.occupied_co[not self.node.turn] & self.node.knights),
+            self.captures_piece(self.node.occupied_co[not self.node.turn] & self.node.pawns),
             self.node.generate_pseudo_legal_moves(0xffff_ffff_ffff_ffff, ~self.node.occupied_co[not self.node.turn])
         ) if self.node.is_legal(m))
-
-    def seepos_factor(self) -> int:
-        white = self.node.occupied_co[chess.WHITE]
-        black = self.node.occupied_co[chess.BLACK]
-        return sum(itertools.chain(
-            (self.piecesquaretable['p'][i] for i in chess.scan_forward(
-                self.node.pawns & black)),
-            (-self.piecesquaretable['P'][i] for i in chess.scan_forward(
-                self.node.pawns & white)),
-            (self.piecesquaretable['n'][i] for i in chess.scan_forward(
-                self.node.knights & black)),
-            (-self.piecesquaretable['N'][i] for i in chess.scan_forward(
-                self.node.knights & white)),
-            (self.piecesquaretable['b'][i] for i in chess.scan_forward(
-                self.node.bishops & black)),
-            (-self.piecesquaretable['B'][i] for i in chess.scan_forward(
-                self.node.bishops & white)),
-            (self.piecesquaretable['r'][i] for i in chess.scan_forward(
-                self.node.rooks & black)),
-            (-self.piecesquaretable['R'][i] for i in chess.scan_forward(
-                self.node.rooks & white)),
-            (self.piecesquaretable['q'][i] for i in chess.scan_forward(
-                self.node.queens & black)),
-            (-self.piecesquaretable['Q'][i] for i in chess.scan_forward(
-                self.node.queens & white)),
-            (self.piecesquaretable['k'][i] for i in chess.scan_forward(
-                self.node.kings & black)),
-            (-self.piecesquaretable['K'][i] for i in chess.scan_forward(
-                self.node.kings & white))))
 
 class Atomic(Viridithas):
     def __init__(self, human=False, fen='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', pgn='', timeLimit=15, fun=False, contempt=3000, book=True, advancedTC=False,):
@@ -620,17 +608,15 @@ def analysis(engineType, pos="", usebook=True, limit=1000000000000, indef=False)
 
 if __name__ == "__main__":
     #general_purpose()
-    fen = input("enter fen for analysis: ")
-    #fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+    #fen = input("enter fen for analysis: ")
+    fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
     #fen = 'r1bqkb1r/ppp2ppp/2p2n2/8/4P3/8/PPPP1PPP/RNBQKB1R w KQkq - 0 5'
     #fen = "r1bqkb1r/ppp2ppp/2p2n2/8/4P3/8/PPPP1PPP/RNBQKB1R w KQkq - 0 5" # stafford accepted
-    analysis(Viridithas, fen, False, indef=True)
-    #print(selfplay(100, position=fen, player1=Viridithas, player2=Fork, usebook=False))
+    #analysis(Viridithas, fen, False, indef=True)
+    print(selfplay(10, position=fen, player1=Viridithas, player2=Fork, usebook=True))
 
     #general_purpose()
 
-# add a sorting comparison function based on moved piece
+# unroll the MVV/LVA code
 # add a separate qsearch hashtable
-# add an eval hashtable -- semidone
-# reimplement check ext
 
