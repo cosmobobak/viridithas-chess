@@ -301,8 +301,7 @@ class Viridithas():
         moves = self.ordered_moves()  # MOVE ORDERING (HASH -> TAKES -> OTHERS)
         for i, move in enumerate(moves):
             self.node.push(move)  # MAKE MOVE
-            if check:
-                depth += 1
+            if check: depth += 1
             if i == 0:
                 self.best = move
                 # FULL SEARCH ON MOVE 1
@@ -313,8 +312,7 @@ class Viridithas():
                 if a < value and value < b:  # CHECK IF NULLWINDOW FAILED
                     # RE-SEARCH
                     value = - self.negamax_pvs(depth - 1, -colour, - b, -value)
-            if check:
-                depth -= 1
+            if check: depth -= 1
             self.node.pop()  # UNMAKE MOVE
             if value >= b:
                 self.record_hash(key, smallkey, depth, b, 2)
@@ -463,53 +461,67 @@ class Fork(Viridithas):
     def __init__(self, human=False, fen='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', pgn='', timeLimit=15, fun=False, contempt=3000, book=True, advancedTC=False):
         super().__init__(human, fen, pgn, timeLimit, fun,
                          contempt, book, advancedTC)
-    
-    def negamax_pvs(self, depth: int, colour: int, a: int = -1337000000, b: int = 1337000000) -> int:
-        if depth < 1:
-            #return colour * self.evaluate(depth)
-            return self.qsearch(a, b, depth, colour)
 
-        if self.node.is_game_over():
-            return colour * self.evaluate(depth)
+    def captures(self):
+        return (m for m in itertools.chain(
+            self.captures_piece(self.node.queens),
+            self.captures_piece(self.node.rooks),
+            self.captures_piece(self.node.bishops),
+            self.captures_piece(self.node.knights),
+            self.captures_piece(self.node.pawns),
+        ) if self.node.is_legal(m))
 
-        hashDataType = 1
-        key, smallkey = self.pos_hash()
-        probe = self.probe_hash(key, smallkey, depth, a, b)
-        if probe[0] != None:
-            if probe[1]:
-                return probe[0]
-            else:
-                self.best = probe[0]
+    def single_hash_iterator(self):
+        yield self.best
 
-        # NULLMOVE PRUNING
-        if not self.node.is_check():
-            self.pass_turn()  # MAKE A NULL MOVE
-            # PERFORM A LIMITED SEARCH
-            value = - self.negamax_pvs(depth - 3, -colour, -b, -a)
-            self.pass_turn()  # UNMAKE NULL MOVE
-            a = max(a, value)
-            if a >= b:
-                return a
-            check = False
-        else:
-            check = True
+    def captures_piece(self, p): # concentrate on MVV, then LVA
+        return itertools.chain(
+            self.node.generate_pseudo_legal_moves(self.node.occupied_co[not self.node.turn] & self.node.pawns, p),
+            self.node.generate_pseudo_legal_moves(self.node.occupied_co[not self.node.turn] & self.node.knights, p),
+            self.node.generate_pseudo_legal_moves(self.node.occupied_co[not self.node.turn] & self.node.bishops, p),
+            self.node.generate_pseudo_legal_moves(self.node.occupied_co[not self.node.turn] & self.node.rooks, p),
+            self.node.generate_pseudo_legal_moves(self.node.occupied_co[not self.node.turn] & self.node.queens, p),
+            )
 
-        for move in self.ordered_moves():
-            self.node.push(move)  # MAKE MOVE
-            if check: depth += 1
-            value = - self.negamax_pvs(depth - 1, -colour, -b, -a)
-            if check: depth -= 1
-            self.node.pop()  # UNMAKE MOVE
-            if value >= b:
-                self.record_hash(key, smallkey, depth, b, 2)
-                return b
-            if value > a:
-                hashDataType = 0
-                a = value
-                self.best = move
-                
-        self.record_hash(key, smallkey, depth, a, hashDataType)
-        return a
+    def ordered_moves(self):
+        return (m for m in itertools.chain(
+            self.single_hash_iterator(),
+            self.captures_piece(self.node.queens),
+            self.captures_piece(self.node.rooks),
+            self.captures_piece(self.node.bishops),
+            self.captures_piece(self.node.knights),
+            self.captures_piece(self.node.pawns),
+            self.node.generate_pseudo_legal_moves(0xffff_ffff_ffff_ffff, ~self.node.occupied_co[not self.node.turn])
+        ) if self.node.is_legal(m))
+
+    def seepos_factor(self) -> int:
+        white = self.node.occupied_co[chess.WHITE]
+        black = self.node.occupied_co[chess.BLACK]
+        return sum(itertools.chain(
+            (self.piecesquaretable['p'][i] for i in chess.scan_forward(
+                self.node.pawns & black)),
+            (-self.piecesquaretable['P'][i] for i in chess.scan_forward(
+                self.node.pawns & white)),
+            (self.piecesquaretable['n'][i] for i in chess.scan_forward(
+                self.node.knights & black)),
+            (-self.piecesquaretable['N'][i] for i in chess.scan_forward(
+                self.node.knights & white)),
+            (self.piecesquaretable['b'][i] for i in chess.scan_forward(
+                self.node.bishops & black)),
+            (-self.piecesquaretable['B'][i] for i in chess.scan_forward(
+                self.node.bishops & white)),
+            (self.piecesquaretable['r'][i] for i in chess.scan_forward(
+                self.node.rooks & black)),
+            (-self.piecesquaretable['R'][i] for i in chess.scan_forward(
+                self.node.rooks & white)),
+            (self.piecesquaretable['q'][i] for i in chess.scan_forward(
+                self.node.queens & black)),
+            (-self.piecesquaretable['Q'][i] for i in chess.scan_forward(
+                self.node.queens & white)),
+            (self.piecesquaretable['k'][i] for i in chess.scan_forward(
+                self.node.kings & black)),
+            (-self.piecesquaretable['K'][i] for i in chess.scan_forward(
+                self.node.kings & white))))
 
 class Atomic(Viridithas):
     def __init__(self, human=False, fen='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', pgn='', timeLimit=15, fun=False, contempt=3000, book=True, advancedTC=False,):
@@ -608,11 +620,12 @@ def analysis(engineType, pos="", usebook=True, limit=1000000000000, indef=False)
 
 if __name__ == "__main__":
     #general_purpose()
-    #fen = input("enter fen for analysis: ")
-    fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+    fen = input("enter fen for analysis: ")
+    #fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+    #fen = 'r1bqkb1r/ppp2ppp/2p2n2/8/4P3/8/PPPP1PPP/RNBQKB1R w KQkq - 0 5'
     #fen = "r1bqkb1r/ppp2ppp/2p2n2/8/4P3/8/PPPP1PPP/RNBQKB1R w KQkq - 0 5" # stafford accepted
     analysis(Viridithas, fen, False, indef=True)
-    #print(selfplay(60, position=fen, player1=Viridithas, player2=Fork))
+    #print(selfplay(100, position=fen, player1=Viridithas, player2=Fork, usebook=False))
 
     #general_purpose()
 

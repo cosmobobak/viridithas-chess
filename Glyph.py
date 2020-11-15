@@ -1,6 +1,3 @@
-import random
-from collections import defaultdict
-
 class Glyph:
     def __init__(self):
         self.node = [0b000000000, 0b000000000]
@@ -129,20 +126,6 @@ class Glyph:
             print("1-0", '\n', end="")
         else:
             print("0-1", '\n' , end="")
-
-class MCTS(Glyph):
-    def __init__(self, exploration_weight=1):
-        super().__init__()
-        self.Q = defaultdict(int)  # total reward of each node
-        self.N = defaultdict(int)  # total visit count for each node
-        self.children = dict()  # children of each node
-        self.exploration_weight = exploration_weight
-    
-    @property
-    def legal_moves(self):
-        for i in range(9):
-            if (not self.pos_filled(i)):
-                yield i
 
 def main():
     glyph = Glyph()
