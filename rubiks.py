@@ -2,6 +2,7 @@ import numpy as np
 
 FACES = [TOP, BOTTOM, LEFT, RIGHT, BACK, FRONT] = range(0, 6)
 COLOURS = [WHITE, YELLOW, RED, ORANGE, GREEN, BLUE] = range(0, 6)
+facenames = ['TOP', 'BOTTOM', 'LEFT', 'RIGHT', 'BACK', 'FRONT']
 
 
 class BaseCube():
@@ -11,7 +12,7 @@ class BaseCube():
         self.state = cube
 
     def __repr__(self):
-        return "\n".join([str(face) for face in self.state])
+        return "\n".join([facenames[i] + str(face) for i, face in enumerate(self.state)])
 
     def __str__(self):
         return self.__repr__()

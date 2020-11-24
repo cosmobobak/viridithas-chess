@@ -341,7 +341,7 @@ The combination player thinks forward; he starts from the given position, and tr
 [END]
 
 [BEGIN]
-A Chess game is divided into three stages: the first, when you hope you have the advantage, the second when you believe you have an   advantage, and the third... when you know you’re going to lose!
+A Chess game is divided into three stages: the first, when you hope you have the advantage, the second when you believe you have an advantage, and the third... when you know you’re going to lose!
 
 -- Savielly Tartakower
 [END]
@@ -643,9 +643,7 @@ A good sacrifice is one that is not necessarily sound but leaves your opponent d
 [END]
 
 [BEGIN]
-Chess, like any creative activity, can exist only through the combined efforts of those who have creative talent, and those who have the ability to organize their creative work[END]
-.
-[BEGIN]
+Chess, like any creative activity, can exist only through the combined efforts of those who have creative talent, and those who have the ability to organize their creative work.
 
 -- Mikhail Botvinnik
 [END]
@@ -886,7 +884,7 @@ I had a toothache during the first game. In the second game I had a headache. In
 [END]
 
 [BEGIN]
-﻿By the time a player becomes a Grandmaster, almost all of his training time is dedicated to work on this first phase. The opening is the only phase that holds out the potential for true creativity and doing something entirely new.
+By the time a player becomes a Grandmaster, almost all of his training time is dedicated to work on this first phase. The opening is the only phase that holds out the potential for true creativity and doing something entirely new.
 
 -- Garry Kasparov
 [END]
@@ -898,7 +896,7 @@ By strictly observing Botvinnik’s rule regarding the thorough analysis of one�
 [END]
 
 [BEGIN]
-Chess continues to advance over time, so the players of the future will inevitably surpass me in the quality of their play, assuming the rules and regulations allow them to play serious chess. But it will likely be a long time before anyone spends 20 consecutive years as number, one as I did.
+Chess continues to advance over time, so the players of the future will inevitably surpass me in the quality of their play, assuming the rules and regulations allow them to play serious chess. But it will likely be a long time before anyone spends 20 consecutive years as number one as I did.
 
 -– Garry Kasparov
 [END]

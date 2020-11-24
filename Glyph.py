@@ -93,7 +93,6 @@ class Glyph:
                         return -1
         return 0 
     
-
     def negamax(self, turn, a = -2, b = 2):
         if (self.evaluate() != 0 or self.is_full() == True):
             return self.turn * self.evaluate()
