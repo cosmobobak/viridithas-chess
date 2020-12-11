@@ -26,18 +26,20 @@ class Glyph:
                 return False
         return True
 
-    def show(self):
+    def __repr__(self):
+        builder = ""
         for x in range(3):
             for y in range(3):
                 if (self.pos_filled(x * 3 + y)):
                     if (self.player_at(x * 3 + y)):
-                        print("X ", end="")
+                        builder += "X "
                     else:
-                        print("0 ", end="")
+                        builder += "0 "
                 else:
-                    print(". ", end="")
-            print()
-        print()
+                    builder += ". "
+            builder += '\n'
+        builder += '\n'
+        return builder
 
     def play(self, i):
         #  n ^ (1, k) is a binary XOR where you flip the kth bit of n
@@ -130,18 +132,18 @@ def main():
     glyph = Glyph()
     i = int(input())
     glyph.play(i) 
-    glyph.show() 
+    print(glyph) 
 
     while (glyph.evaluate() == 0 and glyph.is_full() == False):
         glyph.engine_move() 
         print("Nodes processed for move: ", glyph.nodes, "\n" , end="")
         glyph.reset_nodes() 
-        glyph.show() 
+        print(glyph) 
         if (glyph.evaluate() != 0 or glyph.is_full() == True):
             break
         i = int(input())
         glyph.play(i) 
-        glyph.show() 
+        print(glyph) 
     
     glyph.show_result() 
     return 0 
