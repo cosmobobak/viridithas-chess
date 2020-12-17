@@ -1,8 +1,15 @@
+from mcts import mcts
+
 class Glyph:
-    def __init__(self):
-        self.node = [0b000000000, 0b000000000]
-        self.turn = 1
-        self.nodes = 0
+    def __init__(self, inputG = None):
+        if inputG != None:
+            self.node = [m for m in inputG.node]
+            self.turn = inputG.turn
+            self.nodes = inputG.nodes
+        else:
+            self.node = [0b000000000, 0b000000000]
+            self.turn = 1
+            self.nodes = 0
     
     def reset_nodes(self):
         self.nodes = 0
@@ -95,13 +102,13 @@ class Glyph:
                         return -1
         return 0 
     
-    def negamax(self, turn, a = -2, b = 2):
+    def minimax(self, turn, a = -2, b = 2):
         if (self.evaluate() != 0 or self.is_full() == True):
             return self.turn * self.evaluate()
         for i in range(9):
             if (not self.pos_filled(i)):
                 self.play(i)
-                score = -self.negamax(-turn, -b, -a)
+                score = -self.minimax(-turn, -b, -a)
                 self.unplay(i)
                 if (score > b):
                     return b
@@ -128,6 +135,32 @@ class Glyph:
         else:
             print("0-1", '\n' , end="")
 
+    def copy(self):
+        return Glyph(self)
+
+    def is_game_over(self):
+        return self.is_full() or (self.evaluate() != 0)
+
+    def getPossibleActions(self):
+        return [m for m in range(9) if not self.pos_filled(m)]
+
+    def takeAction(self, action):
+        self.play(action)
+        out = self.copy()
+        self.unplay(action)
+        return out
+
+    def isTerminal(self) -> bool:
+        return self.is_game_over()
+
+    def getReward(self) -> int:
+        return -self.evaluate()
+
+    def mcts_move(self):
+        searcher = mcts(timeLimit=2000)
+        bestAction = searcher.search(initialState=self)
+        self.play(bestAction)
+
 def main():
     glyph = Glyph()
     i = int(input())
@@ -135,7 +168,7 @@ def main():
     print(glyph) 
 
     while (glyph.evaluate() == 0 and glyph.is_full() == False):
-        glyph.engine_move() 
+        glyph.mcts_move() 
         print("Nodes processed for move: ", glyph.nodes, "\n" , end="")
         glyph.reset_nodes() 
         print(glyph) 

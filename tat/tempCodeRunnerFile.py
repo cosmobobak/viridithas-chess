@@ -1,3 +1,3 @@
-print(count_parents("shiny gold"))
-# print(count_children("shiny gold"))
-# print(callCount)
+for n in [0, 3, 6]:
+#     print(n)
+# print(test(10))

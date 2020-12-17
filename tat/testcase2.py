@@ -1000,14 +1000,25 @@ data = """17-19 p: pwpzpfbrcpppjppbmppp
 4-7 g: vczggdgbgxgg"""
 
 lines = data.split("\n")
-splitlines = [[int(l.split()[0].split("-")[0]), int(l.split()[0].split("-")[1]), l.split()[1][0], l.split()[-1]] for l in lines]
+splitlines = [
+    [
+        int(l.split(" ")[0].split("-")[0]), 
+        int(l.split(" ")[0].split("-")[1]), 
+        l.split(" ")[1][0], 
+        l.split(" ")[-1]
+    ] 
+    for l in lines]
 
 total = 0
 for l in splitlines:
-    if l[0] <= l[-1].count(l[2]) <= l[1]: total += 1
+    if l[0] <= l[-1].count(l[2]) <= l[1]: 
+        total += 1
+
+print(total)
 
 total = 0
 for l in splitlines:
-    if (l[-1][l[0]-1] == l[2]) != (l[-1][l[1]-1] == l[2]) : total += 1
+    if (l[-1][l[0]-1] == l[2]) != (l[-1][l[1]-1] == l[2]): 
+        total += 1
 
 print(total)

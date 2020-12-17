@@ -537,7 +537,6 @@ class Viridithas():
                 for move in moves:
                     board.push(Move.from_uci(move))
 
-
 class Fork(Viridithas):
     def __init__(self, human=False, fen='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', pgn='', timeLimit=15, fun=False, contempt=3000, book=True, advancedTC=False):
         super().__init__(human, fen, pgn, timeLimit, fun,
@@ -726,8 +725,8 @@ if __name__ == "__main__":
     
     #print("\n.".join([selfplay(time=60, usebook=bool(i), position="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1") for i in range(3)]))
     
-    fen = input()
-    analysis(Viridithas, pos=fen, usebook=False)
+    pos = input()
+    analysis(engineType=Viridithas, pos=pos, usebook=False)
     #engine = Viridithas()
     #engine.play_viri()
 

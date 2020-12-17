@@ -1,3 +1,5 @@
+import time
+
 data = """LLLLLLLLLL.LLLLLLLLL.LLLLL.LLLLL.LLLLLLL.LLLL..LLLLLLLL.LLLLLLLL.LLLLLLLL..LLLLLLLL.LLLLLLLL.LLLLL
 LLLLLLLLLL.LLLLLLLLLLLLLLLLLLLLL..LLLLLL.LLLLL.LLLLLLLLLLLLLLLLL.LLLLLLLL.LLLLLLLLL.LLLLLLLL.LLLLL
 LLLLLLLLLLLLLLLLLLLL.LLLLL.LLLLL.LLLLLLL.LLLLLLLLLLLLLL.LLLL.LLLLLLLLLLLL.LLLLLLLLL.LLLL.LLL.LLLLL
@@ -163,14 +165,14 @@ def format(grid):
 def task1(grid):
     done = False
     while not done:
-        #print(format(grid), end="\n\n")
+        print(format(grid), end="\n\n")
         new = transition(grid)
         if new == grid:
             done = True
         else:
             grid = new
     else:
-        #print(format(grid), end="\n\n")
+        print(format(grid), end="\n\n")
         pass
 
     print(format(grid).count("#"))
@@ -190,5 +192,10 @@ def task2(grid):
 
     print(format(grid).count("#"))
 
-task1(grid)
-task2(grid)
+t1 = time.time()
+task1(testdata)
+print(time.time()-t1)
+
+t2 = time.time()
+#task2(grid)
+print(time.time()-t2)

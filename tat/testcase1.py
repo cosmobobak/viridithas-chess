@@ -201,12 +201,12 @@ nums = """1772
 
 numlist = [int(n) for n in nums.split("\n")]
 
-print(numlist)
-
-pair = ((((x, y, z) for x in numlist if x + y + z == 2020) for y in numlist) for z in numlist)
+pair = ((x, y, z)
+        for x in numlist 
+        for y in numlist 
+        for z in numlist 
+        if x + y + z == 2020)
 
 for p in pair:
-    for j in p:
-        for i in j:
-            if len(i) > 0:
-                print (i)
+    print(p)
+
