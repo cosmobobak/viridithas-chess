@@ -1,5 +1,3 @@
-from mcts import mcts
-
 class Glyph:
     def __init__(self, inputG = None):
         if inputG != None:
