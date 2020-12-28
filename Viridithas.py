@@ -201,7 +201,7 @@ class Viridithas():
         if self.pos_hash() in self.hashstack:
             rating = -self.contempt * (1 if self.node.turn else -1)
 
-        rating += self.seepos_factor()
+        rating += self.see_factor()
 
         return rating
 
@@ -404,7 +404,7 @@ class Viridithas():
         # book = chess.polyglot.open_reader(
         #     r"ProDeo292/ProDeo292/books/elo2500.bin")
         book = chess.polyglot.open_reader(
-            r"ProDeo292/ProDeo292/books/Human.bin")
+            r"books/Human.bin")
         main_entry = book.find(self.node)
         choice = book.weighted_choice(self.node)
         book.close()
@@ -703,8 +703,8 @@ if __name__ == "__main__":
     pass
     #print("\n.".join([selfplay(time=60, usebook=bool(i), position="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1") for i in range(3)]))
 
-    pos = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-    analysis(engineType=Fork, pos=pos, usebook=False)
+    pos = input()
+    analysis(engineType=Viridithas, pos=pos, usebook=False)
     #engine = Viridithas()
     # engine.play_viri()
 

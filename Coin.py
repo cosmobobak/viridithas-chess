@@ -241,6 +241,8 @@ class Coin:
         return (self.evaluate() != 0 or self.is_full() == True)
 
 
+
+
 if __name__ == "__main__":
     coin = Coin(5)
     coin.show()
