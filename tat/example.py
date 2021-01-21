@@ -1,13 +1,4 @@
-l = [1, 2, 3]
+print("hello", end="")
+print(" world", end="")
+print("!")
 
-strlist = ["a b", "c d", "e f"]
-
-def double(x):
-    return x * 2
-
-def splitter(string):
-    return string.split(" ")
-
-
-# gives [['a', 'b'], ['c', 'd'], ['e', 'f']]
-print(list(map(splitter, strlist)))

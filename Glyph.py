@@ -1,13 +1,26 @@
-class Glyph:
+from copy import deepcopy
+from random import choice
+
+Move = int
+
+class State:
     def __init__(self, inputG = None):
         if inputG != None:
             self.node = [m for m in inputG.node]
             self.turn = inputG.turn
             self.nodes = inputG.nodes
+            self.stack = [m for m in inputG.stack]
         else:
             self.node = [0b000000000, 0b000000000]
             self.turn = 1
             self.nodes = 0
+            self.stack = []
+
+    def __hash__(self):
+        return hash(self.node[0]) + hash(self.node[1])
+
+    def __eq__(self, other):
+        return (self.turn == other.turn) and (self.node[0] == other.node[0]) and (self.node[1] == other.node[1])
     
     def reset_nodes(self):
         self.nodes = 0
@@ -49,19 +62,25 @@ class Glyph:
     def play(self, i):
         #  n ^ (1, k) is a binary XOR where you flip the kth bit of n
         if (self.turn == 1):
-            self.node[0] = self.node[0] ^ (1 << i) 
-            self.turn = -1
+            self.node[0] = self.node[0] ^ (1 << i)
         else:
-            self.node[1] = self.node[1] ^ (1 << i) 
-            self.turn = 1
+            self.node[1] = self.node[1] ^ (1 << i)
+        self.turn = -self.turn
+        self.stack.append(i)
 
-    def unplay(self, i): #  only valid directly after a move, do not unplay on root, or unplay twice in a row:
+    def unplay(self): #  only valid directly after a move, do not unplay on root, or unplay twice in a row:
+        i = self.stack.pop()
         if (self.turn == 1):
-            self.node[1] = self.node[1] ^ (1 << i) 
-            self.turn = -1
+            self.node[1] = self.node[1] ^ (1 << i)
         else:
-            self.node[0] = self.node[0] ^ (1 << i) 
-            self.turn = 1    
+            self.node[0] = self.node[0] ^ (1 << i)
+        self.turn = -self.turn
+
+    def push(self, i):
+        self.play(i)
+
+    def pop(self):
+        self.unplay()
 
     def evaluate(self):
         self.nodes += 1  # increment nodes
@@ -100,15 +119,15 @@ class Glyph:
                         return -1
         return 0 
     
-    def minimax(self, turn, a = -2, b = 2):
+    def negamax(self, turn, a = -2, b = 2):
         if (self.evaluate() != 0 or self.is_full() == True):
             return self.turn * self.evaluate()
         for i in range(9):
             if (not self.pos_filled(i)):
                 self.play(i)
-                score = -self.minimax(-turn, -b, -a)
+                score = -self.negamax(-turn, -b, -a)
                 self.unplay(i)
-                if (score > b):
+                if (score >= b):
                     return b
                 if (score > a):
                     a = score
@@ -134,39 +153,39 @@ class Glyph:
             print("0-1", '\n' , end="")
 
     def copy(self):
-        return Glyph(self)
+        return deepcopy(self)
 
     def is_game_over(self):
         return self.is_full() or (self.evaluate() != 0)
 
-    def getPossibleActions(self):
+    def legal_moves(self):
         return [m for m in range(9) if not self.pos_filled(m)]
 
-    def takeAction(self, action):
-        self.play(action)
-        out = self.copy()
-        self.unplay(action)
-        return out
+    def random_play(self):
+        self.play(choice(self.legal_moves()))
 
-    def isTerminal(self) -> bool:
-        return self.is_game_over()
+def fnegamax(node: State, turn, a=-2, b=2):
+    if (node.evaluate() != 0 or node.is_full() == True):
+        return node.turn * node.evaluate()
+    for i in range(9):
+        if (not node.pos_filled(i)):
+            node.play(i)
+            score = -fnegamax(-turn, -b, -a)
+            node.unplay(i)
+            if (score >= b):
+                return b
+            if (score > a):
+                a = score
+    return a
 
-    def getReward(self) -> int:
-        return -self.evaluate()
-
-    def mcts_move(self):
-        searcher = mcts(timeLimit=2000)
-        bestAction = searcher.search(initialState=self)
-        self.play(bestAction)
-
-def main():
-    glyph = Glyph()
+if __name__ == "__main__":
+    glyph = State()
     i = int(input())
     glyph.play(i) 
     print(glyph) 
 
     while (glyph.evaluate() == 0 and glyph.is_full() == False):
-        glyph.mcts_move() 
+        glyph.engine_move()
         print("Nodes processed for move: ", glyph.nodes, "\n" , end="")
         glyph.reset_nodes() 
         print(glyph) 
@@ -176,7 +195,4 @@ def main():
         glyph.play(i) 
         print(glyph) 
     
-    glyph.show_result() 
-    return 0 
-
-main()
+    glyph.show_result()

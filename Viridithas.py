@@ -201,7 +201,7 @@ class Viridithas():
         if self.pos_hash() in self.hashstack:
             rating = -self.contempt * (1 if self.node.turn else -1)
 
-        rating += self.see_factor()
+        rating += self.seepos_factor()
 
         return rating
 
@@ -484,7 +484,7 @@ class Viridithas():
         except Exception:
             return "PGN ERROR"
 
-    def play_viri(self):
+    def play_viri(self, fen=None):
         player_colour = input(
             "Enter the human player's colour in the form b/w\n--> ")
         while player_colour not in ['b', 'w']:
@@ -493,7 +493,7 @@ class Viridithas():
         player_colour = WHITE if player_colour == 'w' else BLACK
         timeControl = int(
             input("how many seconds should viri get per move?\n--> "))
-        self.__init__(human=True, timeLimit=timeControl)
+        self.__init__(human=True, timeLimit=timeControl, fen=fen)
         while not self.node.is_game_over():
             print(self.__repr__())
             if player_colour == self.node.turn:
@@ -701,10 +701,13 @@ interestingPosition = "8/b7/4P2p/8/3p2k1/1K1P4/pB6/8 b - - 0 58"
 
 if __name__ == "__main__":
     pass
+    fen = "1nb1kbn1/ppp2ppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQ - 0 1"
+    engine = Viridithas()
+    engine.play_viri("1nb1kbn1/ppp2ppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQ - 0 1")
     #print("\n.".join([selfplay(time=60, usebook=bool(i), position="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1") for i in range(3)]))
 
-    pos = input()
-    analysis(engineType=Viridithas, pos=pos, usebook=False)
+    #pos = input()
+    #analysis(engineType=Viridithas, pos=pos, usebook=False)
     #engine = Viridithas()
     # engine.play_viri()
 
