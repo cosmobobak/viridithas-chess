@@ -12,6 +12,7 @@ import sys
 import itertools
 from functools import lru_cache
 from chess import WHITE, BLACK, Move, Board
+from chess.variant import CrazyhouseBoard
 from cachetools import LRUCache
 from typing import Hashable
 from PSTs import PieceSquareTable
@@ -283,7 +284,7 @@ class Viridithas():
         ) if self.node.is_legal(m))
 
     def pass_turn(self) -> None:
-        self.node.turn = not self.node.turn
+        self.node.push(Move.from_uci("0000"))
 
     # @profile
     # qsearch hashtable would like speed stuff up
@@ -323,7 +324,7 @@ class Viridithas():
             self.pass_turn()  # MAKE A NULL MOVE
             # PERFORM A LIMITED SEARCH
             value = - self.negamax_pvs(depth - 3, -colour, -b, -a)
-            self.pass_turn()  # UNMAKE NULL MOVE
+            self.node.pop()  # UNMAKE NULL MOVE
             a = max(a, value)
             if a >= b:
                 return a
@@ -588,23 +589,15 @@ class Crazyhouse(Viridithas):
     def __init__(self, human=False, fen='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', pgn='', timeLimit=15, fun=False, contempt=3000, book=True, advancedTC=False):
         super().__init__(human, fen, pgn, timeLimit, fun,
                          contempt, book, advancedTC)
-        self.node = chess.variant.CrazyhouseBoard(fen)
-
-    def evaluate(self, depth: float) -> int:
-        self.nodes += 1
-
-        rating = 0
-        if self.node.is_checkmate():
-            return 1000000000 * int(depth+1) * (1 if self.node.turn else -1)
-        if self.node.can_claim_fifty_moves():
-            rating = -self.contempt * (1 if self.node.turn else -1)
-
-        if self.pos_hash() in self.hashstack:
-            rating = -self.contempt * (1 if self.node.turn else -1)
-
-        rating += self.seepos_factor()
-
-        return rating
+        if pgn == '':
+            self.node = CrazyhouseBoard(fen)
+        else:
+            self.node = CrazyhouseBoard()
+            for move in pgn.split():
+                try:
+                    self.node.push_san(move)
+                except Exception:
+                    continue
 
 
 class Antichess(Viridithas):
@@ -701,14 +694,16 @@ interestingPosition = "8/b7/4P2p/8/3p2k1/1K1P4/pB6/8 b - - 0 58"
 
 if __name__ == "__main__":
     pass
-    fen = "1nb1kbn1/ppp2ppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQ - 0 1"
-    engine = Viridithas()
-    engine.play_viri("1nb1kbn1/ppp2ppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQ - 0 1")
-    #print("\n.".join([selfplay(time=60, usebook=bool(i), position="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1") for i in range(3)]))
-
-    #pos = input()
-    #analysis(engineType=Viridithas, pos=pos, usebook=False)
-    #engine = Viridithas()
+    # fen = "1nb1kbn1/ppp2ppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQ - 0 1"
+    engine = Crazyhouse()
+    engine.user_setup()
+    engine.run_game()
+    # engine.play_viri("1nb1kbn1/ppp2ppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQ - 0 1")
+    # print("\n.".join([selfplay(time=60, usebook=bool(i), position="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1") for i in range(3)]))
+    
+    # pos = input()
+    # analysis(engineType=Crazyhouse, pos=pos, usebook=False)
+    # engine = Viridithas()
     # engine.play_viri()
 
 # add a separate qsearch hashtable
