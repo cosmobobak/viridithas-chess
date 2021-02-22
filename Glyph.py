@@ -126,7 +126,7 @@ class State:
             if (not self.pos_filled(i)):
                 self.play(i)
                 score = -self.negamax(-turn, -b, -a)
-                self.unplay(i)
+                self.unplay()
                 if (score >= b):
                     return b
                 if (score > a):
@@ -139,7 +139,7 @@ class State:
             if (not self.pos_filled(i)):
                 self.play(i) 
                 scores[i] = -self.negamax(self.turn, -2, 2)
-                self.unplay(i)
+                self.unplay()
         index = scores.index(max(scores))
         self.play(index)
 
@@ -171,7 +171,7 @@ def fnegamax(node: State, turn, a=-2, b=2):
         if (not node.pos_filled(i)):
             node.play(i)
             score = -fnegamax(-turn, -b, -a)
-            node.unplay(i)
+            node.unplay()
             if (score >= b):
                 return b
             if (score > a):

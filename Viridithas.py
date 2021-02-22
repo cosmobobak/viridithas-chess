@@ -299,7 +299,7 @@ class Viridithas():
             score = -self.qsearch(-b, -a, depth - 1, -colour)
             self.node.pop()
             if score >= b:
-                return b
+                return score
             a = max(score, a)
 
         return a
@@ -352,7 +352,7 @@ class Viridithas():
             self.node.pop()  # UNMAKE MOVE
             if value >= b:
                 self.record_hash(key, best, depth, b, 2)
-                return b
+                return value
             if value > a:
                 hashDataType = 0
                 a = value
@@ -695,7 +695,7 @@ interestingPosition = "8/b7/4P2p/8/3p2k1/1K1P4/pB6/8 b - - 0 58"
 if __name__ == "__main__":
     pass
     # fen = "1nb1kbn1/ppp2ppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQ - 0 1"
-    engine = Crazyhouse()
+    engine = Viridithas()
     engine.user_setup()
     engine.run_game()
     # engine.play_viri("1nb1kbn1/ppp2ppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQ - 0 1")
