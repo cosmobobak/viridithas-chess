@@ -1,2 +1,0 @@
-
-            incremement(distArray);
