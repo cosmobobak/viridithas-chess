@@ -15,11 +15,12 @@ from chess import WHITE, BLACK, Move, Board
 from chess.variant import CrazyhouseBoard
 from cachetools import LRUCache
 from typing import Hashable
-from evaluation import chessboard_pst_eval
+from evaluation import chessboard_pst_eval, chessboard_static_exchange_eval
 from data_input import get_engine_parameters
 print("Python version")
 print(sys.version)
 
+MOBILITY_FACTOR = 10
 
 class TTEntry():
     def __init__(self, best: Move, depth: float, a: int, hashDataType: int):
@@ -40,12 +41,6 @@ class Viridithas():
         contempt: int = 3000,
         book: bool = True,
         advancedTC: list = [],
-        use_alphabeta: bool = True,
-        use_nmp: bool = True,
-        use_tt: bool = True,
-        use_pvs: bool = True,
-        use_mvvlva: bool = True,
-        use_qsearch: bool = True
     ):
         if pgn == '':
             self.node = Board(fen)
@@ -80,13 +75,6 @@ class Viridithas():
         self.inbook = book
         self.ext = False
         self.searchdata = []
-
-        self.use_pvs: bool = use_pvs
-        self.use_mvvlva: bool = use_mvvlva
-        self.use_alphabeta: bool = use_alphabeta
-        self.use_qsearch: bool = use_qsearch
-        self.use_tt: bool = use_tt
-        self.use_nmp: bool = use_nmp
 
     def set_position(self, fen):
         self.node = Board(fen)
@@ -124,6 +112,7 @@ class Viridithas():
             advancedTC=datadict["advancedTC"]
         )
 
+    #@profile
     def evaluate(self, depth: float) -> int:
         self.nodes += 1
 
@@ -138,6 +127,20 @@ class Viridithas():
 
         rating += chessboard_pst_eval(self.node)
 
+        # mobility = 0
+        # if self.node.turn == WHITE:
+        #     mobility -= len(list(self.node.generate_legal_moves()))
+        #     self.node.push(Move.from_uci("0000"))
+        #     mobility += len(list(self.node.generate_legal_moves()))
+        #     self.node.pop()
+        # else:
+        #     mobility += len(list(self.node.generate_legal_moves()))
+        #     self.node.push(Move.from_uci("0000"))
+        #     mobility -= len(list(self.node.generate_legal_moves()))
+        #     self.node.pop()
+
+        # rating += mobility * MOBILITY_FACTOR
+        
         return rating
 
     def pos_hash(self):
@@ -220,19 +223,16 @@ class Viridithas():
     def pass_turn(self) -> None:
         self.node.push(Move.from_uci("0000"))
 
-    # @profile
-    # qsearch hashtable would like speed stuff up
+
+    # qsearch hashtable would likely speed stuff up
+    #@profile
     def qsearch(self, a: int, b: int, depth: float, colour: int) -> int:
         scoreIfNoCaptures = self.evaluate(depth) * colour
         if scoreIfNoCaptures >= b:
             return b
         a = max(scoreIfNoCaptures, a)
 
-        if self.use_mvvlva:
-            captures = self.captures()
-        else:
-            captures = filter(lambda m: self.node.is_capture(m), self.node.legal_moves)
-        for capture in captures:
+        for capture in self.captures():
             self.node.push(capture)
             score = -self.qsearch(-b, -a, depth - 1, -colour)
             self.node.pop()
@@ -242,85 +242,72 @@ class Viridithas():
 
         return a
 
+    #@profile
     def negamax_pvs(self, depth: float, colour: int, a: int = -1337000000, b: int = 1337000000) -> int:
         if depth < 1:
-            if self.use_qsearch:
-                return self.qsearch(a, b, depth, colour)
-            else:
-                return colour * self.evaluate(depth)
-
+            return self.qsearch(a, b, depth, colour)
+            
         if self.node.is_game_over():
             return colour * self.evaluate(depth)
 
         best = Move.from_uci("0000")
-        if self.use_tt:
-            hashDataType = 1
-            key = self.pos_hash()
-            probe = self.probe_hash(key, depth, a, b)
-            if probe[0] != None:
-                if probe[1]:
-                    return probe[0]
-                else:
-                    best = probe[0]
-
-        if self.use_nmp:
-            # NULLMOVE PRUNING
-            if not self.node.is_check():
-                self.pass_turn()  # MAKE A NULL MOVE
-                # PERFORM A LIMITED SEARCH
-                value = - self.negamax_pvs(depth - 3, -colour, -b, -a)
-                self.node.pop()  # UNMAKE NULL MOVE
-                a = max(a, value)
-                if a >= b:
-                    return a
-                check = False
+        hashDataType = 1
+        key = self.pos_hash()
+        probe = self.probe_hash(key, depth, a, b)
+        if probe[0] != None:
+            if probe[1]:
+                return probe[0]
             else:
-                check = True
+                best = probe[0]
+
+        # NULLMOVE PRUNING
+        if not self.node.is_check():
+            self.pass_turn()  # MAKE A NULL MOVE
+            # PERFORM A LIMITED SEARCH
+            value = - self.negamax_pvs(depth - 3, -colour, -b, -a)
+            self.node.pop()  # UNMAKE NULL MOVE
+            a = max(a, value)
+            if a >= b:
+                return a
+            check = False
         else:
-            check = self.node.is_check()
+            check = True
         
         # MOVE ORDERING (HASH -> TAKES -> OTHERS)
-        if self.use_mvvlva:
-            moves = self.ordered_moves(best)
-        else:
-            moves = self.node.legal_moves
+        
+        moves = self.ordered_moves(best)
         
         for i, move in enumerate(moves):
             self.node.push(move)  # MAKE MOVE
             if check:
                 depth += 1
-            if self.use_pvs:
-                if i == 0:
-                    best = move
-                    # FULL SEARCH ON MOVE 1
-                    value = - self.negamax_pvs(depth - 1, -colour, -b, -a)
-                else:
-                    # NULL-WINDOW SEARCH
-                    value = - self.negamax_pvs(depth - 1, -colour, -a - 1, -a)
-                    if a < value < b:  # CHECK IF NULLWINDOW FAILED
-                        # RE-SEARCH
-                        value = - self.negamax_pvs(depth - 1, -colour, - b, -value)
-            else:
+            
+            if i == 0:
+                best = move
+                # FULL SEARCH ON MOVE 1
                 value = - self.negamax_pvs(depth - 1, -colour, -b, -a)
+            else:
+                # NULL-WINDOW SEARCH
+                value = - self.negamax_pvs(depth - 1, -colour, -a - 1, -a)
+                if a < value < b:  # CHECK IF NULLWINDOW FAILED
+                    # RE-SEARCH
+                    value = - self.negamax_pvs(depth - 1, -colour, - b, -value)
+           
 
             if check:
                 depth -= 1
             self.node.pop()  # UNMAKE MOVE
 
             ###### AB CUTOFFS
-            if self.use_alphabeta:
-                if value >= b:
-                    if self.use_tt:
-                        self.record_hash(key, best, depth, b, 2)
-                    return value
-                if value > a:
-                    if self.use_tt:
-                        hashDataType = 0
-                    a = value
-                    self.best = move
+            if value >= b:
+                self.record_hash(key, best, depth, b, 2)
+                return value
+            if value > a:
+                hashDataType = 0
+                a = value
+                self.best = move
             
-        if self.use_tt:
-            self.record_hash(key, best, depth, a, hashDataType)
+        self.record_hash(key, best, depth, a, hashDataType)
         return a
 
     def move_sort(self, moves: list, ratings: list):
@@ -659,7 +646,7 @@ interestingPosition = "8/b7/4P2p/8/3p2k1/1K1P4/pB6/8 b - - 0 58"
 if __name__ == "__main__":
     pass
     # fen = "1nb1kbn1/ppp2ppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQ - 0 1"
-    analysis(Viridithas, input())
+    analysis(Viridithas, input(), usebook=False)
     # engine.play_viri("1nb1kbn1/ppp2ppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQ - 0 1")
     # print("\n.".join([selfplay(time=60, usebook=bool(i), position="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1") for i in range(3)]))
 
