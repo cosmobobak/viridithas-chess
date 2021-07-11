@@ -28,7 +28,7 @@ Pillow==8.2.0
 prompt-toolkit==3.0.7
 pycodestyle==2.6.0
 pyglet==1.5.0
-Pygments==2.7.1
+Pygments==2.7.4
 pyodbc==4.0.30
 python-chess==1.1.0
 python-dateutil==2.8.1
