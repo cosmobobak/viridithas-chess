@@ -23,7 +23,7 @@ def chessboard_static_exchange_eval(board) -> int:
 
 
 #@profile
-@lru_cache(maxsize=64000)
+# @lru_cache(maxsize=64000)
 def chessboard_pst_eval(board: Board) -> int:
     white = board.occupied_co[WHITE]
     black = board.occupied_co[BLACK]
