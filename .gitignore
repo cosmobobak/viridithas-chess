@@ -17,4 +17,5 @@ training_7/checkpoint
 *.pyc
 *.bin
 *.h
+*.lprof
 env

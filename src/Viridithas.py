@@ -1,4 +1,5 @@
 #from __future__ import annotations
+from typing import Hashable
 import chess
 import chess.svg
 import chess.pgn
@@ -11,10 +12,10 @@ import operator
 import sys
 import itertools
 from TTEntry import *
-from chess import WHITE, BLACK, Move, Board
+from chess import WHITE, BLACK, Move, Board, scan_forward
 from chess.variant import CrazyhouseBoard
 from cachetools import LRUCache 
-from evaluation import chessboard_pst_eval, chessboard_static_exchange_eval
+from evaluation import chessboard_pst_eval, chessboard_static_exchange_eval, PAWN_VALUE
 from data_input import get_engine_parameters
 from LMR import search_reduction_factor
 from copy import deepcopy
@@ -60,7 +61,7 @@ class Viridithas():
         self.nodes = 0
         self.advancedTC = advancedTC
         self.tableSize = 2**20+49
-        self.hashtable: dict[Board, TTEntry] = dict()#LRUCache(
+        self.hashtable: dict[Hashable, TTEntry] = dict()#LRUCache(
             #maxsize=self.tableSize)
         self.hashstack: dict[Board, int] = dict()
         self.pieces = range(1, 7)
@@ -104,7 +105,7 @@ class Viridithas():
             advancedTC=datadict["advancedTC"]
         )
 
-    #@profile
+    ##@profile
     def evaluate(self, depth: float) -> int:
         self.nodes += 1
 
@@ -118,17 +119,18 @@ class Viridithas():
         #     rating = -self.contempt * (1 if self.node.turn else -1)
 
         rating += chessboard_pst_eval(self.node)
+        # rating += chessboard_static_exchange_eval(self.node)
 
         # mobility = 0
         # if self.node.turn == WHITE:
-        #     mobility -= sum(1 for m in self.node.generate_pseudo_legal_moves() if self.node.is_into_check(m))
+        #     mobility -= sum(1 for m in self.node.generate_pseudo_legal_moves() if not self.node.is_into_check(m))
         #     self.node.push(Move.from_uci("0000"))
-        #     mobility += sum(1 for m in self.node.generate_pseudo_legal_moves() if self.node.is_into_check(m))
+        #     mobility += sum(1 for m in self.node.generate_pseudo_legal_moves() if not self.node.is_into_check(m))
         #     self.node.pop()
         # else:
-        #     mobility += sum(1 for m in self.node.generate_pseudo_legal_moves() if self.node.is_into_check(m))
+        #     mobility += sum(1 for m in self.node.generate_pseudo_legal_moves() if not self.node.is_into_check(m))
         #     self.node.push(Move.from_uci("0000"))
-        #     mobility -= sum(1 for m in self.node.generate_pseudo_legal_moves() if self.node.is_into_check(m))
+        #     mobility -= sum(1 for m in self.node.generate_pseudo_legal_moves() if not self.node.is_into_check(m))
         #     self.node.pop()
 
         # rating += mobility * MOBILITY_FACTOR
@@ -140,29 +142,6 @@ class Viridithas():
             self.hashstack[self.node] += 1
         else:
             self.hashstack[self.node] = 1
-
-    def record_hash(self, key: Board, best: Move, depth: float, a: int, hashDataType: int) -> None:
-        if key in self.hashtable:
-            entry = self.hashtable[key]
-            if entry.depth >= depth:
-                self.hashtable[key] = TTEntry(best, depth, a, hashDataType)
-        else:
-            self.hashtable[key] = TTEntry(best, depth, a, hashDataType)
-
-    def probe_hash(self, key: Board, depth: float = 0, a: int = -1000, b: int = 1000) -> tuple:
-        try:
-            entry = self.hashtable[key]
-        except Exception:
-            return (None, None)
-        if entry.depth >= depth:
-            if entry.type == 0:
-                return (entry.value, True)
-            if entry.type == 1 and entry.value <= a:
-                return (a, True)
-            if entry.type == 2 and entry.value >= b:
-                return (b, True)
-            return (entry.best, False)
-        return (entry.best, False)
 
     def single_hash_iterator(self, best):
         yield best
@@ -177,6 +156,7 @@ class Viridithas():
             self.node.generate_pseudo_legal_moves(self.node.kings, p),
         )
 
+    #@profile
     def captures(self):  # (MVV/LVA)
         return (m for m in itertools.chain(
             self.captures_piece(
@@ -189,7 +169,7 @@ class Viridithas():
                 self.node.occupied_co[not self.node.turn] & self.node.knights),
             self.captures_piece(
                 self.node.occupied_co[not self.node.turn] & self.node.pawns),
-        ) if not self.node.is_into_check(m))
+        ) if self.node.is_legal(m))
 
     def winning_captures(self):  # (MVV/LVA)
         target_all = self.node.occupied_co[not self.node.turn]
@@ -233,15 +213,12 @@ class Viridithas():
             self.node.generate_pseudo_legal_moves(
                 0xffff_ffff_ffff_ffff, ~self.node.occupied_co[not self.node.turn]),
             self.losing_captures()
-        ) if not self.node.is_into_check(m))
+        ) if self.node.is_legal(m))
 
     def pass_turn(self) -> None:
         self.node.push(Move.from_uci("0000"))
 
-
-    # qsearch hashtable would likely speed stuff up
     #@profile
-
     def qsearch(self, a: float, b: float, depth: float, colour: int) -> float:
         scoreIfNoCaptures = self.evaluate(depth) * colour
         if scoreIfNoCaptures >= b:
@@ -259,11 +236,14 @@ class Viridithas():
         return a
 
     def tt_lookup(self, board: Board) -> "TTEntry":
-        return self.hashtable.get(board, TTEntry.default())
+        key = board._transposition_key()
+        return self.hashtable.get(key, TTEntry.default())
 
     def tt_store(self, board: Board, entry: TTEntry):
-        self.hashtable[board] = entry
+        key = board._transposition_key()    
+        self.hashtable[key] = entry
 
+    #@profile
     def wikisearch(self, depth: float, colour: int, alpha: float, beta: float) -> float:
         alphaOrig = alpha
 
@@ -280,46 +260,63 @@ class Viridithas():
             if alpha >= beta:
                 return ttEntry.value
             
-            moves = itertools.chain([ttEntry.best], filter(lambda x: x != ttEntry.best, self.ordered_moves()))
+            if self.node.is_legal(ttEntry.best):
+                moves = itertools.chain([ttEntry.best], filter(lambda x: x != ttEntry.best, self.ordered_moves()))
+            else:
+                moves = self.ordered_moves()
         else:
             moves = self.ordered_moves()
 
-        if depth < 1:
+        if depth < 0:
             return self.qsearch(alpha, beta, depth, colour)
 
         if self.node.is_game_over():
             return colour * self.evaluate(depth)
 
         current_pos_is_check = self.node.is_check()
-        if not current_pos_is_check:
+        if not current_pos_is_check and depth >= 3:
             # MAKE A NULL MOVE
             self.node.push(Move.null())  
             # PERFORM A LIMITED SEARCH
             value = - self.wikisearch(depth - 3, -colour, -beta, -alpha)
             # UNMAKE NULL MOVE
-            self.node.pop()  
-            alpha = max(alpha, value)
-            if alpha >= beta:
-                return alpha
+            self.node.pop()
+            if value >= beta:
+                return beta
 
+        best_move = Move.null()
+        search_pv = True
         value = float("-inf")
         for move_idx, move in enumerate(moves):
             if move_idx == 0:
                 best_move = move
             gives_check = self.node.gives_check(move)
             is_capture = self.node.is_capture(move)
-            is_promo = move.promotion
+            is_promo = bool(move.promotion)
             depth_reduction = search_reduction_factor(
                 move_idx, current_pos_is_check, gives_check, is_capture, is_promo, depth)
+
             self.node.push(move)
-            value = max(value, -self.wikisearch(depth - depth_reduction, -colour, -beta, -alpha))
+
+            if search_pv:
+                r = -self.wikisearch(depth - depth_reduction, -colour, -beta, -alpha)
+                value = max(value, r)
+            else:
+                r = -self.wikisearch(depth - depth_reduction, -colour, -alpha-1, -alpha)
+                value = max(value, r)
+                if (value > alpha): # // in fail-soft ... & & value < beta) is common
+                    r = -self.wikisearch(depth - depth_reduction, -colour, -beta, -alpha) #// re-search
+                    value = max(value, r)
+
             self.node.pop()
+
             if value > alpha:
                 alpha = value
                 best_move = move
             alpha = max(alpha, value)
             if alpha >= beta:
                 break
+            search_pv = False
 
         # (* Transposition Table Store; self.node is the lookup key for ttEntry *)
         # ttEntry = TTEntry()
@@ -332,131 +329,89 @@ class Viridithas():
             ttEntry.type = EXACT
         ttEntry.depth = depth
         ttEntry.best = best_move
+        ttEntry.null = False
         self.tt_store(self.node, ttEntry)
 
         return value
-
-    #@profile
-    def negamax_pvs(self, depth: float, colour: int, a: float = -1337000000, b: float = 1337000000) -> float:
-        if depth < 1:
-            return self.qsearch(a, b, depth, colour)
-            
-        if self.node.is_game_over():
-            return colour * self.evaluate(depth)
-
-        # best = Move.from_uci("0000")
-        # hashDataType = 1
-        # probe = self.probe_hash(self.node, depth, a, b)
-        # if probe[0] != None:
-        #     if probe[1]:
-        #         return probe[0]
-        #     else:
-        #         best = probe[0]
-
-        # NULLMOVE PRUNING
-        if not self.node.is_check():
-            self.pass_turn()  # MAKE A NULL MOVE
-            # PERFORM A LIMITED SEARCH
-            value = - self.negamax_pvs(depth - 3, -colour, -b, -a)
-            self.node.pop()  # UNMAKE NULL MOVE
-            a = max(a, value)
-            if a >= b:
-                return a
-            check = False
-        else:
-            check = True
-        
-        # MOVE ORDERING (HASH -> TAKES -> OTHERS)
-        
-        moves = self.ordered_moves()
-        
-        for i, move in enumerate(moves):
-            self.node.push(move)  # MAKE MOVE
-            if check:
-                depth += 1
-            
-            if i == 0:
-                best = move
-                # FULL SEARCH ON MOVE 1
-                value = - self.negamax_pvs(depth - 1, -colour, -b, -a)
-            else:
-                # NULL-WINDOW SEARCH
-                value = - self.negamax_pvs(depth - 1, -colour, -a - 1, -a)
-                if a < value < b:  # CHECK IF NULLWINDOW FAILED
-                    # RE-SEARCH
-                    value = - self.negamax_pvs(depth - 1, -colour, - b, -value)
-            
-
-            if check:
-                depth -= 1
-            self.node.pop()  # UNMAKE MOVE
-
-            ###### AB CUTOFFS
-            if value >= b:
-                # self.record_hash(self.node, best, depth, b, 2)
-                return value
-            if value > a:
-                # hashDataType = 0
-                a = value
-                self.best = move
-            
-        # self.record_hash(self.node, best, depth, a, hashDataType)
-        return a
 
     def move_sort(self, moves: list, ratings: list):
         pairs = zip(*sorted(zip(moves, ratings), key=operator.itemgetter(1)))
         moves, ratings = [list(pair) for pair in pairs]
         return moves, ratings
 
+    def pv_string(self):
+        count = 0
+        moves = []
+        while True:
+            e = self.tt_lookup(self.node)
+            if e.is_null() or not self.node.is_legal(e.best):
+                break
+
+            # print(self.node.__str__())
+            # print(self.node.__repr__())
+            # print(e.best)
+            # print(self.node.san(e.best))
+
+            moves.append(self.node.san(e.best))
+            self.node.push(e.best)
+            count += 1
+        
+        for _ in moves:
+            self.node.pop()
+
+        if count == 0: return ""
+        return " ".join(moves)
+        return ""
+
     def turnmod(self) -> int:
         return -1 if self.node.turn else 1
 
     def show_iteration_data(self, moves: list, values: list, depth: float) -> tuple:
         t = round(time.time()-self.startTime, 2)
-        print(f"{self.node.san(moves[0])} | {round((self.turnmod()*values[0])/1000, 3)} | {str(t)}s at depth {str(depth + 1)}, {str(self.nodes)} nodes processed, at {str(int(self.nodes / (t+0.00001)))}NPS.\n", end="")
+        print(f"{self.node.san(moves[0])} | {-round((self.turnmod()*values[0])/1000, 3)} | {str(t)}s at depth {str(depth + 1)}, {str(self.nodes)} nodes processed, at {str(int(self.nodes / (t+0.00001)))}NPS.\n", f"PV: {self.pv_string()}\n", end="")
         return (self.node.san(moves[0]), self.turnmod()*values[0], self.nodes, depth+1, t)
 
     def search(self, ponder: bool = False):
-        self.hashtable.clear()
-        # self.startTime = time.time()
-        # self.nodes = 0
-        # moves = list(self.ordered_moves())
-        # values = [0.0 for m in moves]
-        # for depth in range(0, 40):
-        #     if self.timeLimit*2/3 < time.time()-self.startTime and not ponder:
-        #         return moves[0]
-        #     for i, move in enumerate(moves):
-        #         self.node.push(move)
-        #         # values[i] = self.negamax_pvs(depth, self.turnmod())
-        #         values[i] = self.wikisearch(depth, self.turnmod(), alpha=float("-inf"), beta=float("inf"))
-        #         self.node.pop()
-        #         if self.timeLimit < time.time()-self.startTime and not ponder:
-        #             return moves[0]
-        #     moves, values = self.move_sort(moves, values)
-        #     self.searchdata.append(
-        #         self.show_iteration_data(moves, values, depth))
-        #     # [print(self.node.san(move), end=" ") for move in moves]
-        #     # print("\n")
-        #     # if depth < 7 and abs(values[0]) > 300000000 and not ponder:
-        #     # return moves[0]
-        # return moves[0]
+
         start_time = time.time()
         self.startTime = start_time
         self.nodes = 0
         moves = [next(self.ordered_moves())]
         saved_position = deepcopy(self.node)
+
+        alpha, beta = float("-inf"), float("inf")
+        valWINDOW = PAWN_VALUE / 4
+
         try:
-            for depth in range(0, 40):
+            depth = 0
+            while depth < 40:
+                best = self.tt_lookup(self.node).best
                 time_elapsed = time.time() - start_time
+                # check if we aren't going to finish the next search in time
                 if time_elapsed > 0.5 * self.timeLimit and not ponder:
-                    return self.tt_lookup(self.node).best
-                self.wikisearch(depth, self.turnmod(), alpha=float("-inf"), beta=float("inf"))
+                    return best
+
+                val = self.wikisearch(
+                    depth, self.turnmod(), alpha=alpha, beta=beta)
+                if ((val <= alpha) or (val >= beta)):
+                    # We fell outside the window, so try again with a
+                    # full-width window (and the same depth).
+                    alpha = float("-inf")
+                    beta = float("inf")
+                    continue
+
+                best = self.tt_lookup(self.node).best
+                # check if we've run out of time
                 if time_elapsed > self.timeLimit and not ponder:
-                    return self.tt_lookup(self.node).best
+                    return best
 
                 moves = [self.tt_lookup(self.node).best]
                 values = [self.tt_lookup(self.node).value]
                 self.searchdata.append(self.show_iteration_data(moves, values, depth))
+
+                alpha = val - valWINDOW # Set up the window for the next iteration.
+                beta = val + valWINDOW
+                depth += 1
         except KeyboardInterrupt:
             self.node = saved_position
             pass
@@ -470,7 +425,7 @@ class Viridithas():
         # book = chess.polyglot.open_reader(
         #     r"ProDeo292/ProDeo292/books/elo2500.bin")
         book = chess.polyglot.open_reader(
-            r"books/Human.bin")
+            r"books/elo2500.bin")
         main_entry = book.find(self.node)
         choice = book.weighted_choice(self.node)
         book.close()
@@ -559,15 +514,17 @@ class Viridithas():
         player_colour = WHITE if player_colour == 'w' else BLACK
         timeControl = int(
             input("how many seconds should viri get per move?\n--> "))
-        self.__init__(human=True, timeLimit=timeControl, fen=fen)
+        self.__init__(human=True, timeLimit=timeControl, fen=fen, book=True, fun=False)
+        self.fun = False
         while not self.node.is_game_over():
             print(self.__repr__())
             if player_colour == self.node.turn:
-                try:
-                    self.ponder()
-                except KeyboardInterrupt:
-                    self.node = self.origin
-                    self.user_move()
+                # try:
+                #     self.ponder()
+                # except KeyboardInterrupt:
+                #     self.node = self.origin
+                #     self.user_move()
+                self.user_move()
             else:
                 self.engine_move()
         self.display_ending()
@@ -606,175 +563,3 @@ class Viridithas():
                     board.push(Move.from_uci(move))
 
 
-class Fork(Viridithas):
-    def __init__(self, human: bool = False, fen: str = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', pgn: str = '', timeLimit: int = 15, fun: bool = False, contempt: int = 3000, book: bool = True, advancedTC: list = []):
-        if pgn == '':
-            self.node = Board(fen)
-        else:
-            self.node = Board()
-            for move in pgn.split():
-                try:
-                    self.node.push_san(move)
-                except Exception:
-                    continue
-        self.timeLimit = timeLimit
-        self.startTime = time.time()
-        if advancedTC:
-            if not human:
-                advancedTC[0] = advancedTC[0]*2
-            self.endpoint = time.time()+advancedTC[0]*60
-            self.increment = advancedTC[1]
-        else:
-            self.endpoint = 0
-            self.increment = 0
-        self.fun = fun
-        self.contempt = contempt
-        self.human = human
-        self.nodes = 0
-        self.advancedTC = advancedTC
-        self.c = len(list(self.node.legal_moves))
-        self.tableSize = 2**20+49
-        self.hashtable = LRUCache(maxsize=self.tableSize)
-        self.ett = LRUCache(maxsize=self.tableSize)
-        self.hashstack = dict()
-        self.pieces = range(1, 7)
-        self.best = Move.from_uci('0000')
-        self.inbook = book
-        self.ext = False
-        self.searchdata = []
-
-
-class Atomic(Viridithas):
-    def __init__(self, human=False, fen='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', pgn='', timeLimit=15, fun=False, contempt=3000, book=True, advancedTC=False,):
-        super().__init__(human, fen, pgn, timeLimit, fun,
-                         contempt, False, advancedTC)
-        self.node = chess.variant.AtomicBoard(fen)
-
-
-class Crazyhouse(Viridithas):
-    def __init__(self, human=False, fen='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', pgn='', timeLimit=15, fun=False, contempt=3000, book=True, advancedTC=False):
-        super().__init__(human, fen, pgn, timeLimit, fun,
-                         contempt, book, advancedTC)
-        if pgn == '':
-            self.node = CrazyhouseBoard(fen)
-        else:
-            self.node = CrazyhouseBoard()
-            for move in pgn.split():
-                try:
-                    self.node.push_san(move)
-                except Exception:
-                    continue
-
-
-class Antichess(Viridithas):
-    def __init__(self, human=False, fen='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', pgn='', timeLimit=15, fun=False, contempt=3000, book=True, advancedTC=False):
-        super().__init__(human, fen, pgn, timeLimit, fun,
-                         contempt, False, advancedTC)
-        self.node = chess.variant.AntichessBoard(fen)
-
-    def evaluate(self, depth: float) -> int:
-        self.nodes += 1
-        return sum(itertools.chain((-1 for i in chess.scan_forward(self.node.occupied_co[0])), (1 for i in chess.scan_forward(self.node.occupied_co[1]))))
-
-
-class AntichessN(Viridithas):
-    def __init__(self, human=False, fen='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', pgn='', timeLimit=15, fun=False, contempt=3000, book=True, advancedTC=False):
-        super().__init__(human, fen, pgn, timeLimit, fun,
-                         contempt, False, advancedTC)
-        self.node = chess.variant.AntichessBoard(fen)
-
-    def evaluate(self, depth: float) -> int:
-        self.nodes += 1
-        return -sum(itertools.chain((-1 for i in chess.scan_forward(self.node.occupied_co[0])), (1 for i in chess.scan_forward(self.node.occupied_co[1]))))
-
-
-def selfplay(time: int = 15, position: str = "", pgn: str = "", usebook: bool = False, player1=Viridithas, player2=Fork):
-    e1 = player1(book=usebook, fun=True, contempt=0,
-                 fen=position, pgn=pgn, timeLimit=time)
-    e2 = player2(book=usebook, fun=True, contempt=0,
-                 fen=position, pgn=pgn, timeLimit=time)
-
-    while not (e1.node.is_game_over() or e2.node.is_game_over()):
-        print(e1.__repr__())
-        e2.node.push(e1.engine_move())
-        if e1.node.is_game_over() or e2.node.is_game_over():
-            break
-        print(e2.__repr__())
-        e1.node.push(e2.engine_move())
-
-    e1.display_ending()
-    game1 = e1.node.result()
-
-    e2 = player1(book=usebook, fun=True, contempt=0,
-                 fen=position, timeLimit=time)
-    e1 = player2(book=usebook, fun=True, contempt=0,
-                 fen=position, timeLimit=time)
-
-    while not (e1.node.is_game_over() or e2.node.is_game_over()):
-        print(e1.__repr__())
-        e2.node.push(e1.engine_move())
-        if e1.node.is_game_over() or e2.node.is_game_over():
-            break
-        print(e2.__repr__())
-        e1.node.push(e2.engine_move())
-
-    e1.display_ending()
-    game2 = e1.node.result()
-
-    insertion = "using book" if usebook else "without book"
-    resultstring = f"\nengine selfplay {insertion} with timecontrol of {str(time)} seconds per move each.\n"
-    resultstring += f"game1: White: {str(e1)} | Black: {str(e2)} | {game1}\n"
-    resultstring += f"game2: White: {str(e2)} | Black: {str(e1)} | {game2}\n"
-
-    return resultstring
-
-
-def general_purpose():
-
-    engineType = input(
-        "Enter variant: Regular, Atomic, Crazyhouse, Antichess, Fork [1/2/3/4/5]: ")
-    while engineType not in ['1', '2', '3', '4', '5']:
-        engineType = input(
-            "Enter variant: Regular, Atomic, Crazyhouse, Antichess, Fork [1/2/3/4/5]: ")
-
-    engines = [Viridithas, Atomic, Crazyhouse, Antichess, Fork]
-    engine = engines[int(engineType)-1]
-
-    engine.user_setup()
-    engine.run_game()
-
-
-def analysis(engineType, pos="", usebook=True, limit=1000000000000, indef=False):
-    engine = engineType(book=usebook, contempt=0,
-                        timeLimit=limit, fun=False, fen=pos)
-    engine.run_game(indefinite=indef)
-    return [elem[3:] for elem in engine.searchdata]
-
-
-interestingPosition = "8/b7/4P2p/8/3p2k1/1K1P4/pB6/8 b - - 0 58"
-
-if __name__ == "__main__":
-    pass
-    fen = "rn2k2r/pbpp1p1p/1p2p1p1/3Pbq1P/3BN3/8/PPP2P1P/R2QKBNR w KQkq - 4 11"
-    # fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-    analysis(Viridithas, input(), usebook=False)
-    # engine = Viridithas(
-    #     human=True,
-    #     timeLimit=15,
-    #     fun=True,
-    #     book=True,
-    # )
-    # engine.play_viri(fen)
-    # selfplay(
-    #     time=3, 
-    #     usebook=False, 
-    #     position="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
-    #     player1=Viridithas,
-    #     player2=Viridithas)
-
-    # pos = input()
-    # analysis(engineType=Crazyhouse, pos=pos, usebook=False)
-    # engine = Viridithas()
-    # engine.play_viri()
-
-# add a separate qsearch hashtable

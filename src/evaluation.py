@@ -1,12 +1,13 @@
 from functools import lru_cache
 from chess import Board, WHITE, BLACK, popcount, scan_forward
-from numpy.core.numeric import binary_repr
 from PSTs import PieceSquareTable
 from itertools import chain
 
 piecesquaretable = PieceSquareTable()()
 
 p, n, b, r, q, k, P, N, B, R, Q, K = range(12)
+
+PAWN_VALUE = 1000
 
 def chessboard_static_exchange_eval(board) -> int:
     rating = popcount(board.occupied_co[BLACK] & board.pawns) * 1000
@@ -20,10 +21,7 @@ def chessboard_static_exchange_eval(board) -> int:
     rating += popcount(board.occupied_co[BLACK] & board.queens) * 8800
     rating -= popcount(board.occupied_co[WHITE] & board.queens) * 8800
     return rating
-
-
-#@profile
-# @lru_cache(maxsize=64000)
+ 
 def chessboard_pst_eval(board: Board) -> int:
     white = board.occupied_co[WHITE]
     black = board.occupied_co[BLACK]
