@@ -15,14 +15,12 @@ from TTEntry import *
 from chess import WHITE, BLACK, Move, Board, scan_forward
 from chess.variant import CrazyhouseBoard
 from cachetools import LRUCache 
-from evaluation import chessboard_pst_eval, chessboard_static_exchange_eval, PAWN_VALUE
+from evaluation import ATTACK_FACTOR, KING_SAFETY_FACTOR, MOBILITY_FACTOR, PIECE_VALUES, QUEEN_VALUE, SPACE_FACTOR, chessboard_pst_eval, chessboard_static_exchange_eval, PAWN_VALUE, king_safety, mobility, piece_attack_counts, space
 from data_input import get_engine_parameters
 from LMR import search_reduction_factor
 from copy import deepcopy
 print("Python version")
 print(sys.version)
-
-MOBILITY_FACTOR = 10
 
 class Viridithas():
     def __init__(
@@ -63,7 +61,6 @@ class Viridithas():
         self.tableSize = 2**20+49
         self.hashtable: dict[Hashable, TTEntry] = dict()#LRUCache(
             #maxsize=self.tableSize)
-        self.hashstack: dict[Board, int] = dict()
         self.pieces = range(1, 7)
         self.inbook = book
         self.ext = False
@@ -105,43 +102,31 @@ class Viridithas():
             advancedTC=datadict["advancedTC"]
         )
 
-    ##@profile
-    def evaluate(self, depth: float) -> int:
+    # @profile
+    def evaluate(self, depth: float) -> float:
         self.nodes += 1
 
-        rating: int = 0
+        rating: float = 0
         if self.node.is_checkmate():
             return 1000000000 * int(depth+1) * (1 if self.node.turn else -1)
         if self.node.can_claim_fifty_moves():
             rating = -self.contempt * (1 if self.node.turn else -1)
 
-        # if self.node in self.hashstack:
-        #     rating = -self.contempt * (1 if self.node.turn else -1)
+        if self.node.is_repetition(2):
+            return  -self.contempt * (1 if self.node.turn else -1)
 
         rating += chessboard_pst_eval(self.node)
         # rating += chessboard_static_exchange_eval(self.node)
 
-        # mobility = 0
-        # if self.node.turn == WHITE:
-        #     mobility -= sum(1 for m in self.node.generate_pseudo_legal_moves() if not self.node.is_into_check(m))
-        #     self.node.push(Move.from_uci("0000"))
-        #     mobility += sum(1 for m in self.node.generate_pseudo_legal_moves() if not self.node.is_into_check(m))
-        #     self.node.pop()
-        # else:
-        #     mobility += sum(1 for m in self.node.generate_pseudo_legal_moves() if not self.node.is_into_check(m))
-        #     self.node.push(Move.from_uci("0000"))
-        #     mobility -= sum(1 for m in self.node.generate_pseudo_legal_moves() if not self.node.is_into_check(m))
-        #     self.node.pop()
-
-        # rating += mobility * MOBILITY_FACTOR
+        # rating += mobility(self.node) * MOBILITY_FACTOR
         
-        return rating
+        # rating += piece_attack_counts(self.node) * ATTACK_FACTOR
 
-    def record_stack(self) -> None:
-        if self.node in self.hashstack:
-            self.hashstack[self.node] += 1
-        else:
-            self.hashstack[self.node] = 1
+        # rating += king_safety(self.node) * KING_SAFETY_FACTOR
+
+        # rating += space(self.node) * SPACE_FACTOR
+
+        return rating
 
     def single_hash_iterator(self, best):
         yield best
@@ -219,21 +204,24 @@ class Viridithas():
         self.node.push(Move.from_uci("0000"))
 
     #@profile
-    def qsearch(self, a: float, b: float, depth: float, colour: int) -> float:
-        scoreIfNoCaptures = self.evaluate(depth) * colour
-        if scoreIfNoCaptures >= b:
-            return b
-        a = max(scoreIfNoCaptures, a)
+    def qsearch(self, alpha: float, beta: float, depth: float, colour: int) -> float:
+        val = self.evaluate(1) * colour
+        if val >= beta:
+            return beta
+        if (val < alpha - QUEEN_VALUE):
+            return alpha
+        
+        alpha = max(val, alpha)
 
         for capture in self.captures():
             self.node.push(capture)
-            score = -self.qsearch(-b, -a, depth - 1, -colour)
+            score = -self.qsearch(-beta, -alpha, depth - 1, -colour)
             self.node.pop()
-            if score >= b:
+            if score >= beta:
                 return score
-            a = max(score, a)
+            alpha = max(score, alpha)
 
-        return a
+        return alpha
 
     def tt_lookup(self, board: Board) -> "TTEntry":
         key = board._transposition_key()
@@ -458,7 +446,6 @@ class Viridithas():
             print(chess.pgn.Game.from_board(self.node)[-1])
         # self.record_stack()
         self.endpoint += self.increment
-
         return best
 
     def user_move(self) -> str:
