@@ -102,18 +102,23 @@ class Viridithas():
             advancedTC=datadict["advancedTC"]
         )
 
+    def gameover_check_info(self):
+        checkmate = self.node.is_checkmate()
+        draw = self.node.is_stalemate() or \
+            self.node.is_insufficient_material( ) or \
+            self.node.is_repetition(2) or self.node.is_seventyfive_moves() or not any(self.node.generate_legal_moves())
+        return checkmate or draw, checkmate, draw
+
     # @profile
-    def evaluate(self, depth: float) -> float:
+    def evaluate(self, depth: float, checkmate: bool, draw: bool) -> float:
         self.nodes += 1
 
-        rating: float = 0
-        if self.node.is_checkmate():
-            return 1000000000 * int(depth+1) * (1 if self.node.turn else -1)
-        if self.node.can_claim_fifty_moves():
-            rating = -self.contempt * (1 if self.node.turn else -1)
+        if checkmate:
+            return 1000000000 * int(max(depth+1, 1)) * (1 if self.node.turn else -1)
+        if draw:
+            return -self.contempt * (1 if self.node.turn else -1)
 
-        if self.node.is_repetition(2):
-            return  -self.contempt * (1 if self.node.turn else -1)
+        rating: float = 0
 
         rating += chessboard_pst_eval(self.node)
         # rating += chessboard_static_exchange_eval(self.node)
@@ -204,8 +209,11 @@ class Viridithas():
         self.node.push(Move.from_uci("0000"))
 
     #@profile
-    def qsearch(self, alpha: float, beta: float, depth: float, colour: int) -> float:
-        val = self.evaluate(1) * colour
+    def qsearch(self, alpha: float, beta: float, depth: float, colour: int, gameover: bool, checkmate: bool, draw: bool) -> float:
+
+        val = self.evaluate(1, checkmate, draw) * colour
+        if gameover:
+            return val
         if val >= beta:
             return beta
         if (val < alpha - QUEEN_VALUE):
@@ -215,7 +223,8 @@ class Viridithas():
 
         for capture in self.captures():
             self.node.push(capture)
-            score = -self.qsearch(-beta, -alpha, depth - 1, -colour)
+            gameover, checkmate, draw = self.gameover_check_info()
+            score = -self.qsearch(-beta, -alpha, depth - 1, -colour, gameover, checkmate, draw)
             self.node.pop()
             if score >= beta:
                 return score
@@ -255,11 +264,13 @@ class Viridithas():
         else:
             moves = self.ordered_moves()
 
-        if depth < 0:
-            return self.qsearch(alpha, beta, depth, colour)
+        gameover, checkmate, draw = self.gameover_check_info()
 
-        if self.node.is_game_over():
-            return colour * self.evaluate(depth)
+        if gameover:
+            return colour * self.evaluate(depth, checkmate, draw)
+
+        if depth < 0:
+            return self.qsearch(alpha, beta, depth, colour, gameover, checkmate, draw)
 
         current_pos_is_check = self.node.is_check()
         if not current_pos_is_check and depth >= 3:
