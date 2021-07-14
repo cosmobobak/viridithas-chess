@@ -73,7 +73,7 @@ class CrazyHouse(Viridithas):
 if __name__ == "__main__":
     pass
     fen = "8/3Q4/6kp/6p1/3Bq1K1/8/6PP/8 w - - 0 1"
-    # fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+    fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     high_branch_fen = "1r6/3kp3/4Rp2/1prP2p1/p7/P6P/1PPR1PPK/8 w - - 7 32"
     # analysis(Viridithas, input(), usebook=False)
     engine = Viridithas(

@@ -52,6 +52,8 @@ interestingPosition = "8/b7/4P2p/8/3p2k1/1K1P4/pB6/8 b - - 0 58"
 
 viriQueenSacPosition = "r4qk1/1rp2pp1/p2p1n2/P2Pp3/4P3/1B4QP/2P2PP1/3RR1K1 w - - 0 30"
 
+invisible_mate = "r4k1r/3n1ppp/3p4/2bQ2P1/1q6/5P2/PB2R1KP/4R3 b - - 2 29"
+
 class CrazyHouse(Viridithas):
     def __init__(self,
                  human: bool = False,
@@ -70,7 +72,7 @@ if __name__ == "__main__":
     fen = "8/8/5p2/3k4/p5P1/P1r2P2/1R4P1/6K1 w - - 5 46"
     fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     high_branch_fen = "1r6/3kp3/4Rp2/1prP2p1/p7/P6P/1PPR1PPK/8 w - - 7 32"
-    analysis(Viridithas, input(), usebook=False)
+    analysis(Viridithas, input(), usebook=True)
     # engine = CrazyHouse(
     #     human=True,
     #     timeLimit=15,

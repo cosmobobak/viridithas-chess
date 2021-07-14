@@ -189,20 +189,20 @@ class Viridithas():
 
     def ordered_moves(self):
         return (m for m in itertools.chain(
-            self.winning_captures(),
-            # self.captures_piece(
-            #     self.node.occupied_co[not self.node.turn] & self.node.queens),
-            # self.captures_piece(
-            #     self.node.occupied_co[not self.node.turn] & self.node.rooks),
-            # self.captures_piece(
-            #     self.node.occupied_co[not self.node.turn] & self.node.bishops),
-            # self.captures_piece(
-            #     self.node.occupied_co[not self.node.turn] & self.node.knights),
-            # self.captures_piece(
-            #     self.node.occupied_co[not self.node.turn] & self.node.pawns),
+            # self.winning_captures(),
+            self.captures_piece(
+                self.node.occupied_co[not self.node.turn] & self.node.queens),
+            self.captures_piece(
+                self.node.occupied_co[not self.node.turn] & self.node.rooks),
+            self.captures_piece(
+                self.node.occupied_co[not self.node.turn] & self.node.bishops),
+            self.captures_piece(
+                self.node.occupied_co[not self.node.turn] & self.node.knights),
+            self.captures_piece(
+                self.node.occupied_co[not self.node.turn] & self.node.pawns),
             self.node.generate_pseudo_legal_moves(
                 0xffff_ffff_ffff_ffff, ~self.node.occupied_co[not self.node.turn]),
-            self.losing_captures()
+            # self.losing_captures()
         ) if self.node.is_legal(m))
 
     def pass_turn(self) -> None:
