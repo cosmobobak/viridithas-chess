@@ -28,7 +28,7 @@ class Viridithas():
         human: bool = False,
         fen: str = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
         pgn: str = '',
-        timeLimit: int = 15,
+        timeLimit: float = 15,
         fun: bool = False,
         contempt: int = 3000,
         book: bool = True,
@@ -370,7 +370,7 @@ class Viridithas():
         print(f"{self.node.san(moves[0])} | {-round((self.turnmod()*values[0])/1000, 3)} | {str(t)}s at depth {str(depth + 1)}, {str(self.nodes)} nodes processed, at {str(int(self.nodes / (t+0.00001)))}NPS.\n", f"PV: {self.pv_string()}\n", end="")
         return (self.node.san(moves[0]), self.turnmod()*values[0], self.nodes, depth+1, t)
 
-    def search(self, ponder: bool = False):
+    def search(self, ponder: bool = False, readout: bool = True):
 
         start_time = time.time()
         self.startTime = start_time
@@ -406,7 +406,9 @@ class Viridithas():
 
                 moves = [self.tt_lookup(self.node).best]
                 values = [self.tt_lookup(self.node).value]
-                self.searchdata.append(self.show_iteration_data(moves, values, depth))
+
+                if readout:
+                    self.searchdata.append(self.show_iteration_data(moves, values, depth))
 
                 alpha = val - valWINDOW # Set up the window for the next iteration.
                 beta = val + valWINDOW
