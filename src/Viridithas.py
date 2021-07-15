@@ -28,7 +28,7 @@ class Viridithas():
         human: bool = False,
         fen: str = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
         pgn: str = '',
-        timeLimit: float = 15,
+        time_limit: float = 15,
         fun: bool = False,
         contempt: int = 3000,
         book: bool = True,
@@ -43,8 +43,7 @@ class Viridithas():
                     self.node.push_san(move)
                 except Exception:
                     continue
-        self.timeLimit = timeLimit
-        self.startTime = time.time()
+        self.time_limit = time_limit
         if advancedTC:
             if not human:
                 advancedTC[0] = advancedTC[0]*2
@@ -95,7 +94,7 @@ class Viridithas():
             human=datadict["human"],
             fen=datadict["fen"],
             pgn=datadict["pgn"],
-            timeLimit=datadict["timeLimit"],
+            time_limit=datadict["time_limit"],
             fun=datadict["fun"],
             contempt=datadict["contempt"],
             book=datadict["book"],
@@ -125,7 +124,7 @@ class Viridithas():
 
         # rating += mobility(self.node) * MOBILITY_FACTOR
         
-        # rating += piece_attack_counts(self.node) * ATTACK_FACTOR
+        rating += piece_attack_counts(self.node) * ATTACK_FACTOR
 
         # rating += king_safety(self.node) * KING_SAFETY_FACTOR
 
@@ -242,23 +241,23 @@ class Viridithas():
 
     #@profile
     def wikisearch(self, depth: float, colour: int, alpha: float, beta: float) -> float:
-        alphaOrig = alpha
+        initial_alpha = alpha
 
         # (* Transposition Table Lookup; self.node is the lookup key for ttEntry *)
-        ttEntry = self.tt_lookup(self.node)
-        if not ttEntry.is_null() and ttEntry.depth >= depth:
-            if ttEntry.type == EXACT:
-                return ttEntry.value
-            elif ttEntry.type == LOWERBOUND:
-                alpha = max(alpha, ttEntry.value)
-            elif ttEntry.type == UPPERBOUND:
-                beta = min(beta, ttEntry.value)
+        tt_entry = self.tt_lookup(self.node)
+        if not tt_entry.is_null() and tt_entry.depth >= depth:
+            if tt_entry.type == EXACT:
+                return tt_entry.value
+            elif tt_entry.type == LOWERBOUND:
+                alpha = max(alpha, tt_entry.value)
+            elif tt_entry.type == UPPERBOUND:
+                beta = min(beta, tt_entry.value)
 
             if alpha >= beta:
-                return ttEntry.value
+                return tt_entry.value
             
-            if self.node.is_legal(ttEntry.best):
-                moves = itertools.chain([ttEntry.best], filter(lambda x: x != ttEntry.best, self.ordered_moves()))
+            if self.node.is_legal(tt_entry.best):
+                moves = itertools.chain([tt_entry.best], filter(lambda x: x != tt_entry.best, self.ordered_moves()))
             else:
                 moves = self.ordered_moves()
         else:
@@ -319,17 +318,17 @@ class Viridithas():
 
         # (* Transposition Table Store; self.node is the lookup key for ttEntry *)
         # ttEntry = TTEntry()
-        ttEntry.value = value
-        if value <= alphaOrig:
-            ttEntry.type = UPPERBOUND
+        tt_entry.value = value
+        if value <= initial_alpha:
+            tt_entry.type = UPPERBOUND
         elif value >= beta:
-            ttEntry.type = LOWERBOUND
+            tt_entry.type = LOWERBOUND
         else:
-            ttEntry.type = EXACT
-        ttEntry.depth = depth
-        ttEntry.best = best_move
-        ttEntry.null = False
-        self.tt_store(self.node, ttEntry)
+            tt_entry.type = EXACT
+        tt_entry.depth = depth
+        tt_entry.best = best_move
+        tt_entry.null = False
+        self.tt_store(self.node, tt_entry)
 
         return value
 
@@ -360,20 +359,18 @@ class Viridithas():
 
         if count == 0: return ""
         return " ".join(moves)
-        return ""
 
     def turnmod(self) -> int:
         return -1 if self.node.turn else 1
 
-    def show_iteration_data(self, moves: list, values: list, depth: float) -> tuple:
-        t = round(time.time()-self.startTime, 2)
+    def show_iteration_data(self, moves: list, values: list, depth: float, start: float) -> tuple:
+        t = round(time.time()-start, 2)
         print(f"{self.node.san(moves[0])} | {-round((self.turnmod()*values[0])/1000, 3)} | {str(t)}s at depth {str(depth + 1)}, {str(self.nodes)} nodes processed, at {str(int(self.nodes / (t+0.00001)))}NPS.\n", f"PV: {self.pv_string()}\n", end="")
         return (self.node.san(moves[0]), self.turnmod()*values[0], self.nodes, depth+1, t)
 
     def search(self, ponder: bool = False, readout: bool = True):
 
         start_time = time.time()
-        self.startTime = start_time
         self.nodes = 0
         moves = [next(self.ordered_moves())]
         saved_position = deepcopy(self.node)
@@ -387,7 +384,7 @@ class Viridithas():
                 best = self.tt_lookup(self.node).best
                 time_elapsed = time.time() - start_time
                 # check if we aren't going to finish the next search in time
-                if time_elapsed > 0.5 * self.timeLimit and not ponder:
+                if time_elapsed > 0.5 * self.time_limit and not ponder:
                     return best
 
                 val = self.wikisearch(
@@ -401,14 +398,15 @@ class Viridithas():
 
                 best = self.tt_lookup(self.node).best
                 # check if we've run out of time
-                if time_elapsed > self.timeLimit and not ponder:
+                if time_elapsed > self.time_limit and not ponder:
                     return best
 
                 moves = [self.tt_lookup(self.node).best]
                 values = [self.tt_lookup(self.node).value]
 
                 if readout:
-                    self.searchdata.append(self.show_iteration_data(moves, values, depth))
+                    self.searchdata.append(self.show_iteration_data(
+                        moves, values, depth, start_time))
 
                 alpha = val - valWINDOW # Set up the window for the next iteration.
                 beta = val + valWINDOW
@@ -435,8 +433,8 @@ class Viridithas():
     def engine_move(self) -> Move:
         # add flag_func for egtb mode
         if self.advancedTC:
-            self.timeLimit = (self.endpoint-time.time())/20
-        print("Time for move: " + str(round(self.timeLimit, 2)) + "s")
+            self.time_limit = (self.endpoint-time.time())/20
+        print("Time for move: " + str(round(self.time_limit, 2)) + "s")
         if self.inbook:
             try:
                 best, choice = self.get_book_move()
@@ -447,12 +445,12 @@ class Viridithas():
                     self.node.push(best)
                 print(chess.pgn.Game.from_board(self.node)[-1])
             except IndexError:
-                self.timeLimit = self.timeLimit*2
+                self.time_limit = self.time_limit*2
                 best = self.search()
                 self.node.push(best)
                 print(chess.pgn.Game.from_board(self.node)[-1])
                 self.inbook = False
-                self.timeLimit = self.timeLimit/2
+                self.time_limit = self.time_limit/2
         else:
             best = self.search()
             self.node.push(best)
@@ -514,7 +512,7 @@ class Viridithas():
         player_colour = WHITE if player_colour == 'w' else BLACK
         timeControl = int(
             input("how many seconds should viri get per move?\n--> "))
-        self.__init__(human=True, timeLimit=timeControl, fen=fen, book=True, fun=False)
+        self.__init__(human=True, time_limit=timeControl, fen=fen, book=True, fun=False)
         self.fun = False
         while not self.node.is_game_over():
             print(self.__repr__())
