@@ -45,8 +45,6 @@ class Viridithas():
                     continue
         self.time_limit = time_limit
         if advancedTC:
-            if not human:
-                advancedTC[0] = advancedTC[0]*2
             self.endpoint = time.time()+advancedTC[0]*60
             self.increment = advancedTC[1]
         else:
@@ -57,25 +55,14 @@ class Viridithas():
         self.human = human
         self.nodes = 0
         self.advancedTC = advancedTC
-        self.tableSize = 2**20+49
-        self.hashtable: dict[Hashable, TTEntry] = dict()#LRUCache(
-            #maxsize=self.tableSize)
-        self.pieces = range(1, 7)
+        self.hashtable: dict[Hashable, TTEntry] = dict()
         self.inbook = book
-        self.ext = False
-        self.searchdata = []
 
     def set_position(self, fen):
         self.node = Board(fen)
 
     def __repr__(self) -> str:
-        try:
-            display(chess.svg.board(board=self.node,
-                                    size=400,
-                                    flipped=not self.node.turn))  # FOR A JUPYTER NOTEBOOK
-            return self.__class__.__name__+"-engine at position "+str(self.node.fen())
-        except Exception:
-            return str(self.node) + '\n' + self.__class__.__name__+"-engine at position " + str(self.node.fen())
+        return str(self.node) + '\n' + self.__class__.__name__+"-engine at position " + str(self.node.fen())
 
     def __str__(self) -> str:
         return self.__class__.__name__
@@ -405,8 +392,7 @@ class Viridithas():
                 values = [self.tt_lookup(self.node).value]
 
                 if readout:
-                    self.searchdata.append(self.show_iteration_data(
-                        moves, values, depth, start_time))
+                    self.show_iteration_data(moves, values, depth, start_time)
 
                 alpha = val - valWINDOW # Set up the window for the next iteration.
                 beta = val + valWINDOW
