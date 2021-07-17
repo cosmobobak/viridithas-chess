@@ -21,7 +21,7 @@ KING_SAFETY_FACTOR = 10
 SPACE_FACTOR = 10
 PIECE_VALUES = [0, 1000, 3200, 3330, 5100, 8800, 2000000]
 
-def chessboard_static_exchange_eval(board) -> int:
+def see_eval(board) -> int:
     rating = popcount(board.occupied_co[BLACK] & board.pawns) * 1000
     rating -= popcount(board.occupied_co[WHITE] & board.pawns) * 1000
     rating += popcount(board.occupied_co[BLACK] & board.knights) * 3200
@@ -33,8 +33,8 @@ def chessboard_static_exchange_eval(board) -> int:
     rating += popcount(board.occupied_co[BLACK] & board.queens) * 8800
     rating -= popcount(board.occupied_co[WHITE] & board.queens) * 8800
     return rating
- 
-def chessboard_pst_eval(board: Board) -> int:
+
+def pst_eval(board: Board) -> int:
     white = board.occupied_co[WHITE]
     black = board.occupied_co[BLACK]
     return sum(chain(

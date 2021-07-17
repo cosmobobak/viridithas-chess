@@ -15,7 +15,7 @@ from TTEntry import *
 from chess import WHITE, BLACK, Move, Board, scan_forward
 from chess.variant import CrazyhouseBoard
 from cachetools import LRUCache 
-from evaluation import ATTACK_FACTOR, FUTILITY_MARGIN, KING_SAFETY_FACTOR, MATE_VALUE, MOBILITY_FACTOR, PIECE_VALUES, QUEEN_VALUE, SPACE_FACTOR, chessboard_pst_eval, chessboard_static_exchange_eval, PAWN_VALUE, king_safety, mobility, piece_attack_counts, space
+from evaluation import ATTACK_FACTOR, FUTILITY_MARGIN, KING_SAFETY_FACTOR, MATE_VALUE, MOBILITY_FACTOR, PIECE_VALUES, QUEEN_VALUE, SPACE_FACTOR, pst_eval, see_eval, PAWN_VALUE, king_safety, mobility, piece_attack_counts, space
 from data_input import get_engine_parameters
 from LMR import search_reduction_factor
 from copy import deepcopy
@@ -106,8 +106,8 @@ class Viridithas():
 
         rating: float = 0
 
-        rating += chessboard_pst_eval(self.node)
-        # rating += chessboard_static_exchange_eval(self.node)
+        rating += pst_eval(self.node)
+        # rating += see_eval(self.node)
 
         # rating += mobility(self.node) * MOBILITY_FACTOR
         
@@ -259,17 +259,18 @@ class Viridithas():
             return self.qsearch(alpha, beta, depth, colour, gameover, checkmate, draw)
 
         current_pos_is_check = self.node.is_check()
-        if not current_pos_is_check and depth >= 3:
+        if not current_pos_is_check and depth >= 3 and abs(alpha) < MATE_VALUE and abs(beta) < MATE_VALUE:
             # MAKE A NULL MOVE
             self.node.push(Move.null())  
             # PERFORM A LIMITED SEARCH
-            value = - self.negamax(depth - 3, -colour, -beta, -alpha)
+            value = - self.negamax(depth - 3, -colour, -beta, -beta + 1)
             # UNMAKE NULL MOVE
             self.node.pop()
+
             if value >= beta:
                 return beta
 
-        DO_FUTILITY_PRUNING = not current_pos_is_check and depth == 1 and abs(alpha) < MATE_VALUE / 2 and abs(beta) < MATE_VALUE / 2 and self.evaluate(depth, checkmate, draw) + FUTILITY_MARGIN < alpha 
+        DO_FUTILITY_PRUNING = not current_pos_is_check and depth <= 1 and abs(alpha) < MATE_VALUE / 2 and abs(beta) < MATE_VALUE / 2 and see_eval(self.node) * colour + FUTILITY_MARGIN < alpha
 
         best_move = Move.null()
         search_pv = True
@@ -282,23 +283,22 @@ class Viridithas():
             is_promo = bool(move.promotion)
             depth_reduction = search_reduction_factor(
                 move_idx, current_pos_is_check, gives_check, is_capture, is_promo, depth)
-
+                
             if DO_FUTILITY_PRUNING:
                 # "not search_pv" means we search at least one move, don't know if this is necessary
                 if not gives_check and not is_capture and not search_pv: 
                     continue
 
             self.node.push(move)
-
+            
             if search_pv:
                 r = -self.negamax(depth - depth_reduction, -colour, -beta, -alpha)
                 value = max(value, r)
             else:
                 r = -self.negamax(depth - depth_reduction, -colour, -alpha-1, -alpha)
-                value = max(value, r)
-                if (value > alpha): # // in fail-soft ... & & value < beta) is common
+                if (r > alpha): # // in fail-soft ... & & value < beta) is common
                     r = -self.negamax(depth - depth_reduction, -colour, -beta, -alpha) #// re-search
-                    value = max(value, r)
+                value = max(value, r)
 
             self.node.pop()
 
@@ -363,7 +363,7 @@ class Viridithas():
         return (self.node.san(moves[0]), self.turnmod()*values[0], self.nodes, depth+1, t)
 
     def search(self, ponder: bool = False, readout: bool = True):
-
+        val = float("-inf")
         start_time = time.time()
         self.nodes = 0
         moves = [next(self.ordered_moves())]
@@ -379,10 +379,11 @@ class Viridithas():
                 time_elapsed = time.time() - start_time
                 # check if we aren't going to finish the next search in time
                 if time_elapsed > 0.5 * self.time_limit and not ponder:
-                    return best
+                    return best, val
 
                 val = self.negamax(
                     depth, self.turnmod(), alpha=alpha, beta=beta)
+                # print(val)
                 if ((val <= alpha) or (val >= beta)):
                     # We fell outside the window, so try again with a
                     # full-width window (and the same depth).
@@ -393,7 +394,7 @@ class Viridithas():
                 best = self.tt_lookup(self.node).best
                 # check if we've run out of time
                 if time_elapsed > self.time_limit and not ponder:
-                    return best
+                    return best, val
 
                 moves = [self.tt_lookup(self.node).best]
                 values = [self.tt_lookup(self.node).value]
@@ -407,7 +408,7 @@ class Viridithas():
         except KeyboardInterrupt:
             self.node = saved_position
             pass
-        return moves[0]
+        return moves[0], val
 
     def ponder(self) -> None:
         self.origin = self.node.copy()
@@ -439,13 +440,13 @@ class Viridithas():
                 print(chess.pgn.Game.from_board(self.node)[-1])
             except IndexError:
                 self.time_limit = self.time_limit*2
-                best = self.search()
+                best, _ = self.search()
                 self.node.push(best)
                 print(chess.pgn.Game.from_board(self.node)[-1])
                 self.inbook = False
                 self.time_limit = self.time_limit/2
         else:
-            best = self.search()
+            best, _ = self.search()
             self.node.push(best)
             print(chess.pgn.Game.from_board(self.node)[-1])
         # self.record_stack()
