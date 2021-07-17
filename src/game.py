@@ -4,9 +4,9 @@ from Viridithas import Viridithas
 
 def selfplay(time: int = 15, position: str = "", pgn: str = "", usebook: bool = False, player1=Viridithas, player2=Viridithas):
     e1 = player1(book=usebook, fun=True, contempt=0,
-                 fen=position, pgn=pgn, timeLimit=time)
+                 fen=position, pgn=pgn, time_limit=time)
     e2 = player2(book=usebook, fun=True, contempt=0,
-                 fen=position, pgn=pgn, timeLimit=time)
+                 fen=position, pgn=pgn, time_limit=time)
 
     while not (e1.node.is_game_over() or e2.node.is_game_over()):
         print(e1.__repr__())
@@ -20,9 +20,9 @@ def selfplay(time: int = 15, position: str = "", pgn: str = "", usebook: bool = 
     game1 = e1.node.result()
 
     e2 = player1(book=usebook, fun=True, contempt=0,
-                 fen=position, timeLimit=time)
+                 fen=position, time_limit=time)
     e1 = player2(book=usebook, fun=True, contempt=0,
-                 fen=position, timeLimit=time)
+                 fen=position, time_limit=time)
 
     while not (e1.node.is_game_over() or e2.node.is_game_over()):
         print(e1.__repr__())
@@ -45,7 +45,7 @@ def selfplay(time: int = 15, position: str = "", pgn: str = "", usebook: bool = 
 
 def analysis(engineType, pos="", usebook=True, limit=1000000000000, indef=False):
     engine = engineType(book=usebook, contempt=0,
-                        timeLimit=limit, fun=False, fen=pos)
+                        time_limit=limit, fun=False, fen=pos)
     engine.run_game(indefinite=indef)
     return [elem[3:] for elem in engine.searchdata]
 
@@ -60,12 +60,12 @@ class CrazyHouse(Viridithas):
                  human: bool = False,
                  fen: str = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
                  pgn: str = '',
-                 timeLimit: int = 15,
+                 time_limit: int = 15,
                  fun: bool = False,
                  contempt: int = 3000,
                  book: bool = True,
                  advancedTC: list = [],):
-        super().__init__(human=human, fen=fen, pgn=pgn, timeLimit=timeLimit,
+        super().__init__(human=human, fen=fen, pgn=pgn, time_limit=time_limit,
                          fun=fun, contempt=contempt, book=book, advancedTC=advancedTC)
         self.node = chess.variant.CrazyhouseBoard(fen=fen)
 
@@ -78,11 +78,12 @@ if __name__ == "__main__":
     # analysis(Viridithas, input(), usebook=False)
     engine = Viridithas(
         human=True,
-        timeLimit=15,
+        time_limit=15,
         fun=False,
         book=False,
     )
-    engine.play_viri(fen)
+    engine.play_viri(
+        "r3k2r/1p3ppp/p2p1b2/q3P3/2b5/2N1B2P/PPPQ2P1/1K1R3R b kq - 0 1")
 
     # analysis(Viridithas, viriQueenSacPosition, usebook=False)
     # analysis(Viridithas, fen, usebook=False, limit=10)

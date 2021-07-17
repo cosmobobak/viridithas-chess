@@ -14,7 +14,7 @@ def get_engine_parameters():
     else:
         out["pgn"] = ""
 
-    out["timeLimit"] = 10000000000
+    out["time_limit"] = 10000000000
     out["advancedTC"] = [0, 0]
 
     controlType = input("Advanced, Simple, or Infinite time control? \n[a/s/i]: ").upper()
@@ -22,7 +22,7 @@ def get_engine_parameters():
         controlType = input("[a/s/i]: ").upper()
 
     if controlType == 'S':
-        out["timeLimit"] = int(input("Enter time limit in seconds: "))
+        out["time_limit"] = int(input("Enter time limit in seconds: "))
 
     elif controlType == 'A':
         out["advancedTC"][0] = int(input("Enter minutes: "))

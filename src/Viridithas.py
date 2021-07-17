@@ -111,7 +111,7 @@ class Viridithas():
 
         # rating += mobility(self.node) * MOBILITY_FACTOR
         
-        rating += piece_attack_counts(self.node) * ATTACK_FACTOR
+        # rating += piece_attack_counts(self.node) * ATTACK_FACTOR
 
         # rating += king_safety(self.node) * KING_SAFETY_FACTOR
 
