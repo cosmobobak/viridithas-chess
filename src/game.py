@@ -82,8 +82,7 @@ if __name__ == "__main__":
         fun=False,
         book=False,
     )
-    engine.play_viri(
-        "r3k2r/1p3ppp/p2p1b2/q3P3/2b5/2N1B2P/PPPQ2P1/1K1R3R b kq - 0 1")
+    engine.play_viri(fen)
 
     # analysis(Viridithas, viriQueenSacPosition, usebook=False)
     # analysis(Viridithas, fen, usebook=False, limit=10)

@@ -285,8 +285,7 @@ class Viridithas():
                 move_idx, current_pos_is_check, gives_check, is_capture, is_promo, depth)
                 
             if do_prune:
-                # "not search_pv" means we search at least one move, don't know if this is necessary
-                if not gives_check and not is_capture and not search_pv: 
+                if not gives_check and not is_capture: 
                     continue
 
             self.node.push(move)
@@ -385,13 +384,15 @@ class Viridithas():
         alpha, beta = float("-inf"), float("inf")
         valWINDOW = PAWN_VALUE / 4
 
+        WINDOW_FAILED = False
+
         try:
             depth = 1
             while depth < 40:
                 best = self.tt_lookup(self.node).best
                 time_elapsed = time.time() - start_time
                 # check if we aren't going to finish the next search in time
-                if time_elapsed > 0.5 * self.time_limit and not ponder:
+                if time_elapsed > 0.5 * self.time_limit and not ponder and not WINDOW_FAILED:
                     return best, val
 
                 val = self.negamax(
@@ -402,7 +403,9 @@ class Viridithas():
                     # full-width window (and the same depth).
                     alpha = float("-inf")
                     beta = float("inf")
+                    WINDOW_FAILED = True
                     continue
+                WINDOW_FAILED = False
 
                 best = self.tt_lookup(self.node).best
                 # check if we've run out of time
