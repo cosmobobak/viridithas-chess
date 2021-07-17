@@ -1,5 +1,4 @@
 from Viridithas import Viridithas
-from tqdm import tqdm
 
 def evaluate(fen: str, tl: float) -> float:
     v = Viridithas(time_limit=tl, book=False)

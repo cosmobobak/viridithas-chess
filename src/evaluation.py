@@ -1,5 +1,5 @@
 from functools import lru_cache
-from chess import BB_KNIGHT_ATTACKS, BB_RANK_1, BB_RANK_2, BB_RANK_3, BB_RANK_4, BB_RANK_5, BB_RANK_6, BB_RANK_7, BB_RANK_8, BB_RAYS, Board, Move, WHITE, BLACK, lsb, popcount, scan_forward, BB_PAWN_ATTACKS
+from chess import BB_KNIGHT_ATTACKS, BB_RANK_1, BB_RANK_2, BB_RANK_3, BB_RANK_4, BB_RANK_5, BB_RANK_6, BB_RANK_7, BB_RANK_8, Board, Move, WHITE, BLACK, lsb, popcount, scan_forward, BB_PAWN_ATTACKS
 import chess
 from PSTs import PieceSquareTable
 from itertools import chain
@@ -13,6 +13,8 @@ KNIGHT_VALUE = 3200
 BISHOP_VALUE = 3330
 ROOK_VALUE = 5100
 QUEEN_VALUE = 8800
+MATE_VALUE = 1000000000
+FUTILITY_MARGIN = BISHOP_VALUE + 100
 MOBILITY_FACTOR = 10
 ATTACK_FACTOR = 10
 KING_SAFETY_FACTOR = 10

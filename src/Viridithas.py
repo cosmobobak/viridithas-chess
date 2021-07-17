@@ -15,7 +15,7 @@ from TTEntry import *
 from chess import WHITE, BLACK, Move, Board, scan_forward
 from chess.variant import CrazyhouseBoard
 from cachetools import LRUCache 
-from evaluation import ATTACK_FACTOR, KING_SAFETY_FACTOR, MOBILITY_FACTOR, PIECE_VALUES, QUEEN_VALUE, SPACE_FACTOR, chessboard_pst_eval, chessboard_static_exchange_eval, PAWN_VALUE, king_safety, mobility, piece_attack_counts, space
+from evaluation import ATTACK_FACTOR, FUTILITY_MARGIN, KING_SAFETY_FACTOR, MATE_VALUE, MOBILITY_FACTOR, PIECE_VALUES, QUEEN_VALUE, SPACE_FACTOR, chessboard_pst_eval, chessboard_static_exchange_eval, PAWN_VALUE, king_safety, mobility, piece_attack_counts, space
 from data_input import get_engine_parameters
 from LMR import search_reduction_factor
 from copy import deepcopy
@@ -100,7 +100,7 @@ class Viridithas():
         self.nodes += 1
 
         if checkmate:
-            return 1000000000 * int(max(depth+1, 1)) * (1 if self.node.turn else -1)
+            return MATE_VALUE * int(max(depth+1, 1)) * (1 if self.node.turn else -1)
         if draw:
             return -self.contempt * (1 if self.node.turn else -1)
 
@@ -227,7 +227,7 @@ class Viridithas():
         self.hashtable[key] = entry
 
     #@profile
-    def wikisearch(self, depth: float, colour: int, alpha: float, beta: float) -> float:
+    def negamax(self, depth: float, colour: int, alpha: float, beta: float) -> float:
         initial_alpha = alpha
 
         # (* Transposition Table Lookup; self.node is the lookup key for ttEntry *)
@@ -255,7 +255,7 @@ class Viridithas():
         if gameover:
             return colour * self.evaluate(depth, checkmate, draw)
 
-        if depth < 0:
+        if depth < 1:
             return self.qsearch(alpha, beta, depth, colour, gameover, checkmate, draw)
 
         current_pos_is_check = self.node.is_check()
@@ -263,11 +263,13 @@ class Viridithas():
             # MAKE A NULL MOVE
             self.node.push(Move.null())  
             # PERFORM A LIMITED SEARCH
-            value = - self.wikisearch(depth - 3, -colour, -beta, -alpha)
+            value = - self.negamax(depth - 3, -colour, -beta, -alpha)
             # UNMAKE NULL MOVE
             self.node.pop()
             if value >= beta:
                 return beta
+
+        DO_FUTILITY_PRUNING = not current_pos_is_check and depth == 1 and abs(alpha) < MATE_VALUE / 2 and abs(beta) < MATE_VALUE / 2 and self.evaluate(depth, checkmate, draw) + FUTILITY_MARGIN < alpha 
 
         best_move = Move.null()
         search_pv = True
@@ -281,16 +283,21 @@ class Viridithas():
             depth_reduction = search_reduction_factor(
                 move_idx, current_pos_is_check, gives_check, is_capture, is_promo, depth)
 
+            if DO_FUTILITY_PRUNING:
+                # "not search_pv" means we search at least one move, don't know if this is necessary
+                if not gives_check and not is_capture and not search_pv: 
+                    continue
+
             self.node.push(move)
 
             if search_pv:
-                r = -self.wikisearch(depth - depth_reduction, -colour, -beta, -alpha)
+                r = -self.negamax(depth - depth_reduction, -colour, -beta, -alpha)
                 value = max(value, r)
             else:
-                r = -self.wikisearch(depth - depth_reduction, -colour, -alpha-1, -alpha)
+                r = -self.negamax(depth - depth_reduction, -colour, -alpha-1, -alpha)
                 value = max(value, r)
                 if (value > alpha): # // in fail-soft ... & & value < beta) is common
-                    r = -self.wikisearch(depth - depth_reduction, -colour, -beta, -alpha) #// re-search
+                    r = -self.negamax(depth - depth_reduction, -colour, -beta, -alpha) #// re-search
                     value = max(value, r)
 
             self.node.pop()
@@ -366,7 +373,7 @@ class Viridithas():
         valWINDOW = PAWN_VALUE / 4
 
         try:
-            depth = 0
+            depth = 1
             while depth < 40:
                 best = self.tt_lookup(self.node).best
                 time_elapsed = time.time() - start_time
@@ -374,7 +381,7 @@ class Viridithas():
                 if time_elapsed > 0.5 * self.time_limit and not ponder:
                     return best
 
-                val = self.wikisearch(
+                val = self.negamax(
                     depth, self.turnmod(), alpha=alpha, beta=beta)
                 if ((val <= alpha) or (val >= beta)):
                     # We fell outside the window, so try again with a

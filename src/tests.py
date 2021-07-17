@@ -63,6 +63,7 @@ def parse_pgn(pgn: str):
 
 
 def read_positions(limit: float = 0.25):
+    fen = "xxx"
     with open("mate_in_threes.txt", "r") as f:
         for _idx, line in enumerate(f):
             idx = _idx + 1

@@ -45,7 +45,6 @@ def analysis(engineType, pos="", usebook=True, limit=1000000000000, indef=False)
     engine = engineType(book=usebook, contempt=0,
                         time_limit=limit, fun=False, fen=pos)
     engine.run_game(indefinite=indef)
-    return [elem[3:] for elem in engine.searchdata]
 
 
 interestingPosition = "8/b7/4P2p/8/3p2k1/1K1P4/pB6/8 b - - 0 58"
@@ -72,7 +71,7 @@ if __name__ == "__main__":
     fen = "8/8/5p2/3k4/p5P1/P1r2P2/1R4P1/6K1 w - - 5 46"
     fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     high_branch_fen = "1r6/3kp3/4Rp2/1prP2p1/p7/P6P/1PPR1PPK/8 w - - 7 32"
-    analysis(Viridithas, input(), usebook=True)
+    analysis(Viridithas, input(), usebook=False)
     # engine = CrazyHouse(
     #     human=True,
     #     time_limit=15,
