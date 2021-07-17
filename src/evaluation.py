@@ -1,18 +1,18 @@
 from functools import lru_cache
 from chess import BB_KNIGHT_ATTACKS, BB_RANK_1, BB_RANK_2, BB_RANK_3, BB_RANK_4, BB_RANK_5, BB_RANK_6, BB_RANK_7, BB_RANK_8, Board, Move, WHITE, BLACK, lsb, popcount, scan_forward, BB_PAWN_ATTACKS
 import chess
-from PSTs import PieceSquareTable
+from PSTs import PAWN_NORM, mg_pst, piece_values
 from itertools import chain
-
-piecesquaretable = PieceSquareTable()()
 
 p, n, b, r, q, k, P, N, B, R, Q, K = range(12)
 
-PAWN_VALUE = 1000
-KNIGHT_VALUE = 3200
-BISHOP_VALUE = 3330
-ROOK_VALUE = 5100
-QUEEN_VALUE = 8800
+MIDGAME = 0
+
+PAWN_VALUE = piece_values[MIDGAME][0] * PAWN_NORM
+KNIGHT_VALUE = piece_values[MIDGAME][1] * PAWN_NORM
+BISHOP_VALUE = piece_values[MIDGAME][2] * PAWN_NORM
+ROOK_VALUE = piece_values[MIDGAME][3] * PAWN_NORM
+QUEEN_VALUE = piece_values[MIDGAME][4] * PAWN_NORM
 MATE_VALUE = 1000000000
 FUTILITY_MARGIN = BISHOP_VALUE + 100
 FUTILITY_MARGIN_2 = ROOK_VALUE + 100
@@ -20,7 +20,6 @@ MOBILITY_FACTOR = 10
 ATTACK_FACTOR = 10
 KING_SAFETY_FACTOR = 10
 SPACE_FACTOR = 10
-PIECE_VALUES = [0, 1000, 3200, 3330, 5100, 8800, 2000000]
 
 def see_eval(board) -> int:
     rating = popcount(board.occupied_co[BLACK] & board.pawns) * 1000
@@ -39,29 +38,29 @@ def pst_eval(board: Board) -> int:
     white = board.occupied_co[WHITE]
     black = board.occupied_co[BLACK]
     return sum(chain(
-        (piecesquaretable[p][i] for i in scan_forward(
+        (mg_pst[p][i] for i in scan_forward(
             board.pawns & black)),
-        (-piecesquaretable[P][i] for i in scan_forward(
+        (-mg_pst[P][i] for i in scan_forward(
             board.pawns & white)),
-        (piecesquaretable[n][i] for i in scan_forward(
+        (mg_pst[n][i] for i in scan_forward(
             board.knights & black)),
-        (-piecesquaretable[N][i] for i in scan_forward(
+        (-mg_pst[N][i] for i in scan_forward(
             board.knights & white)),
-        (piecesquaretable[b][i] for i in scan_forward(
+        (mg_pst[b][i] for i in scan_forward(
             board.bishops & black)),
-        (-piecesquaretable[B][i] for i in scan_forward(
+        (-mg_pst[B][i] for i in scan_forward(
             board.bishops & white)),
-        (piecesquaretable[r][i] for i in scan_forward(
+        (mg_pst[r][i] for i in scan_forward(
             board.rooks & black)),
-        (-piecesquaretable[R][i] for i in scan_forward(
+        (-mg_pst[R][i] for i in scan_forward(
             board.rooks & white)),
-        (piecesquaretable[q][i] for i in scan_forward(
+        (mg_pst[q][i] for i in scan_forward(
             board.queens & black)),
-        (-piecesquaretable[Q][i] for i in scan_forward(
+        (-mg_pst[Q][i] for i in scan_forward(
             board.queens & white)),
-        (piecesquaretable[k][i] for i in scan_forward(
+        (mg_pst[k][i] for i in scan_forward(
             board.kings & black)),
-        (-piecesquaretable[K][i] for i in scan_forward(
+        (-mg_pst[K][i] for i in scan_forward(
             board.kings & white))))
 
 def piece_attack_counts(board: Board):

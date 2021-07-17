@@ -15,7 +15,7 @@ from TTEntry import *
 from chess import WHITE, BLACK, Move, Board, scan_forward
 from chess.variant import CrazyhouseBoard
 from cachetools import LRUCache 
-from evaluation import ATTACK_FACTOR, FUTILITY_MARGIN, FUTILITY_MARGIN_2, KING_SAFETY_FACTOR, MATE_VALUE, MOBILITY_FACTOR, PIECE_VALUES, QUEEN_VALUE, SPACE_FACTOR, pst_eval, see_eval, PAWN_VALUE, king_safety, mobility, piece_attack_counts, space
+from evaluation import ATTACK_FACTOR, FUTILITY_MARGIN, FUTILITY_MARGIN_2, KING_SAFETY_FACTOR, MATE_VALUE, MOBILITY_FACTOR, QUEEN_VALUE, SPACE_FACTOR, pst_eval, see_eval, PAWN_VALUE, king_safety, mobility, piece_attack_counts, space
 from data_input import get_engine_parameters
 from LMR import search_reduction_factor
 from copy import deepcopy

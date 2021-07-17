@@ -29,7 +29,7 @@ test_positions = [
 def check_position(position: TestPosition, debug = True):
     v = Viridithas(time_limit=position.time, book=False)
     v.set_position(position.fen)
-    result = v.search(readout=False)
+    result, _ = v.search(readout=False)
     pos_eval = v.tt_lookup(v.node).value * -v.turnmod()
     san = v.node.san(result)
 
