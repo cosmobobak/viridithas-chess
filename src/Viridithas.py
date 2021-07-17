@@ -15,7 +15,7 @@ from TTEntry import *
 from chess import WHITE, BLACK, Move, Board, scan_forward
 from chess.variant import CrazyhouseBoard
 from cachetools import LRUCache 
-from evaluation import ATTACK_FACTOR, FUTILITY_MARGIN, KING_SAFETY_FACTOR, MATE_VALUE, MOBILITY_FACTOR, PIECE_VALUES, QUEEN_VALUE, SPACE_FACTOR, pst_eval, see_eval, PAWN_VALUE, king_safety, mobility, piece_attack_counts, space
+from evaluation import ATTACK_FACTOR, FUTILITY_MARGIN, FUTILITY_MARGIN_2, KING_SAFETY_FACTOR, MATE_VALUE, MOBILITY_FACTOR, PIECE_VALUES, QUEEN_VALUE, SPACE_FACTOR, pst_eval, see_eval, PAWN_VALUE, king_safety, mobility, piece_attack_counts, space
 from data_input import get_engine_parameters
 from LMR import search_reduction_factor
 from copy import deepcopy
@@ -270,7 +270,7 @@ class Viridithas():
             if value >= beta:
                 return beta
 
-        DO_FUTILITY_PRUNING = not current_pos_is_check and depth <= 1 and abs(alpha) < MATE_VALUE / 2 and abs(beta) < MATE_VALUE / 2 and see_eval(self.node) * colour + FUTILITY_MARGIN < alpha
+        do_prune = self.pruning(depth, colour, alpha, beta, current_pos_is_check)
 
         best_move = Move.null()
         search_pv = True
@@ -284,7 +284,7 @@ class Viridithas():
             depth_reduction = search_reduction_factor(
                 move_idx, current_pos_is_check, gives_check, is_capture, is_promo, depth)
                 
-            if DO_FUTILITY_PRUNING:
+            if do_prune:
                 # "not search_pv" means we search at least one move, don't know if this is necessary
                 if not gives_check and not is_capture and not search_pv: 
                     continue
@@ -325,6 +325,19 @@ class Viridithas():
         self.tt_store(self.node, tt_entry)
 
         return value
+
+    def pruning(self, depth, colour, alpha, beta, current_pos_is_check):
+        if not (not current_pos_is_check and abs(
+                alpha) < MATE_VALUE / 2 and abs(beta) < MATE_VALUE / 2) or depth > 2:
+            return False
+
+        see = see_eval(self.node) * colour
+
+        DO_D1_PRUNING = depth <= 1 and see + FUTILITY_MARGIN < alpha
+
+        DO_D2_PRUNING = depth <= 2 and see + FUTILITY_MARGIN_2 < alpha
+
+        return DO_D1_PRUNING or DO_D2_PRUNING
 
     def move_sort(self, moves: list, ratings: list):
         pairs = zip(*sorted(zip(moves, ratings), key=operator.itemgetter(1)))
