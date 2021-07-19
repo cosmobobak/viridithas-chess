@@ -99,13 +99,13 @@ for color in [chess.WHITE, chess.BLACK]:
                 if rank in [0, 7]:
                     continue
                 # print(f"{pc + offset} {sq} {rank} {file}")
-                mg_pst[pc + offset][sq] = (PBonus[rank][file].midgame + mg_piece) * PAWN_NORM
-                eg_pst[pc + offset][sq] = (PBonus[rank][file].endgame + eg_piece) * PAWN_NORM
+                mg_pst[pc + offset][sq] = PBonus[rank][file].midgame + mg_piece * PAWN_NORM
+                eg_pst[pc + offset][sq] = PBonus[rank][file].endgame + eg_piece * PAWN_NORM
             else:
                 mapping = {4: 3, 5: 2, 6: 1, 7: 0}
                 access_file = file if file < 4 else mapping[file]
-                mg_pst[pc + offset][sq] = (Bonus[pc][rank][access_file].midgame + mg_piece) * PAWN_NORM
-                eg_pst[pc + offset][sq] = (Bonus[pc][rank][access_file].endgame + eg_piece) * PAWN_NORM
+                mg_pst[pc + offset][sq] = Bonus[pc][rank][access_file].midgame + mg_piece * PAWN_NORM
+                eg_pst[pc + offset][sq] = Bonus[pc][rank][access_file].endgame + eg_piece * PAWN_NORM
 
 # print(mg_pst[W_PAWN].reshape((8, 8)))
 # print(mg_pst[W_PAWN + 6].reshape((8, 8)))

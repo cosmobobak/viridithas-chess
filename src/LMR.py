@@ -5,8 +5,10 @@ def search_reduction_factor(lateness: int, is_check: bool, gives_check: bool, is
     reduction = 1
     if is_check or gives_check:
         reduction += -1 # 0 reduction
-    elif is_capt or is_promo:
-        reduction += -0.5 # 0.5 reduction
+    elif is_capt:
+        reduction += -0.2 # 0.5 reduction
+    elif is_promo:
+        reduction += -0.7
     elif d < 3:
         pass
     else:
@@ -18,4 +20,4 @@ def search_reduction_factor(lateness: int, is_check: bool, gives_check: bool, is
         else:
             # moves after move six
             reduction += 1 # max(d / 3, 1) # either d / 3 + 1 or 2 reduction
-    return max(reduction * 2, MIN_DEPTH_REDUCTION)
+    return max(reduction, MIN_DEPTH_REDUCTION)
