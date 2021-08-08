@@ -74,6 +74,7 @@ if __name__ == "__main__":
     pass
     fen = "8/3Q4/6kp/6p1/3Bq1K1/8/6PP/8 w - - 0 1"
     fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+    test = "3r1b1r/1k1qpppp/1pn2n2/p2p1b2/Q2P1B2/P1N2NPP/1P2PPB1/2R1K2R w K - 0 13"
     high_branch_fen = "1r6/3kp3/4Rp2/1prP2p1/p7/P6P/1PPR1PPK/8 w - - 7 32"
     # analysis(Viridithas, input(), usebook=False)
     engine = Viridithas(
@@ -82,8 +83,7 @@ if __name__ == "__main__":
         fun=False,
         book=False,
     )
-    engine.play_viri(
-        "3r1b1r/1k1qpppp/1pn2n2/p2p1b2/Q2P1B2/P1N2NPP/1P2PPB1/2R1K2R w K - 0 13")
+    engine.play_viri(fen)
 
     # analysis(Viridithas, viriQueenSacPosition, usebook=False)
     # analysis(Viridithas, fen, usebook=False, limit=10)

@@ -1,7 +1,7 @@
 from functools import lru_cache
 from chess import BB_KNIGHT_ATTACKS, BB_RANK_1, BB_RANK_2, BB_RANK_3, BB_RANK_4, BB_RANK_5, BB_RANK_6, BB_RANK_7, BB_RANK_8, Board, Move, WHITE, BLACK, lsb, popcount, scan_forward, BB_PAWN_ATTACKS
 import chess
-from PSTs import PAWN_NORM, mg_pst, piece_values
+from PSTs import PAWN_NORM, mg_pst, eg_pst, piece_values
 from itertools import chain
 
 p, n, b, r, q, k, P, N, B, R, Q, K = range(12)
@@ -38,29 +38,29 @@ def pst_eval(board: Board) -> int:
     white = board.occupied_co[WHITE]
     black = board.occupied_co[BLACK]
     return sum(chain(
-        (mg_pst[p][i] for i in scan_forward(
+        (eg_pst[p][i] for i in scan_forward(
             board.pawns & black)),
-        (-mg_pst[P][i] for i in scan_forward(
+        (-eg_pst[P][i] for i in scan_forward(
             board.pawns & white)),
-        (mg_pst[n][i] for i in scan_forward(
+        (eg_pst[n][i] for i in scan_forward(
             board.knights & black)),
-        (-mg_pst[N][i] for i in scan_forward(
+        (-eg_pst[N][i] for i in scan_forward(
             board.knights & white)),
-        (mg_pst[b][i] for i in scan_forward(
+        (eg_pst[b][i] for i in scan_forward(
             board.bishops & black)),
-        (-mg_pst[B][i] for i in scan_forward(
+        (-eg_pst[B][i] for i in scan_forward(
             board.bishops & white)),
-        (mg_pst[r][i] for i in scan_forward(
+        (eg_pst[r][i] for i in scan_forward(
             board.rooks & black)),
-        (-mg_pst[R][i] for i in scan_forward(
+        (-eg_pst[R][i] for i in scan_forward(
             board.rooks & white)),
-        (mg_pst[q][i] for i in scan_forward(
+        (eg_pst[q][i] for i in scan_forward(
             board.queens & black)),
-        (-mg_pst[Q][i] for i in scan_forward(
+        (-eg_pst[Q][i] for i in scan_forward(
             board.queens & white)),
-        (mg_pst[k][i] for i in scan_forward(
+        (eg_pst[k][i] for i in scan_forward(
             board.kings & black)),
-        (-mg_pst[K][i] for i in scan_forward(
+        (-eg_pst[K][i] for i in scan_forward(
             board.kings & white))))
 
 def piece_attack_counts(board: Board):
