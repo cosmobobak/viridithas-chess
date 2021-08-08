@@ -1,23 +1,18 @@
-MIN_DEPTH_REDUCTION = 0.5
+
 
 def search_reduction_factor(lateness: int, is_check: bool, gives_check: bool, is_capt: bool, is_promo: bool, d: float) -> float:
-    # return 1
-    reduction = 1
-    if is_check or gives_check:
-        reduction += -1 # 0 reduction
-    elif is_capt:
-        reduction += -0.2 # 0.5 reduction
-    elif is_promo:
-        reduction += -0.7
-    elif d < 3:
-        pass
+    return 1
+    DO_NOT_REDUCE = is_capt or is_promo or d < 3
+    CHECK_EXTENSION = is_check or gives_check
+    if DO_NOT_REDUCE:
+        val = 0 if CHECK_EXTENSION else 1
     else:
         if lateness == 0:
-            reduction -= 0.5 # 0.5 reduction
+            val = 1
         elif lateness <= 5: 
             # first six moves
-            reduction += 0 # 1 reduction
+            val = 2
         else:
             # moves after move six
-            reduction += 1 # max(d / 3, 1) # either d / 3 + 1 or 2 reduction
-    return max(reduction, MIN_DEPTH_REDUCTION)
+            val = max(2, d / 3)
+    return max(val, 0.5)
