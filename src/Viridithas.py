@@ -15,7 +15,7 @@ from TTEntry import *
 from chess import WHITE, BLACK, Move, Board, scan_forward
 from chess.variant import CrazyhouseBoard
 from cachetools import LRUCache 
-from evaluation import ATTACK_FACTOR, FUTILITY_MARGIN, FUTILITY_MARGIN_2, KING_SAFETY_FACTOR, MATE_VALUE, MOBILITY_FACTOR, QUEEN_VALUE, SPACE_FACTOR, pst_eval, see_eval, PAWN_VALUE, king_safety, mobility, piece_attack_counts, space
+from evaluation import ATTACK_FACTOR, FUTILITY_MARGIN, FUTILITY_MARGIN_2, FUTILITY_MARGIN_3, KING_SAFETY_FACTOR, MATE_VALUE, MOBILITY_FACTOR, QUEEN_VALUE, SPACE_FACTOR, pst_eval, see_eval, PAWN_VALUE, king_safety, mobility, piece_attack_counts, space
 from data_input import get_engine_parameters
 from LMR import search_reduction_factor
 from copy import deepcopy
@@ -332,16 +332,18 @@ class Viridithas():
 
     def do_futility_pruning(self, depth, colour, alpha, beta, current_pos_is_check):
         if not (not current_pos_is_check and abs(
-                alpha) < MATE_VALUE / 2 and abs(beta) < MATE_VALUE / 2) or depth > 2:
+                alpha) < MATE_VALUE / 2 and abs(beta) < MATE_VALUE / 2):
             return False
 
         see = see_eval(self.node) * colour
 
         DO_D1_PRUNING = depth <= 1 and see + FUTILITY_MARGIN < alpha
-
+        if DO_D1_PRUNING: return True
         DO_D2_PRUNING = depth <= 2 and see + FUTILITY_MARGIN_2 < alpha
-
-        return DO_D1_PRUNING or DO_D2_PRUNING
+        if DO_D2_PRUNING: return True
+        DO_D3_PRUNING = depth <= 3 and see + FUTILITY_MARGIN_3 < alpha
+        if DO_D3_PRUNING: return True
+        return False
 
     def pv_string(self):
         count = 0

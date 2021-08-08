@@ -8,59 +8,60 @@ p, n, b, r, q, k, P, N, B, R, Q, K = range(12)
 
 MIDGAME = 0
 
-PAWN_VALUE = piece_values[MIDGAME][0] * PAWN_NORM
-KNIGHT_VALUE = piece_values[MIDGAME][1] * PAWN_NORM
-BISHOP_VALUE = piece_values[MIDGAME][2] * PAWN_NORM
-ROOK_VALUE = piece_values[MIDGAME][3] * PAWN_NORM
-QUEEN_VALUE = piece_values[MIDGAME][4] * PAWN_NORM
-MATE_VALUE = 1000000000
-FUTILITY_MARGIN = BISHOP_VALUE + 100
-FUTILITY_MARGIN_2 = ROOK_VALUE + 100
-MOBILITY_FACTOR = 10
-ATTACK_FACTOR = 10
-KING_SAFETY_FACTOR = 10
-SPACE_FACTOR = 10
+PAWN_VALUE: int = piece_values[MIDGAME][0] * PAWN_NORM
+KNIGHT_VALUE: int = piece_values[MIDGAME][1] * PAWN_NORM
+BISHOP_VALUE: int = piece_values[MIDGAME][2] * PAWN_NORM
+ROOK_VALUE: int = piece_values[MIDGAME][3] * PAWN_NORM
+QUEEN_VALUE: int = piece_values[MIDGAME][4] * PAWN_NORM
+MATE_VALUE: int = 1000000000
+FUTILITY_MARGIN: int = BISHOP_VALUE + 100
+FUTILITY_MARGIN_2: int = ROOK_VALUE + 100
+FUTILITY_MARGIN_3: int = FUTILITY_MARGIN + FUTILITY_MARGIN_2
+MOBILITY_FACTOR: int = 10
+ATTACK_FACTOR: int = 10
+KING_SAFETY_FACTOR: int = 10
+SPACE_FACTOR: int = 10
 
 def see_eval(board) -> int:
-    rating = popcount(board.occupied_co[BLACK] & board.pawns) * 1000
-    rating -= popcount(board.occupied_co[WHITE] & board.pawns) * 1000
-    rating += popcount(board.occupied_co[BLACK] & board.knights) * 3200
-    rating -= popcount(board.occupied_co[WHITE] & board.knights) * 3200
-    rating += popcount(board.occupied_co[BLACK] & board.bishops) * 3330
-    rating -= popcount(board.occupied_co[WHITE] & board.bishops) * 3330
-    rating += popcount(board.occupied_co[BLACK] & board.rooks) * 5100
-    rating -= popcount(board.occupied_co[WHITE] & board.rooks) * 5100
-    rating += popcount(board.occupied_co[BLACK] & board.queens) * 8800
-    rating -= popcount(board.occupied_co[WHITE] & board.queens) * 8800
+    rating =  popcount(board.occupied_co[BLACK] & board.pawns)   * PAWN_VALUE
+    rating -= popcount(board.occupied_co[WHITE] & board.pawns)   * PAWN_VALUE
+    rating += popcount(board.occupied_co[BLACK] & board.knights) * KNIGHT_VALUE
+    rating -= popcount(board.occupied_co[WHITE] & board.knights) * KNIGHT_VALUE
+    rating += popcount(board.occupied_co[BLACK] & board.bishops) * BISHOP_VALUE
+    rating -= popcount(board.occupied_co[WHITE] & board.bishops) * BISHOP_VALUE
+    rating += popcount(board.occupied_co[BLACK] & board.rooks)   * ROOK_VALUE
+    rating -= popcount(board.occupied_co[WHITE] & board.rooks)   * ROOK_VALUE
+    rating += popcount(board.occupied_co[BLACK] & board.queens)  * QUEEN_VALUE
+    rating -= popcount(board.occupied_co[WHITE] & board.queens)  * QUEEN_VALUE
     return rating
 
 def pst_eval(board: Board) -> int:
     white = board.occupied_co[WHITE]
     black = board.occupied_co[BLACK]
     return sum(chain(
-        (eg_pst[p][i] for i in scan_forward(
+        (mg_pst[p][i] for i in scan_forward(
             board.pawns & black)),
-        (-eg_pst[P][i] for i in scan_forward(
+        (-mg_pst[P][i] for i in scan_forward(
             board.pawns & white)),
-        (eg_pst[n][i] for i in scan_forward(
+        (mg_pst[n][i] for i in scan_forward(
             board.knights & black)),
-        (-eg_pst[N][i] for i in scan_forward(
+        (-mg_pst[N][i] for i in scan_forward(
             board.knights & white)),
-        (eg_pst[b][i] for i in scan_forward(
+        (mg_pst[b][i] for i in scan_forward(
             board.bishops & black)),
-        (-eg_pst[B][i] for i in scan_forward(
+        (-mg_pst[B][i] for i in scan_forward(
             board.bishops & white)),
-        (eg_pst[r][i] for i in scan_forward(
+        (mg_pst[r][i] for i in scan_forward(
             board.rooks & black)),
-        (-eg_pst[R][i] for i in scan_forward(
+        (-mg_pst[R][i] for i in scan_forward(
             board.rooks & white)),
-        (eg_pst[q][i] for i in scan_forward(
+        (mg_pst[q][i] for i in scan_forward(
             board.queens & black)),
-        (-eg_pst[Q][i] for i in scan_forward(
+        (-mg_pst[Q][i] for i in scan_forward(
             board.queens & white)),
-        (eg_pst[k][i] for i in scan_forward(
+        (mg_pst[k][i] for i in scan_forward(
             board.kings & black)),
-        (-eg_pst[K][i] for i in scan_forward(
+        (-mg_pst[K][i] for i in scan_forward(
             board.kings & white))))
 
 def piece_attack_counts(board: Board):

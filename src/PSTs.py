@@ -12,7 +12,7 @@ class S:
     endgame: int
 
 
-PAWN_NORM = 1000 / 126
+PAWN_NORM: int = 1000 // 126
 
 # 'Bonus' contains Piece-Square parameters.
 # Scores are explicit for files A to D, implicitly mirrored for E to H.
