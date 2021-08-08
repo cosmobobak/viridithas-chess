@@ -19,6 +19,8 @@ from evaluation import ATTACK_FACTOR, FUTILITY_MARGIN, FUTILITY_MARGIN_2, KING_S
 from data_input import get_engine_parameters
 from LMR import search_reduction_factor
 from copy import deepcopy
+
+# from neuraleval import neural_eval
 print("Python version")
 print(sys.version)
 
@@ -102,7 +104,7 @@ class Viridithas():
         if checkmate:
             return MATE_VALUE * int(max(depth+1, 1)) * (1 if self.node.turn else -1)
         if draw:
-            return -self.contempt * (1 if self.node.turn else -1)
+            return -self.contempt * (1 if self.node.turn == WHITE else -1)
 
         rating: float = 0
 
@@ -116,6 +118,8 @@ class Viridithas():
         # rating += king_safety(self.node) * KING_SAFETY_FACTOR
 
         # rating += space(self.node) * SPACE_FACTOR
+
+        # rating += neural_eval(self.node) / 10
 
         return rating
 
@@ -202,6 +206,7 @@ class Viridithas():
             return val
         if val >= beta:
             return beta
+        # basic delta pruning, more can be done mid-qsearch
         if (val < alpha - QUEEN_VALUE):
             return alpha
         
@@ -270,7 +275,7 @@ class Viridithas():
             if value >= beta:
                 return beta
 
-        do_prune = self.pruning(depth, colour, alpha, beta, current_pos_is_check)
+        do_fprune = self.do_futility_pruning(depth, colour, alpha, beta, current_pos_is_check)
 
         best_move = Move.null()
         search_pv = True
@@ -284,7 +289,7 @@ class Viridithas():
             depth_reduction = search_reduction_factor(
                 move_idx, current_pos_is_check, gives_check, is_capture, is_promo, depth)
                 
-            if do_prune:
+            if do_fprune:
                 if not gives_check and not is_capture: 
                     continue
 
@@ -325,7 +330,7 @@ class Viridithas():
 
         return value
 
-    def pruning(self, depth, colour, alpha, beta, current_pos_is_check):
+    def do_futility_pruning(self, depth, colour, alpha, beta, current_pos_is_check):
         if not (not current_pos_is_check and abs(
                 alpha) < MATE_VALUE / 2 and abs(beta) < MATE_VALUE / 2) or depth > 2:
             return False
@@ -337,11 +342,6 @@ class Viridithas():
         DO_D2_PRUNING = depth <= 2 and see + FUTILITY_MARGIN_2 < alpha
 
         return DO_D1_PRUNING or DO_D2_PRUNING
-
-    def move_sort(self, moves: list, ratings: list):
-        pairs = zip(*sorted(zip(moves, ratings), key=operator.itemgetter(1)))
-        moves, ratings = [list(pair) for pair in pairs]
-        return moves, ratings
 
     def pv_string(self):
         count = 0
@@ -397,15 +397,14 @@ class Viridithas():
 
                 val = self.negamax(
                     depth, self.turnmod(), alpha=alpha, beta=beta)
-                # print(val)
-                if ((val <= alpha) or (val >= beta)):
+
+                WINDOW_FAILED = val <= alpha or val >= beta
+                if WINDOW_FAILED:
                     # We fell outside the window, so try again with a
                     # full-width window (and the same depth).
                     alpha = float("-inf")
                     beta = float("inf")
-                    WINDOW_FAILED = True
                     continue
-                WINDOW_FAILED = False
 
                 best = self.tt_lookup(self.node).best
                 # check if we've run out of time
