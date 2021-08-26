@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 import chess
-import numpy as np
+# import numpy as np
 
 p, n, b, r, q, k, P, N, B, R, Q, K = range(12)
 
@@ -81,8 +81,10 @@ PBonus: "list[list[S]]" = [ # Pawn (asymmetric distribution)
    []
 ]
 
-mg_pst = np.zeros((12, 64))
-eg_pst = np.zeros((12, 64))
+# mg_pst = np.zeros((12, 64))
+# eg_pst = np.zeros((12, 64))
+mg_pst = [[0 for _ in range(64)] for _ in range(12)]
+eg_pst = [[0 for _ in range(64)] for _ in range(12)]
 
 pieces = [W_PAWN, W_KNIGHT, W_BISHOP, W_ROOK, W_QUEEN, W_KING] = range(6)
 for color in [chess.WHITE, chess.BLACK]:
