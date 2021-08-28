@@ -94,7 +94,7 @@ class Viridithas():
         checkmate = self.node.is_checkmate()
         draw = self.node.is_stalemate() or \
             self.node.is_insufficient_material( ) or \
-            self.node.is_repetition(2) or self.node.is_seventyfive_moves() or not any(self.node.generate_legal_moves())
+            self.node.is_repetition() or self.node.is_seventyfive_moves() or not any(self.node.generate_legal_moves())
         return checkmate or draw, checkmate, draw
 
     # @profile
@@ -136,7 +136,6 @@ class Viridithas():
             self.node.generate_pseudo_legal_moves(self.node.kings, p),
         )
 
-    #@profile
     def captures(self):  # (MVV/LVA)
         return (m for m in itertools.chain(
             self.captures_piece(
@@ -144,55 +143,25 @@ class Viridithas():
             self.captures_piece(
                 self.node.occupied_co[not self.node.turn] & self.node.rooks),
             self.captures_piece(
-                self.node.occupied_co[not self.node.turn] & self.node.bishops),
-            self.captures_piece(
-                self.node.occupied_co[not self.node.turn] & self.node.knights),
+                self.node.occupied_co[not self.node.turn] & (
+                    self.node.bishops | self.node.knights)),
             self.captures_piece(
                 self.node.occupied_co[not self.node.turn] & self.node.pawns),
         ) if self.node.is_legal(m))
 
-    def winning_captures(self):  # (MVV/LVA)
-        target_all = self.node.occupied_co[not self.node.turn]
-        target_3 = target_all & ~self.node.pawns
-        target_5 = target_3 & (~self.node.bishops | ~self.node.knights)
-        target_9 = target_5 & ~self.node.rooks
-        return itertools.chain(
-            self.node.generate_pseudo_legal_moves(self.node.pawns, target_all),
-            self.node.generate_pseudo_legal_moves(self.node.knights, target_3),
-            self.node.generate_pseudo_legal_moves(self.node.bishops, target_3),
-            self.node.generate_pseudo_legal_moves(self.node.rooks, target_5),
-            self.node.generate_pseudo_legal_moves(self.node.queens, target_9),
-            self.node.generate_pseudo_legal_moves(self.node.kings, target_9),
-        )
-
-    def losing_captures(self):  # (MVV/LVA)
-        target_pawns = self.node.pawns
-        target_pnb = target_pawns | self.node.bishops | self.node.knights
-        target_pnbr = target_pnb | self.node.rooks
-        return itertools.chain(
-            self.node.generate_pseudo_legal_moves(self.node.knights, target_pawns),
-            self.node.generate_pseudo_legal_moves(self.node.bishops, target_pawns),
-            self.node.generate_pseudo_legal_moves(self.node.rooks, target_pnb),
-            self.node.generate_pseudo_legal_moves(self.node.queens, target_pnbr),
-            self.node.generate_pseudo_legal_moves(self.node.kings, target_pnbr),
-        )
-
     def ordered_moves(self):
         return (m for m in itertools.chain(
-            # self.winning_captures(),
             self.captures_piece(
                 self.node.occupied_co[not self.node.turn] & self.node.queens),
             self.captures_piece(
                 self.node.occupied_co[not self.node.turn] & self.node.rooks),
             self.captures_piece(
-                self.node.occupied_co[not self.node.turn] & self.node.bishops),
-            self.captures_piece(
-                self.node.occupied_co[not self.node.turn] & self.node.knights),
+                self.node.occupied_co[not self.node.turn] & (
+                    self.node.bishops | self.node.knights)),
             self.captures_piece(
                 self.node.occupied_co[not self.node.turn] & self.node.pawns),
             self.node.generate_pseudo_legal_moves(
                 0xffff_ffff_ffff_ffff, ~self.node.occupied_co[not self.node.turn]),
-            # self.losing_captures()
         ) if self.node.is_legal(m))
 
     def pass_turn(self) -> None:
@@ -283,26 +252,30 @@ class Viridithas():
         for move_idx, move in enumerate(moves):
             if move_idx == 0:
                 best_move = move
-            gives_check = self.node.gives_check(move)
+            
             is_capture = self.node.is_capture(move)
-            is_promo = bool(move.promotion)
-            depth_reduction = search_reduction_factor(
-                move_idx, current_pos_is_check, gives_check, is_capture, is_promo, depth)
+            # is_promo = bool(move.promotion)
                 
             if do_fprune:
-                if not gives_check and not is_capture: 
+                if not is_capture and not self.node.gives_check(move): 
                     continue
 
             self.node.push(move)
+
+            # gives_check = self.node.is_check()
+
+            # depth_reduction = search_reduction_factor(
+            #     move_idx, current_pos_is_check, gives_check, is_capture, is_promo, depth)
+            depth_reduction = 1
             
             if search_pv:
                 r = -self.negamax(depth - depth_reduction, -colour, -beta, -alpha)
-                value = max(value, r)
             else:
                 r = -self.negamax(depth - depth_reduction, -colour, -alpha-1, -alpha)
-                if (r > alpha): # // in fail-soft ... & & value < beta) is common
-                    r = -self.negamax(depth - depth_reduction, -colour, -beta, -alpha) #// re-search
-                value = max(value, r)
+                if (r > alpha): # // in fail-soft ... && value < beta) is common
+                    # null-window failed, so re-search
+                    r = -self.negamax(depth - depth_reduction, -colour, -beta, -alpha) 
+            value = max(value, r)
 
             self.node.pop()
 
@@ -528,11 +501,11 @@ class Viridithas():
         while not self.node.is_game_over():
             print(self.__repr__())
             if player_colour == self.node.turn:
-                # try:
-                #     self.ponder()
-                # except KeyboardInterrupt:
-                #     self.node = self.origin
-                #     self.user_move()
+                try:
+                    self.ponder()
+                except KeyboardInterrupt:
+                    self.node = self.origin
+                    self.user_move()
                 self.user_move()
             else:
                 self.engine_move()
