@@ -85,16 +85,4 @@ if __name__ == "__main__":
     )
     engine.play_viri(fen)
 
-    # analysis(Viridithas, viriQueenSacPosition, usebook=False)
-    # analysis(Viridithas, fen, usebook=False, limit=10)
-
-    # engine = Viridithas()
-    # engine.node.set_fen(high_branch_fen)
-
-    # for d in range(10):
-    #     engine.perft(d)
-
-    selfplay(time=15, position=fen, usebook=False,
-             player1=Viridithas, player2=Viridithas)
-
 # add a separate qsearch hashtable
