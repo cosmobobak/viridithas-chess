@@ -83,6 +83,9 @@ if __name__ == "__main__":
         fun=False,
         book=False,
     )
+
+    # fen = "r1b4R/pp1r3p/4p1kB/5p2/5P1P/P7/1P4P1/4K3 w - - 3 26"
+
     engine.play_viri(fen)
 
 # add a separate qsearch hashtable

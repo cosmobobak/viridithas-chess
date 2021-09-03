@@ -35,33 +35,34 @@ def see_eval(board) -> int:
     rating -= popcount(board.occupied_co[WHITE] & board.queens)  * QUEEN_VALUE
     return rating
 
+pst = eg_pst
 def pst_eval(board: Board) -> int:
     white = board.occupied_co[WHITE]
     black = board.occupied_co[BLACK]
     return sum(chain(
-        (mg_pst[p][i] for i in scan_forward(
+        (pst[p][i] for i in scan_forward(
             board.pawns & black)),
-        (-mg_pst[P][i] for i in scan_forward(
+        (-pst[P][i] for i in scan_forward(
             board.pawns & white)),
-        (mg_pst[n][i] for i in scan_forward(
+        (pst[n][i] for i in scan_forward(
             board.knights & black)),
-        (-mg_pst[N][i] for i in scan_forward(
+        (-pst[N][i] for i in scan_forward(
             board.knights & white)),
-        (mg_pst[b][i] for i in scan_forward(
+        (pst[b][i] for i in scan_forward(
             board.bishops & black)),
-        (-mg_pst[B][i] for i in scan_forward(
+        (-pst[B][i] for i in scan_forward(
             board.bishops & white)),
-        (mg_pst[r][i] for i in scan_forward(
+        (pst[r][i] for i in scan_forward(
             board.rooks & black)),
-        (-mg_pst[R][i] for i in scan_forward(
+        (-pst[R][i] for i in scan_forward(
             board.rooks & white)),
-        (mg_pst[q][i] for i in scan_forward(
+        (pst[q][i] for i in scan_forward(
             board.queens & black)),
-        (-mg_pst[Q][i] for i in scan_forward(
+        (-pst[Q][i] for i in scan_forward(
             board.queens & white)),
-        (mg_pst[k][i] for i in scan_forward(
+        (pst[k][i] for i in scan_forward(
             board.kings & black)),
-        (-mg_pst[K][i] for i in scan_forward(
+        (-pst[K][i] for i in scan_forward(
             board.kings & white))))
 
 def piece_attack_counts(board: Board):
@@ -103,12 +104,12 @@ def mobility(board: Board):
         board.pop()
     return mobility
 
-def king_safety(board: Board):
+def king_safety(board: Board) -> float:
     wpieces = board.occupied_co[WHITE]
     bpieces = board.occupied_co[BLACK]
     wkingloc = lsb(board.kings & wpieces)
     bkingloc = lsb(board.kings & bpieces)
-    safety: float = 0
+    safety = 0
     safety += sum(chess.square_distance(bkingloc, sq) * 2 for sq in scan_forward(board.queens & wpieces))
     safety -= sum(chess.square_distance(wkingloc, sq) * 2 for sq in scan_forward(board.queens & bpieces))
     safety += sum(chess.square_distance(bkingloc, sq) / 2 for sq in scan_forward(board.bishops & wpieces))
@@ -119,16 +120,16 @@ def king_safety(board: Board):
     safety -= sum(chess.square_distance(wkingloc, sq) for sq in scan_forward(board.knights & bpieces))
     return safety
 
+W_AREA = BB_RANK_1 | BB_RANK_2 | BB_RANK_3 | BB_RANK_4
+B_AREA = BB_RANK_8 | BB_RANK_7 | BB_RANK_6 | BB_RANK_5
 def space(board: Board):
-    w_area = BB_RANK_1 | BB_RANK_2 | BB_RANK_3 | BB_RANK_4
-    b_area = BB_RANK_8 | BB_RANK_7 | BB_RANK_6 | BB_RANK_5
     space = 0
-    space -= sum(popcount(BB_PAWN_ATTACKS[WHITE][sq] & b_area) for sq in scan_forward(
+    space -= sum(popcount(BB_PAWN_ATTACKS[WHITE][sq] & B_AREA) for sq in scan_forward(
         board.pawns & board.occupied_co[WHITE]))
-    space += sum(popcount(BB_PAWN_ATTACKS[BLACK][sq] & w_area) for sq in scan_forward(
+    space += sum(popcount(BB_PAWN_ATTACKS[BLACK][sq] & W_AREA) for sq in scan_forward(
         board.pawns & board.occupied_co[BLACK]))
-    space -= sum(popcount(BB_KNIGHT_ATTACKS[sq] & b_area) for sq in scan_forward(
+    space -= sum(popcount(BB_KNIGHT_ATTACKS[sq] & B_AREA) for sq in scan_forward(
         board.knights & board.occupied_co[WHITE]))
-    space += sum(popcount(BB_KNIGHT_ATTACKS[sq] & w_area) for sq in scan_forward(
+    space += sum(popcount(BB_KNIGHT_ATTACKS[sq] & W_AREA) for sq in scan_forward(
         board.knights & board.occupied_co[BLACK]))
     return space
