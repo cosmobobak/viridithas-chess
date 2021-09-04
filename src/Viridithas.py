@@ -15,6 +15,7 @@ from TTEntry import *
 from chess import WHITE, BLACK, Move, Board, scan_forward
 from chess.variant import CrazyhouseBoard
 from cachetools import LRUCache 
+import evaluation
 from evaluation import ATTACK_FACTOR, FUTILITY_MARGIN, FUTILITY_MARGIN_2, FUTILITY_MARGIN_3, KING_SAFETY_FACTOR, MATE_VALUE, MOBILITY_FACTOR, QUEEN_VALUE, SPACE_FACTOR, pst_eval, see_eval, PAWN_VALUE, king_safety, mobility, piece_attack_counts, space
 from data_input import get_engine_parameters
 from LMR import search_reduction_factor
@@ -355,6 +356,12 @@ class Viridithas():
         self.nodes = 0
         moves = [next(self.ordered_moves())]
         saved_position = deepcopy(self.node)
+
+        # load the tapered eval for the position
+        # yes, we are using at-root game stage eval
+        # as a search-value, but it's the only way to
+        # run efficiently in python
+        evaluation.set_pst(self.node)
 
         alpha, beta = float("-inf"), float("inf")
         valWINDOW = PAWN_VALUE / 4

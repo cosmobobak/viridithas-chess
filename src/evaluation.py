@@ -35,8 +35,55 @@ def see_eval(board) -> int:
     rating -= popcount(board.occupied_co[WHITE] & board.queens)  * QUEEN_VALUE
     return rating
 
+
+def compute_merged_pst(board: Board) -> "list[list[float]]":
+    # determine game stage
+
+    PawnPhase = 0
+    KnightPhase = 1
+    BishopPhase = 1
+    RookPhase = 2
+    QueenPhase = 4
+    TotalPhase = PawnPhase*16 + KnightPhase*4 + BishopPhase*4 + RookPhase*4 + QueenPhase*2
+
+    phase = TotalPhase
+
+    wp = popcount(board.pawns & board.occupied_co[WHITE])
+    bp = popcount(board.pawns & board.occupied_co[BLACK])
+    wn = popcount(board.knights & board.occupied_co[WHITE])
+    bn = popcount(board.knights & board.occupied_co[BLACK])
+    wb = popcount(board.bishops & board.occupied_co[WHITE])
+    bb = popcount(board.bishops & board.occupied_co[BLACK])
+    wr = popcount(board.rooks & board.occupied_co[WHITE])
+    br = popcount(board.rooks & board.occupied_co[BLACK])
+    wq = popcount(board.queens & board.occupied_co[WHITE])
+    bq = popcount(board.queens & board.occupied_co[BLACK])
+
+    phase -= wp * PawnPhase      # White pawns
+    phase -= wn * KnightPhase    # White knights
+    phase -= wb * BishopPhase    # White bishops
+    phase -= wr * RookPhase      # White rooks
+    phase -= wq * QueenPhase     # White queens
+    phase -= bp * PawnPhase      # Black pawns
+    phase -= bn * KnightPhase    # Black knights
+    phase -= bb * BishopPhase    # Black bishops
+    phase -= br * RookPhase      # Black rooks
+    phase -= bq * QueenPhase     # Black queens
+
+    phase = (phase * 256 + (TotalPhase / 2)) / TotalPhase
+    
+    out_pst = [[mgval * phase + egval * (1 - phase) for mgval, egval in zip(mgrow, egrow)]
+               for mgrow, egrow in zip(mg_pst, eg_pst)]
+
+    return out_pst
+
 pst = mg_pst
-def pst_eval(board: Board) -> int:
+
+def set_pst(board: Board) -> None:
+    global pst
+    pst = compute_merged_pst(board)
+
+def pst_eval(board: Board) -> float:
     white = board.occupied_co[WHITE]
     black = board.occupied_co[BLACK]
     return sum(chain(

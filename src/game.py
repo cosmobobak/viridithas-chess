@@ -84,7 +84,7 @@ if __name__ == "__main__":
         book=False,
     )
 
-    # fen = "r1b4R/pp1r3p/4p1kB/5p2/5P1P/P7/1P4P1/4K3 w - - 3 26"
+    # fen = "r1bqkb1r/pp2pp1p/2np1np1/2p5/P1B1P3/3P1N2/1PP2PPP/RNBQ1RK1 b"
 
     engine.play_viri(fen)
 
