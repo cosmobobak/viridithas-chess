@@ -35,35 +35,23 @@ def see_eval(board) -> int:
     rating -= popcount(board.occupied_co[WHITE] & board.queens)  * QUEEN_VALUE
     return rating
 
-pst = eg_pst
+pst = mg_pst
 def pst_eval(board: Board) -> int:
     white = board.occupied_co[WHITE]
     black = board.occupied_co[BLACK]
     return sum(chain(
-        (pst[p][i] for i in scan_forward(
-            board.pawns & black)),
-        (-pst[P][i] for i in scan_forward(
-            board.pawns & white)),
-        (pst[n][i] for i in scan_forward(
-            board.knights & black)),
-        (-pst[N][i] for i in scan_forward(
-            board.knights & white)),
-        (pst[b][i] for i in scan_forward(
-            board.bishops & black)),
-        (-pst[B][i] for i in scan_forward(
-            board.bishops & white)),
-        (pst[r][i] for i in scan_forward(
-            board.rooks & black)),
-        (-pst[R][i] for i in scan_forward(
-            board.rooks & white)),
-        (pst[q][i] for i in scan_forward(
-            board.queens & black)),
-        (-pst[Q][i] for i in scan_forward(
-            board.queens & white)),
-        (pst[k][i] for i in scan_forward(
-            board.kings & black)),
-        (-pst[K][i] for i in scan_forward(
-            board.kings & white))))
+        (pst[p][i] for i in scan_forward(board.pawns & black)),
+        (-pst[P][i] for i in scan_forward(board.pawns & white)),
+        (pst[n][i] for i in scan_forward(board.knights & black)),
+        (-pst[N][i] for i in scan_forward(board.knights & white)),
+        (pst[b][i] for i in scan_forward(board.bishops & black)),
+        (-pst[B][i] for i in scan_forward(board.bishops & white)),
+        (pst[r][i] for i in scan_forward(board.rooks & black)),
+        (-pst[R][i] for i in scan_forward(board.rooks & white)),
+        (pst[q][i] for i in scan_forward(board.queens & black)),
+        (-pst[Q][i] for i in scan_forward(board.queens & white)),
+        (pst[k][i] for i in scan_forward(board.kings & black)),
+        (-pst[K][i] for i in scan_forward(board.kings & white))))
 
 def piece_attack_counts(board: Board):
     white_pawn_attacks = sum(popcount(BB_PAWN_ATTACKS[WHITE][sq] & board.occupied_co[BLACK]) for sq in scan_forward(
