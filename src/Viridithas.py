@@ -1,5 +1,5 @@
 #from __future__ import annotations
-from typing import Hashable
+from typing import Hashable, Iterator
 import chess
 import chess.svg
 import chess.pgn
@@ -12,7 +12,7 @@ import operator
 import sys
 import itertools
 from TTEntry import *
-from chess import WHITE, BLACK, Move, Board, scan_forward
+from chess import BB_ALL, WHITE, BLACK, Move, Board, scan_forward
 from chess.variant import CrazyhouseBoard
 from cachetools import LRUCache 
 import evaluation
@@ -137,6 +137,12 @@ class Viridithas():
             self.node.generate_pseudo_legal_moves(self.node.kings, p),
         )
 
+    def checks(self):
+        """
+        Generate all the checks in a position.
+        """
+        return (m for m in self.node.generate_pseudo_legal_moves(BB_ALL, ~self.node.occupied) if self.node.gives_check(m) and self.node.is_legal(m))
+
     def captures(self):  # (MVV/LVA)
         return (m for m in itertools.chain(
             self.captures_piece(
@@ -149,6 +155,9 @@ class Viridithas():
             self.captures_piece(
                 self.node.occupied_co[not self.node.turn] & self.node.pawns),
         ) if self.node.is_legal(m))
+
+    def checks_and_captures(self):
+        return itertools.chain(self.captures(), self.checks())
 
     def ordered_moves(self):
         return (m for m in itertools.chain(
@@ -182,8 +191,8 @@ class Viridithas():
         
         alpha = max(val, alpha)
 
-        for capture in self.captures():
-            self.node.push(capture)
+        for move in self.checks_and_captures():
+            self.node.push(move)
             gameover, checkmate, draw = self.gameover_check_info()
             score = -self.qsearch(-beta, -alpha, depth - 1, -colour, gameover, checkmate, draw)
             self.node.pop()
@@ -309,15 +318,11 @@ class Viridithas():
                 alpha) < MATE_VALUE / 2 and abs(beta) < MATE_VALUE / 2):
             return False
 
-        see = see_eval(self.node) * colour
+        see = pst_eval(self.node) * colour
 
-        DO_D1_PRUNING = depth <= 1 and see + FUTILITY_MARGIN < alpha
-        if DO_D1_PRUNING: return True
-        DO_D2_PRUNING = depth <= 2 and see + FUTILITY_MARGIN_2 < alpha
-        if DO_D2_PRUNING: return True
-        DO_D3_PRUNING = depth <= 3 and see + FUTILITY_MARGIN_3 < alpha
-        if DO_D3_PRUNING: return True
-        return False
+        return (depth <= 1 and see + FUTILITY_MARGIN < alpha) or \
+            (depth <= 2 and see + FUTILITY_MARGIN_2 < alpha) or \
+            (depth <= 3 and see + FUTILITY_MARGIN_3 < alpha)
 
     def pv_string(self):
         count = 0

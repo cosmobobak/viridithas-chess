@@ -39,17 +39,18 @@ def see_eval(board) -> int:
 def compute_merged_pst(board: Board) -> "list[list[float]]":
     # determine game stage
 
-    PawnPhase = 0
+    # PawnPhase = 0
     KnightPhase = 1
     BishopPhase = 1
     RookPhase = 2
     QueenPhase = 4
-    TotalPhase = PawnPhase*16 + KnightPhase*4 + BishopPhase*4 + RookPhase*4 + QueenPhase*2
+    TotalPhase = KnightPhase*4 + BishopPhase*4 + RookPhase*4 + QueenPhase*2  
+    # + PawnPhase*16
 
     phase = TotalPhase
 
-    wp = popcount(board.pawns & board.occupied_co[WHITE])
-    bp = popcount(board.pawns & board.occupied_co[BLACK])
+    # wp = popcount(board.pawns & board.occupied_co[WHITE])
+    # bp = popcount(board.pawns & board.occupied_co[BLACK])
     wn = popcount(board.knights & board.occupied_co[WHITE])
     bn = popcount(board.knights & board.occupied_co[BLACK])
     wb = popcount(board.bishops & board.occupied_co[WHITE])
@@ -59,20 +60,24 @@ def compute_merged_pst(board: Board) -> "list[list[float]]":
     wq = popcount(board.queens & board.occupied_co[WHITE])
     bq = popcount(board.queens & board.occupied_co[BLACK])
 
-    phase -= wp * PawnPhase      # White pawns
+    # phase -= wp * PawnPhase      # White pawns
     phase -= wn * KnightPhase    # White knights
     phase -= wb * BishopPhase    # White bishops
     phase -= wr * RookPhase      # White rooks
     phase -= wq * QueenPhase     # White queens
-    phase -= bp * PawnPhase      # Black pawns
+    # phase -= bp * PawnPhase      # Black pawns
     phase -= bn * KnightPhase    # Black knights
     phase -= bb * BishopPhase    # Black bishops
     phase -= br * RookPhase      # Black rooks
     phase -= bq * QueenPhase     # Black queens
-
-    phase = (phase * 256 + (TotalPhase / 2)) / TotalPhase
     
-    out_pst = [[mgval * phase + egval * (1 - phase) for mgval, egval in zip(mgrow, egrow)]
+    phase = phase / TotalPhase
+
+    # if not (0 <= phase < 1):
+    #     print(f"{phase = }, ")
+    #     raise ValueError("invalid phase")
+
+    out_pst = [[(mgval * phase + egval * (1 - phase)) / 2 for mgval, egval in zip(mgrow, egrow)]
                for mgrow, egrow in zip(mg_pst, eg_pst)]
 
     return out_pst
