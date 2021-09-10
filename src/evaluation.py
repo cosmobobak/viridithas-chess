@@ -7,12 +7,13 @@ from itertools import chain
 p, n, b, r, q, k, P, N, B, R, Q, K = range(12)
 
 MIDGAME = 0
+ENDGAME = 1
 
-PAWN_VALUE: int = piece_values[MIDGAME][0] * PAWN_NORM
-KNIGHT_VALUE: int = piece_values[MIDGAME][1] * PAWN_NORM
-BISHOP_VALUE: int = piece_values[MIDGAME][2] * PAWN_NORM
-ROOK_VALUE: int = piece_values[MIDGAME][3] * PAWN_NORM
-QUEEN_VALUE: int = piece_values[MIDGAME][4] * PAWN_NORM
+PAWN_VALUE: float = piece_values[MIDGAME][0] * PAWN_NORM
+KNIGHT_VALUE: float = piece_values[MIDGAME][1] * PAWN_NORM
+BISHOP_VALUE: float = piece_values[MIDGAME][2] * PAWN_NORM
+ROOK_VALUE: float = piece_values[MIDGAME][3] * PAWN_NORM
+QUEEN_VALUE: float = piece_values[MIDGAME][4] * PAWN_NORM
 MATE_VALUE: int = 1000000000
 FUTILITY_MARGIN: int = BISHOP_VALUE + 100
 FUTILITY_MARGIN_2: int = ROOK_VALUE + 100
@@ -22,7 +23,7 @@ ATTACK_FACTOR: int = 10
 KING_SAFETY_FACTOR: int = 10
 SPACE_FACTOR: int = 10
 
-def see_eval(board) -> int:
+def see_eval(board) -> float:
     rating =  popcount(board.occupied_co[BLACK] & board.pawns)   * PAWN_VALUE
     rating -= popcount(board.occupied_co[WHITE] & board.pawns)   * PAWN_VALUE
     rating += popcount(board.occupied_co[BLACK] & board.knights) * KNIGHT_VALUE
@@ -35,17 +36,16 @@ def see_eval(board) -> int:
     rating -= popcount(board.occupied_co[WHITE] & board.queens)  * QUEEN_VALUE
     return rating
 
+# PawnPhase = 0.0
+KnightPhase = 1.0
+BishopPhase = 1.0
+RookPhase = 2.0
+QueenPhase = 4.0
+TotalPhase = KnightPhase*4 + BishopPhase*4 + RookPhase*4 + QueenPhase*2
+# + PawnPhase*16
 
-def compute_merged_pst(board: Board) -> "list[list[float]]":
+def game_stage(board: Board) -> float:
     # determine game stage
-
-    # PawnPhase = 0
-    KnightPhase = 1
-    BishopPhase = 1
-    RookPhase = 2
-    QueenPhase = 4
-    TotalPhase = KnightPhase*4 + BishopPhase*4 + RookPhase*4 + QueenPhase*2  
-    # + PawnPhase*16
 
     phase = TotalPhase
 
@@ -70,8 +70,11 @@ def compute_merged_pst(board: Board) -> "list[list[float]]":
     phase -= bb * BishopPhase    # Black bishops
     phase -= br * RookPhase      # Black rooks
     phase -= bq * QueenPhase     # Black queens
-    
-    phase = phase / TotalPhase
+
+    return phase / TotalPhase
+
+def compute_merged_pst(board: Board) -> "list[list[float]]":
+    phase = game_stage(board)
 
     # if not (0 <= phase < 1):
     #     print(f"{phase = }, ")
@@ -82,11 +85,26 @@ def compute_merged_pst(board: Board) -> "list[list[float]]":
 
     return out_pst
 
+def compute_merged_piece_values(board: Board) -> "list[float]":
+    phase = game_stage(board)
+
+    mg = piece_values[MIDGAME]
+    eg = piece_values[ENDGAME]
+
+    out_vals = [(mgval * phase + egval * (1 - phase)) *
+                PAWN_NORM / 2 for mgval, egval in zip(mg, eg)]
+
+    return out_vals
+
 pst = mg_pst
 
 def set_pst(board: Board) -> None:
     global pst
     pst = compute_merged_pst(board)
+
+def set_piece_values(board: Board) -> None:
+    global PAWN_VALUE, KNIGHT_VALUE, BISHOP_VALUE, ROOK_VALUE, QUEEN_VALUE
+    PAWN_VALUE, KNIGHT_VALUE, BISHOP_VALUE, ROOK_VALUE, QUEEN_VALUE, _ = compute_merged_piece_values(board)
 
 def pst_eval(board: Board) -> float:
     white = board.occupied_co[WHITE]

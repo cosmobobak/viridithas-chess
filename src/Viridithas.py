@@ -124,6 +124,20 @@ class Viridithas():
 
         return rating
 
+    def cheap_evaluate(self, depth: float, checkmate: bool, draw: bool) -> float:
+        self.nodes += 1
+
+        if checkmate:
+            return MATE_VALUE * int(max(depth+1, 1)) * (1 if self.node.turn else -1)
+        if draw:
+            return -self.contempt * (1 if self.node.turn == WHITE else -1)
+
+        rating: float = 0
+
+        rating += see_eval(self.node)
+
+        return rating
+
     def single_hash_iterator(self, best):
         yield best
 
@@ -181,6 +195,7 @@ class Viridithas():
     def qsearch(self, alpha: float, beta: float, depth: float, colour: int, gameover: bool, checkmate: bool, draw: bool) -> float:
 
         val = self.evaluate(1, checkmate, draw) * colour
+        
         if gameover:
             return val
         if val >= beta:
@@ -191,7 +206,7 @@ class Viridithas():
         
         alpha = max(val, alpha)
 
-        for move in self.checks_and_captures():
+        for move in self.captures(): # self.checks_and_captures():
             self.node.push(move)
             gameover, checkmate, draw = self.gameover_check_info()
             score = -self.qsearch(-beta, -alpha, depth - 1, -colour, gameover, checkmate, draw)
@@ -264,7 +279,6 @@ class Viridithas():
                 best_move = move
             
             is_capture = self.node.is_capture(move)
-            # is_promo = bool(move.promotion)
                 
             if do_fprune:
                 if not is_capture and not self.node.gives_check(move): 
@@ -272,11 +286,12 @@ class Viridithas():
 
             self.node.push(move)
 
-            # gives_check = self.node.is_check()
+            gives_check = self.node.is_check()
+            is_promo = bool(move.promotion)
 
-            # depth_reduction = search_reduction_factor(
-            #     move_idx, current_pos_is_check, gives_check, is_capture, is_promo, depth)
-            depth_reduction = 1
+            depth_reduction = search_reduction_factor(
+                move_idx, current_pos_is_check, gives_check, is_capture, is_promo, depth)
+            # depth_reduction = 1
             
             if search_pv:
                 r = -self.negamax(depth - depth_reduction, -colour, -beta, -alpha)
@@ -367,6 +382,7 @@ class Viridithas():
         # as a search-value, but it's the only way to
         # run efficiently in python
         evaluation.set_pst(self.node)
+        evaluation.set_piece_values(self.node)
 
         alpha, beta = float("-inf"), float("inf")
         valWINDOW = PAWN_VALUE / 4
