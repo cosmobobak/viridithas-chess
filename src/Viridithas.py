@@ -16,7 +16,7 @@ from chess import BB_ALL, WHITE, BLACK, Move, Board, scan_forward
 from chess.variant import CrazyhouseBoard
 from cachetools import LRUCache 
 import evaluation
-from evaluation import ATTACK_FACTOR, FUTILITY_MARGIN, FUTILITY_MARGIN_2, FUTILITY_MARGIN_3, KING_SAFETY_FACTOR, MATE_VALUE, MOBILITY_FACTOR, QUEEN_VALUE, SPACE_FACTOR, pst_eval, see_eval, PAWN_VALUE, king_safety, mobility, piece_attack_counts, space
+from evaluation import ATTACK_FACTOR, BISHOP_VALUE, FUTILITY_MARGIN, FUTILITY_MARGIN_2, FUTILITY_MARGIN_3, KING_SAFETY_FACTOR, MATE_VALUE, MOBILITY_FACTOR, QUEEN_VALUE, ROOK_VALUE, SPACE_FACTOR, pawn_structure_eval, pst_eval, see_eval, PAWN_VALUE, king_safety, mobility, piece_attack_counts, space
 from data_input import get_engine_parameters
 from LMR import search_reduction_factor
 from copy import deepcopy
@@ -110,6 +110,7 @@ class Viridithas():
         rating: float = 0
 
         rating += pst_eval(self.node)
+        rating += pawn_structure_eval(self.node)
         # rating += see_eval(self.node)
 
         # rating += mobility(self.node) * MOBILITY_FACTOR
@@ -194,7 +195,7 @@ class Viridithas():
     #@profile
     def qsearch(self, alpha: float, beta: float, depth: float, colour: int, gameover: bool, checkmate: bool, draw: bool) -> float:
 
-        val = self.evaluate(1, checkmate, draw) * colour
+        val = self.evaluate(0.5, checkmate, draw) * colour
         
         if gameover:
             return val
@@ -206,7 +207,7 @@ class Viridithas():
         
         alpha = max(val, alpha)
 
-        for move in self.captures(): # self.checks_and_captures():
+        for move in self.checks_and_captures():
             self.node.push(move)
             gameover, checkmate, draw = self.gameover_check_info()
             score = -self.qsearch(-beta, -alpha, depth - 1, -colour, gameover, checkmate, draw)
@@ -255,6 +256,7 @@ class Viridithas():
             return colour * self.evaluate(depth, checkmate, draw)
 
         if depth < 1:
+            # return colour * self.evaluate(depth, checkmate, draw)
             return self.qsearch(alpha, beta, depth, colour, gameover, checkmate, draw)
 
         current_pos_is_check = self.node.is_check()
@@ -370,6 +372,10 @@ class Viridithas():
         print(f"{self.node.san(moves[0])} | {-round((self.turnmod()*values[0])/1000, 3)} | {str(t)}s at depth {str(depth + 1)}, {str(self.nodes)} nodes processed, at {str(int(self.nodes / (t+0.00001)))}NPS.\n", f"PV: {self.pv_string()}\n", end="")
         return (self.node.san(moves[0]), self.turnmod()*values[0], self.nodes, depth+1, t)
 
+    def windows(self):
+        exps = [PAWN_VALUE / 16, PAWN_VALUE / 4, PAWN_VALUE, BISHOP_VALUE, ROOK_VALUE, QUEEN_VALUE, float("inf")]
+        return (window for window in exps)
+
     def search(self, ponder: bool = False, readout: bool = True):
         val = float("-inf")
         start_time = time.time()
@@ -385,7 +391,11 @@ class Viridithas():
         evaluation.set_piece_values(self.node)
 
         alpha, beta = float("-inf"), float("inf")
-        valWINDOW = PAWN_VALUE / 4
+        winds = self.windows()
+        curw = next(winds)
+
+        phasepcnt = evaluation.game_stage(self.node) * 100
+        print(f"game stage: {100 - phasepcnt:.1f}% middlegame, {phasepcnt:.1f}% endgame.")
 
         WINDOW_FAILED = False
 
@@ -403,10 +413,14 @@ class Viridithas():
 
                 WINDOW_FAILED = val <= alpha or val >= beta
                 if WINDOW_FAILED:
+                    print(
+                        f"Window {curw/1000:.2f} failed: a: {-self.turnmod()*(1/1000)*alpha:.1f} b: {-self.turnmod()*(1/1000)*beta:.1f} value: {-self.turnmod()*(1/1000)*val:.1f}")
+                    curw = next(winds)
                     # We fell outside the window, so try again with a
                     # full-width window (and the same depth).
-                    alpha = float("-inf")
-                    beta = float("inf")
+                    # Set up the window for the next iteration.
+                    alpha = alpha - curw
+                    beta = beta + curw
                     continue
 
                 best = self.tt_lookup(self.node).best
@@ -420,8 +434,12 @@ class Viridithas():
                 if readout:
                     self.show_iteration_data(moves, values, depth, start_time)
 
-                alpha = val - valWINDOW # Set up the window for the next iteration.
-                beta = val + valWINDOW
+                # Set up the window for the next iteration.
+                winds = self.windows()
+                curw = next(winds)
+                alpha = val - curw 
+                beta = val + curw
+
                 depth += 1
         except KeyboardInterrupt:
             self.node = saved_position
