@@ -1,5 +1,5 @@
 from functools import lru_cache
-from chess import BB_KNIGHT_ATTACKS, BB_RANK_1, BB_RANK_2, BB_RANK_3, BB_RANK_4, BB_RANK_5, BB_RANK_6, BB_RANK_7, BB_RANK_8, Board, Move, WHITE, BLACK, lsb, popcount, scan_forward, BB_PAWN_ATTACKS
+from chess import BB_FILE_A, BB_KNIGHT_ATTACKS, BB_RANK_1, BB_RANK_2, BB_RANK_3, BB_RANK_4, BB_RANK_5, BB_RANK_6, BB_RANK_7, BB_RANK_8, Board, Move, WHITE, BLACK, lsb, popcount, scan_forward, BB_PAWN_ATTACKS
 import chess
 from PSTs import PAWN_NORM, mg_pst, eg_pst, piece_values
 from itertools import chain
@@ -36,21 +36,20 @@ def see_eval(board) -> float:
     rating -= popcount(board.occupied_co[WHITE] & board.queens)  * QUEEN_VALUE
     return rating
 
-# PawnPhase = 0.0
+PawnPhase = 0.1
 KnightPhase = 1.0
 BishopPhase = 1.0
 RookPhase = 2.0
 QueenPhase = 4.0
-TotalPhase = KnightPhase*4 + BishopPhase*4 + RookPhase*4 + QueenPhase*2
-# + PawnPhase*16
+TotalPhase = KnightPhase*4 + BishopPhase*4 + RookPhase*4 + QueenPhase*2 + PawnPhase*16
 
 def game_stage(board: Board) -> float:
-    # determine game stage
+    # returns a float from 0->1, where 1 is full endgame and 0 is full midgame
 
     phase = TotalPhase
 
-    # wp = popcount(board.pawns & board.occupied_co[WHITE])
-    # bp = popcount(board.pawns & board.occupied_co[BLACK])
+    wp = popcount(board.pawns & board.occupied_co[WHITE])
+    bp = popcount(board.pawns & board.occupied_co[BLACK])
     wn = popcount(board.knights & board.occupied_co[WHITE])
     bn = popcount(board.knights & board.occupied_co[BLACK])
     wb = popcount(board.bishops & board.occupied_co[WHITE])
@@ -60,12 +59,12 @@ def game_stage(board: Board) -> float:
     wq = popcount(board.queens & board.occupied_co[WHITE])
     bq = popcount(board.queens & board.occupied_co[BLACK])
 
-    # phase -= wp * PawnPhase      # White pawns
+    phase -= wp * PawnPhase      # White pawns
     phase -= wn * KnightPhase    # White knights
     phase -= wb * BishopPhase    # White bishops
     phase -= wr * RookPhase      # White rooks
     phase -= wq * QueenPhase     # White queens
-    # phase -= bp * PawnPhase      # Black pawns
+    phase -= bp * PawnPhase      # Black pawns
     phase -= bn * KnightPhase    # Black knights
     phase -= bb * BishopPhase    # Black bishops
     phase -= br * RookPhase      # Black rooks
@@ -76,11 +75,13 @@ def game_stage(board: Board) -> float:
 def compute_merged_pst(board: Board) -> "list[list[float]]":
     phase = game_stage(board)
 
-    # if not (0 <= phase < 1):
-    #     print(f"{phase = }, ")
-    #     raise ValueError("invalid phase")
+    if not (0 <= phase <= 1):
+        print(f"{phase}, ")
+        raise ValueError("invalid phase")
 
-    out_pst = [[(mgval * phase + egval * (1 - phase)) / 2 for mgval, egval in zip(mgrow, egrow)]
+    print(f"{phase:.3f} endgame, {1-phase:.3f} midgame.")
+
+    out_pst = [[(egval * phase + mgval * (1 - phase)) / 2 for mgval, egval in zip(mgrow, egrow)]
                for mgrow, egrow in zip(mg_pst, eg_pst)]
 
     return out_pst
@@ -122,6 +123,77 @@ def pst_eval(board: Board) -> float:
         (-pst[Q][i] for i in scan_forward(board.queens & white)),
         (pst[k][i] for i in scan_forward(board.kings & black)),
         (-pst[K][i] for i in scan_forward(board.kings & white))))
+
+ISOLATION_MASKS = [
+    chess.BB_FILE_A | chess.BB_FILE_B,
+    chess.BB_FILE_A | chess.BB_FILE_B | chess.BB_FILE_C,
+    chess.BB_FILE_B | chess.BB_FILE_C | chess.BB_FILE_D,
+    chess.BB_FILE_C | chess.BB_FILE_D | chess.BB_FILE_E,
+    chess.BB_FILE_D | chess.BB_FILE_E | chess.BB_FILE_F,
+    chess.BB_FILE_E | chess.BB_FILE_F | chess.BB_FILE_G,
+    chess.BB_FILE_F | chess.BB_FILE_G | chess.BB_FILE_H,
+    chess.BB_FILE_G | chess.BB_FILE_H,
+]
+
+def isolated_pawns(board: Board) -> float:
+    white_pawns = board.occupied_co[WHITE] & board.pawns
+    black_pawns = board.occupied_co[BLACK] & board.pawns
+    isolated_white = 0
+    for file_window_mask in ISOLATION_MASKS:
+        if popcount(white_pawns & file_window_mask) == 1:
+            isolated_white += 1
+        if popcount(black_pawns & file_window_mask) == 1:
+            isolated_white -= 1
+    return -isolated_white
+
+
+def blocked_pawns(board: Board) -> float:
+    white_pawns = board.occupied_co[WHITE] & board.pawns
+    black_pawns = board.occupied_co[BLACK] & board.pawns
+    blocked_white = 0
+    for pawn_sq in scan_forward(white_pawns):
+        square_in_front = pawn_sq + 8
+        if (1 << square_in_front) & board.occupied_co[BLACK]:
+            blocked_white += 1
+    for pawn_sq in scan_forward(black_pawns):
+        square_in_front = pawn_sq - 8
+        if (1 << square_in_front) & board.occupied_co[WHITE]:
+            blocked_white -= 1
+    return -blocked_white
+
+def doubled_pawns(board: Board) -> float:
+    white_pawns = board.occupied_co[WHITE] & board.pawns
+    black_pawns = board.occupied_co[BLACK] & board.pawns
+    doubled_white = 0
+    for file_mask in chess.BB_FILES:
+        if popcount(white_pawns & file_mask) >= 2:
+            doubled_white += 1
+        if popcount(black_pawns & file_mask) >= 2:
+            doubled_white -= 1
+    return -doubled_white
+
+def passed_pawns(board: Board) -> float:
+    white_pawns = board.occupied_co[WHITE] & board.pawns
+    black_pawns = board.occupied_co[BLACK] & board.pawns
+    passed_white = 0
+    for file_mask, file_window_mask in zip(chess.BB_FILES, ISOLATION_MASKS):
+        if white_pawns & file_mask:
+            if not (black_pawns & file_window_mask):
+                passed_white += 1
+        if black_pawns & file_mask:
+            if not (white_pawns & file_window_mask):
+                passed_white -= 1
+    return -passed_white
+
+def pawn_structure_eval(board: Board) -> float:
+    half_pawn = PAWN_VALUE / 2
+    isolated = isolated_pawns(board)
+    blocked = blocked_pawns(board)
+    doubled = doubled_pawns(board)
+    passed = passed_pawns(board)
+    # print(f"{isolated=}, {blocked=}, {doubled=}, {passed=}")
+    # print(f"{half_pawn=}")
+    return half_pawn * (-isolated - blocked - doubled + passed)
 
 def piece_attack_counts(board: Board):
     white_pawn_attacks = sum(popcount(BB_PAWN_ATTACKS[WHITE][sq] & board.occupied_co[BLACK]) for sq in scan_forward(

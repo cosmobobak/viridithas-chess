@@ -86,6 +86,7 @@ if __name__ == "__main__":
 
     # fen = "r1bqkb1r/pp2pp1p/2np1np1/2p5/P1B1P3/3P1N2/1PP2PPP/RNBQ1RK1 b"
 
-    engine.play_viri(fen)
+    engine.play_viri(
+        fen)
 
 # add a separate qsearch hashtable
