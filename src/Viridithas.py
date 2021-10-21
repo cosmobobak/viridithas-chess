@@ -16,7 +16,7 @@ from chess import BB_ALL, WHITE, BLACK, Move, Board, scan_forward
 from chess.variant import CrazyhouseBoard
 from cachetools import LRUCache 
 import evaluation
-from evaluation import ATTACK_FACTOR, BISHOP_VALUE, FUTILITY_MARGIN, FUTILITY_MARGIN_2, FUTILITY_MARGIN_3, KING_SAFETY_FACTOR, MATE_VALUE, MOBILITY_FACTOR, QUEEN_VALUE, ROOK_VALUE, SPACE_FACTOR, pawn_structure_eval, pst_eval, see_eval, PAWN_VALUE, king_safety, mobility, piece_attack_counts, space
+from evaluation import ATTACK_FACTOR, BISHOP_VALUE, FUTILITY_MARGIN, FUTILITY_MARGIN_2, FUTILITY_MARGIN_3, INF, KING_SAFETY_FACTOR, MATE_VALUE, MOBILITY_FACTOR, QUEEN_VALUE, ROOK_VALUE, SPACE_FACTOR, pawn_structure_eval, pst_eval, see_eval, PAWN_VALUE, king_safety, mobility, piece_attack_counts, space
 from data_input import get_engine_parameters
 from LMR import search_reduction_factor
 from copy import deepcopy
@@ -111,16 +111,11 @@ class Viridithas():
 
         rating += pst_eval(self.node)
         rating += pawn_structure_eval(self.node)
-        # rating += see_eval(self.node)
-
-        # rating += mobility(self.node) * MOBILITY_FACTOR
+        # rating += mobility(self.node)
         
         # rating += piece_attack_counts(self.node) * ATTACK_FACTOR
-
         # rating += king_safety(self.node) * KING_SAFETY_FACTOR
-
         # rating += space(self.node) * SPACE_FACTOR
-
         # rating += neural_eval(self.node) / 10
 
         return rating
@@ -207,7 +202,7 @@ class Viridithas():
         
         alpha = max(val, alpha)
 
-        for move in self.checks_and_captures():
+        for move in self.captures():
             self.node.push(move)
             gameover, checkmate, draw = self.gameover_check_info()
             score = -self.qsearch(-beta, -alpha, depth - 1, -colour, gameover, checkmate, draw)
@@ -275,7 +270,7 @@ class Viridithas():
 
         best_move = Move.null()
         search_pv = True
-        value = float("-inf")
+        value = -INF
         for move_idx, move in enumerate(moves):
             if move_idx == 0:
                 best_move = move
@@ -373,11 +368,11 @@ class Viridithas():
         return (self.node.san(moves[0]), self.turnmod()*values[0], self.nodes, depth+1, t)
 
     def windows(self):
-        exps = [PAWN_VALUE / 16, PAWN_VALUE / 4, PAWN_VALUE, BISHOP_VALUE, ROOK_VALUE, QUEEN_VALUE, float("inf")]
+        exps = [PAWN_VALUE / 16, PAWN_VALUE / 4, PAWN_VALUE, BISHOP_VALUE, ROOK_VALUE, QUEEN_VALUE]
         return (window for window in exps)
 
     def search(self, ponder: bool = False, readout: bool = True):
-        val = float("-inf")
+        val = -INF
         start_time = time.time()
         self.nodes = 0
         moves = [next(self.ordered_moves())]
@@ -390,7 +385,7 @@ class Viridithas():
         evaluation.set_pst(self.node)
         evaluation.set_piece_values(self.node)
 
-        alpha, beta = float("-inf"), float("inf")
+        alpha, beta = -INF, INF
         winds = self.windows()
         curw = next(winds)
 
@@ -415,10 +410,13 @@ class Viridithas():
                 if WINDOW_FAILED:
                     print(
                         f"Window {curw/1000:.2f} failed: a: {-self.turnmod()*(1/1000)*alpha:.1f} b: {-self.turnmod()*(1/1000)*beta:.1f} value: {-self.turnmod()*(1/1000)*val:.1f}")
-                    curw = next(winds)
-                    # We fell outside the window, so try again with a
-                    # full-width window (and the same depth).
-                    # Set up the window for the next iteration.
+                    try:
+                        curw = next(winds)
+                        # We fell outside the window, so try again with a
+                        # full-width window (and the same depth).
+                        # Set up the window for the next iteration.
+                    except StopIteration:
+                        curw = float("inf")
                     alpha = alpha - curw
                     beta = beta + curw
                     continue
