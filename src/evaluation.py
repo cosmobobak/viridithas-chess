@@ -4,6 +4,8 @@ import chess
 from PSTs import PAWN_NORM, mg_pst, eg_pst, piece_values
 from itertools import chain
 
+from legal_move_counting import count_legal_moves
+
 p, n, b, r, q, k, P, N, B, R, Q, K = range(12)
 
 MIDGAME = 0
@@ -15,10 +17,11 @@ BISHOP_VALUE: float = piece_values[MIDGAME][2] * PAWN_NORM
 ROOK_VALUE: float = piece_values[MIDGAME][3] * PAWN_NORM
 QUEEN_VALUE: float = piece_values[MIDGAME][4] * PAWN_NORM
 MATE_VALUE: int = 1000000000
+INF: int = MATE_VALUE * 100
 FUTILITY_MARGIN: int = BISHOP_VALUE + 100
 FUTILITY_MARGIN_2: int = ROOK_VALUE + 100
 FUTILITY_MARGIN_3: int = FUTILITY_MARGIN + FUTILITY_MARGIN_2
-MOBILITY_FACTOR: int = 10
+MOBILITY_FACTOR: int = 1
 ATTACK_FACTOR: int = 10
 KING_SAFETY_FACTOR: int = 10
 SPACE_FACTOR: int = 10
@@ -221,18 +224,19 @@ def piece_attack_counts(board: Board):
     return black - white
 
 def mobility(board: Board):
+    one_tenth_pawn = PAWN_VALUE / 10
     mobility = 0
     if board.turn == WHITE:
-        mobility -= sum(1 for m in board.generate_pseudo_legal_moves() if not board.is_into_check(m))
+        mobility -= count_legal_moves(board)
         board.push(Move.null())
-        mobility += sum(1 for m in board.generate_pseudo_legal_moves() if not board.is_into_check(m))
+        mobility += count_legal_moves(board)
         board.pop()
     else:
-        mobility += sum(1 for m in board.generate_pseudo_legal_moves() if not board.is_into_check(m))
+        mobility += count_legal_moves(board)
         board.push(Move.null())
-        mobility -= sum(1 for m in board.generate_pseudo_legal_moves() if not board.is_into_check(m))
+        mobility -= count_legal_moves(board)
         board.pop()
-    return mobility
+    return one_tenth_pawn * mobility
 
 def king_safety(board: Board) -> float:
     wpieces = board.occupied_co[WHITE]
