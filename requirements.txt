@@ -1,7 +1,7 @@
 autopep8==1.5.7
 cachetools==4.2.2
 chess==1.6.1
-numpy==1.19.5
+numpy==1.22.0
 pycodestyle==2.7.0
 toml==0.10.2
 tensorflow==2.5.1
